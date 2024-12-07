@@ -20,12 +20,12 @@ export const TaskTimer = ({ startDate, isPaused }: TaskTimerProps) => {
           end: new Date()
         });
         
-        const formattedDuration = formatDuration(duration, {
-          format: ['hours', 'minutes', 'seconds'],
-          zero: true,
-          delimiter: ':',
-          padding: true
-        });
+        // Manually pad numbers and create the time string
+        const hours = String(duration.hours || 0).padStart(2, '0');
+        const minutes = String(duration.minutes || 0).padStart(2, '0');
+        const seconds = String(duration.seconds || 0).padStart(2, '0');
+        
+        const formattedDuration = `${hours}:${minutes}:${seconds}`;
         
         setTimeElapsed(formattedDuration);
       }
