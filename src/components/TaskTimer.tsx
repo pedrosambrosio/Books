@@ -9,8 +9,8 @@ interface TaskTimerProps {
 export const TaskTimer = ({ startDate, isPaused }: TaskTimerProps) => {
   const [timeElapsed, setTimeElapsed] = useState("");
   const [pausedTime, setPausedTime] = useState<string | null>(null);
-  const [accumulatedTime, setAccumulatedTime] = useState(0);
-  const [lastPauseTime, setLastPauseTime] = useState<Date | null>(null);
+  const [activeTime, setActiveTime] = useState(0);
+  const [lastTickTime, setLastTickTime] = useState<Date | null>(null);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -18,11 +18,14 @@ export const TaskTimer = ({ startDate, isPaused }: TaskTimerProps) => {
     const updateTimer = () => {
       if (!isPaused) {
         const now = new Date();
-        const baseTime = lastPauseTime ? accumulatedTime + (now.getTime() - startDate.getTime()) : now.getTime() - startDate.getTime();
+        if (lastTickTime) {
+          setActiveTime(prev => prev + (now.getTime() - lastTickTime.getTime()));
+        }
+        setLastTickTime(now);
         
         const duration = intervalToDuration({
           start: 0,
-          end: baseTime
+          end: activeTime
         });
         
         // Manually pad numbers and create the time string
@@ -36,19 +39,18 @@ export const TaskTimer = ({ startDate, isPaused }: TaskTimerProps) => {
     };
 
     if (!isPaused) {
-      if (lastPauseTime) {
-        setAccumulatedTime(prev => prev + (new Date().getTime() - lastPauseTime.getTime()));
-        setLastPauseTime(null);
+      if (!lastTickTime) {
+        setLastTickTime(new Date());
       }
       updateTimer();
       interval = setInterval(updateTimer, 1000);
     } else {
       setPausedTime(timeElapsed);
-      setLastPauseTime(new Date());
+      setLastTickTime(null);
     }
 
     return () => clearInterval(interval);
-  }, [startDate, isPaused, lastPauseTime, accumulatedTime]);
+  }, [isPaused, activeTime, lastTickTime]);
 
   return (
     <div className="text-sm text-muted-foreground font-medium">
