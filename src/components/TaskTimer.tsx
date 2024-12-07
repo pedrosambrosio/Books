@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { formatDuration, intervalToDuration } from "date-fns";
+import { intervalToDuration } from "date-fns";
 
 interface TaskTimerProps {
   startDate: Date;
@@ -9,15 +9,20 @@ interface TaskTimerProps {
 export const TaskTimer = ({ startDate, isPaused }: TaskTimerProps) => {
   const [timeElapsed, setTimeElapsed] = useState("");
   const [pausedTime, setPausedTime] = useState<string | null>(null);
+  const [accumulatedTime, setAccumulatedTime] = useState(0);
+  const [lastPauseTime, setLastPauseTime] = useState<Date | null>(null);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
     const updateTimer = () => {
       if (!isPaused) {
+        const now = new Date();
+        const baseTime = lastPauseTime ? accumulatedTime + (now.getTime() - startDate.getTime()) : now.getTime() - startDate.getTime();
+        
         const duration = intervalToDuration({
-          start: startDate,
-          end: new Date()
+          start: 0,
+          end: baseTime
         });
         
         // Manually pad numbers and create the time string
@@ -26,20 +31,24 @@ export const TaskTimer = ({ startDate, isPaused }: TaskTimerProps) => {
         const seconds = String(duration.seconds || 0).padStart(2, '0');
         
         const formattedDuration = `${hours}:${minutes}:${seconds}`;
-        
         setTimeElapsed(formattedDuration);
       }
     };
 
     if (!isPaused) {
+      if (lastPauseTime) {
+        setAccumulatedTime(prev => prev + (new Date().getTime() - lastPauseTime.getTime()));
+        setLastPauseTime(null);
+      }
       updateTimer();
       interval = setInterval(updateTimer, 1000);
     } else {
       setPausedTime(timeElapsed);
+      setLastPauseTime(new Date());
     }
 
     return () => clearInterval(interval);
-  }, [startDate, isPaused]);
+  }, [startDate, isPaused, lastPauseTime, accumulatedTime]);
 
   return (
     <div className="text-sm text-muted-foreground font-medium">
