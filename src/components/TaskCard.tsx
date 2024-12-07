@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { TaskTimer } from "./TaskTimer";
 import { format } from "date-fns";
-import { CalendarIcon, CheckCircle, Circle, Timer } from "lucide-react";
+import { CalendarIcon, CheckCircle, Circle, Timer, Pause, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface Task {
@@ -15,6 +15,7 @@ export interface Task {
   endDate?: Date;
   completed: boolean;
   inProgress: boolean;
+  isPaused?: boolean;
 }
 
 interface TaskCardProps {
@@ -39,7 +40,13 @@ export const TaskCard = ({ task, onUpdate, onComplete }: TaskCardProps) => {
 
   const toggleProgress = () => {
     if (!task.startDate) return;
-    onUpdate({ ...task, inProgress: !task.inProgress });
+    if (task.inProgress && !task.isPaused) {
+      // Pause the timer
+      onUpdate({ ...task, isPaused: true });
+    } else {
+      // Start or resume the timer
+      onUpdate({ ...task, inProgress: true, isPaused: false });
+    }
   };
 
   return (
@@ -125,12 +132,28 @@ export const TaskCard = ({ task, onUpdate, onComplete }: TaskCardProps) => {
                 size="sm"
                 className={cn(
                   "h-8",
-                  task.inProgress && "bg-primary text-primary-foreground hover:bg-primary/90"
+                  task.inProgress && !task.isPaused && "bg-primary text-primary-foreground hover:bg-primary/90"
                 )}
                 onClick={toggleProgress}
               >
-                <Timer className="h-4 w-4 mr-2" />
-                {task.inProgress ? "Stop" : "Start"}
+                {task.inProgress ? (
+                  task.isPaused ? (
+                    <>
+                      <Play className="h-4 w-4 mr-2" />
+                      Resume
+                    </>
+                  ) : (
+                    <>
+                      <Pause className="h-4 w-4 mr-2" />
+                      Pause
+                    </>
+                  )
+                ) : (
+                  <>
+                    <Timer className="h-4 w-4 mr-2" />
+                    Start
+                  </>
+                )}
               </Button>
             )}
           </div>

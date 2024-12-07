@@ -7,12 +7,13 @@ const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const { toast } = useToast();
 
-  const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress">) => {
+  const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress" | "isPaused">) => {
     const task: Task = {
       ...newTask,
       id: crypto.randomUUID(),
       completed: false,
       inProgress: false,
+      isPaused: false,
     };
 
     setTasks((prev) => [task, ...prev]);
@@ -32,7 +33,7 @@ const Index = () => {
     setTasks((prev) =>
       prev.map((task) =>
         task.id === taskId
-          ? { ...task, completed: !task.completed, inProgress: false }
+          ? { ...task, completed: !task.completed, inProgress: false, isPaused: false }
           : task
       )
     );
