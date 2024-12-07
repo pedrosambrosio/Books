@@ -45,7 +45,7 @@ export const TaskCard = ({ task, onUpdate, onComplete }: TaskCardProps) => {
       onUpdate({ ...task, isPaused: true });
     } else {
       // Start or resume the timer
-      onUpdate({ ...task, inProgress: true, isPaused: false });
+      onUpdate({ ...task, inProgress: true, isPaused: false, startDate: task.inProgress ? task.startDate : new Date() });
     }
   };
 
@@ -159,7 +159,7 @@ export const TaskCard = ({ task, onUpdate, onComplete }: TaskCardProps) => {
           </div>
           {task.inProgress && task.startDate && (
             <div className="ml-7 mt-2">
-              <TaskTimer startDate={task.startDate} />
+              <TaskTimer startDate={task.startDate} isPaused={task.isPaused || false} />
             </div>
           )}
         </div>

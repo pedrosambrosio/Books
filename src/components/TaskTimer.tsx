@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { formatDistanceStrict } from "date-fns";
+import { formatDuration, intervalToDuration } from "date-fns";
 
 interface TaskTimerProps {
   startDate: Date;
+  isPaused: boolean;
 }
 
-export const TaskTimer = ({ startDate }: TaskTimerProps) => {
+export const TaskTimer = ({ startDate, isPaused }: TaskTimerProps) => {
   const [timeElapsed, setTimeElapsed] = useState("");
-  const [isPaused, setIsPaused] = useState(false);
   const [pausedTime, setPausedTime] = useState<string | null>(null);
 
   useEffect(() => {
@@ -15,7 +15,19 @@ export const TaskTimer = ({ startDate }: TaskTimerProps) => {
 
     const updateTimer = () => {
       if (!isPaused) {
-        setTimeElapsed(formatDistanceStrict(startDate, new Date()));
+        const duration = intervalToDuration({
+          start: startDate,
+          end: new Date()
+        });
+        
+        const formattedDuration = formatDuration(duration, {
+          format: ['hours', 'minutes', 'seconds'],
+          zero: true,
+          delimiter: ':',
+          padding: true
+        });
+        
+        setTimeElapsed(formattedDuration);
       }
     };
 
