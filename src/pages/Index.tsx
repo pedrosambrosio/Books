@@ -1,12 +1,28 @@
 import { useState } from "react";
 import { CreateTask } from "@/components/CreateTask";
+import { CreateGroupTask } from "@/components/CreateGroupTask";
 import { TaskCard, Task } from "@/components/TaskCard";
 import { useToast } from "@/components/ui/use-toast";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { GroupTask, GroupMember } from "@/types/GroupTask";
+
+// Mock data for demonstration
+const mockGroup = {
+  id: "group-1",
+  name: "Study Group A",
+  description: "Physics study group",
+  members: [
+    { id: "1", name: "John Doe" },
+    { id: "2", name: "Jane Smith" },
+  ],
+  inviteCode: "ABC123"
+};
 
 const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [groupTasks, setGroupTasks] = useState<GroupTask[]>([]);
   const { toast } = useToast();
 
   const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress" | "isPaused">) => {
@@ -25,14 +41,44 @@ const Index = () => {
     });
   };
 
+  const handleCreateGroupTask = (newTask: Omit<Task, "id" | "completed" | "inProgress"> & { assignedTo?: string[] }) => {
+    const task: GroupTask = {
+      ...newTask,
+      id: crypto.randomUUID(),
+      completed: false,
+      inProgress: false,
+      isPaused: false,
+      groupId: mockGroup.id,
+    };
+
+    setGroupTasks((prev) => [task, ...prev]);
+    toast({
+      title: "Group task created",
+      description: "Your new group task has been created successfully.",
+    });
+  };
+
   const handleUpdateTask = (updatedTask: Task) => {
-    setTasks((prev) =>
-      prev.map((task) => (task.id === updatedTask.id ? updatedTask : task))
-    );
+    if ((updatedTask as GroupTask).groupId) {
+      setGroupTasks((prev) =>
+        prev.map((task) => (task.id === updatedTask.id ? updatedTask as GroupTask : task))
+      );
+    } else {
+      setTasks((prev) =>
+        prev.map((task) => (task.id === updatedTask.id ? updatedTask : task))
+      );
+    }
   };
 
   const handleCompleteTask = (taskId: string) => {
     setTasks((prev) =>
+      prev.map((task) =>
+        task.id === taskId
+          ? { ...task, completed: !task.completed, inProgress: false, isPaused: false }
+          : task
+      )
+    );
+    setGroupTasks((prev) =>
       prev.map((task) =>
         task.id === taskId
           ? { ...task, completed: !task.completed, inProgress: false, isPaused: false }
@@ -54,21 +100,50 @@ const Index = () => {
               </p>
             </div>
 
-            <div className="space-y-4">
-              <CreateTask onCreateTask={handleCreateTask} />
-              
-              <div className="space-y-2">
-                {tasks.map((task) => (
-                  <div key={task.id} className="animate-fade-in">
-                    <TaskCard
-                      task={task}
-                      onUpdate={handleUpdateTask}
-                      onComplete={handleCompleteTask}
-                    />
+            <Tabs defaultValue="personal" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="personal">Personal Tasks</TabsTrigger>
+                <TabsTrigger value="group">Group Tasks</TabsTrigger>
+              </TabsList>
+              <TabsContent value="personal">
+                <div className="space-y-4">
+                  <CreateTask onCreateTask={handleCreateTask} />
+                  
+                  <div className="space-y-2">
+                    {tasks.map((task) => (
+                      <div key={task.id} className="animate-fade-in">
+                        <TaskCard
+                          task={task}
+                          onUpdate={handleUpdateTask}
+                          onComplete={handleCompleteTask}
+                        />
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
+              </TabsContent>
+              <TabsContent value="group">
+                <div className="space-y-4">
+                  <CreateGroupTask
+                    groupId={mockGroup.id}
+                    members={mockGroup.members}
+                    onCreateTask={handleCreateGroupTask}
+                  />
+                  
+                  <div className="space-y-2">
+                    {groupTasks.map((task) => (
+                      <div key={task.id} className="animate-fade-in">
+                        <TaskCard
+                          task={task}
+                          onUpdate={handleUpdateTask}
+                          onComplete={handleCompleteTask}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </div>
