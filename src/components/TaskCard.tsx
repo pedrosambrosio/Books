@@ -16,6 +16,7 @@ export interface Task {
   completed: boolean;
   inProgress: boolean;
   isPaused?: boolean;
+  priority?: "urgent" | "moderate" | "low";
 }
 
 interface TaskCardProps {
