@@ -42,26 +42,27 @@ const Index = () => {
   };
 
   const handleCreateGroupTask = (newTask: Omit<Task, "id" | "completed" | "inProgress"> & { assignedTo?: string[] }) => {
-    const task: GroupTask = {
+    const groupTask: GroupTask = {
       ...newTask,
       id: crypto.randomUUID(),
       completed: false,
       inProgress: false,
       isPaused: false,
       groupId: mockGroup.id,
+      category: 'group'
     };
 
-    setGroupTasks((prev) => [task, ...prev]);
+    setGroupTasks((prev) => [groupTask, ...prev]);
     toast({
       title: "Group task created",
       description: "Your new group task has been created successfully.",
     });
   };
 
-  const handleUpdateTask = (updatedTask: Task) => {
-    if ((updatedTask as GroupTask).groupId) {
+  const handleUpdateTask = (updatedTask: Task | GroupTask) => {
+    if ('groupId' in updatedTask) {
       setGroupTasks((prev) =>
-        prev.map((task) => (task.id === updatedTask.id ? updatedTask as GroupTask : task))
+        prev.map((task) => (task.id === updatedTask.id ? updatedTask : task))
       );
     } else {
       setTasks((prev) =>

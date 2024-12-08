@@ -1,3 +1,5 @@
+import { Task } from "@/components/TaskCard";
+
 export interface GroupMember {
   id: string;
   name: string;
