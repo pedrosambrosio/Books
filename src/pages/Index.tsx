@@ -108,7 +108,7 @@ const Index = () => {
           </ScrollArea>
         </ResizablePanel>
         
-        <ResizableHandle className="w-1.5 bg-border h-full" />
+        <ResizableHandle withHandle />
         
         <ResizablePanel defaultSize={50} minSize={30} className="h-full">
           <ScrollArea className="h-full">
