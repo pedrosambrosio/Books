@@ -2,23 +2,11 @@ import { useState } from "react";
 import { CreateTask } from "@/components/CreateTask";
 import { TaskCard, Task } from "@/components/TaskCard";
 import { useToast } from "@/components/ui/use-toast";
-import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GroupTask } from "@/types/GroupTask";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
-
-// Mock data for demonstration
-const mockGroup = {
-  id: "group-1",
-  name: "Study Group A",
-  description: "Physics study group",
-  members: [
-    { id: "1", name: "John Doe" },
-    { id: "2", name: "Jane Smith" },
-  ],
-  inviteCode: "ABC123"
-};
+import { useSidebar } from "@/components/ui/sidebar";
 
 const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -49,7 +37,7 @@ const Index = () => {
       completed: false,
       inProgress: false,
       isPaused: false,
-      groupId: mockGroup.id,
+      groupId: "mockGroup.id",
       category: 'group'
     };
 
@@ -97,7 +85,7 @@ const Index = () => {
         className={`flex-1 transition-all duration-300 ${state === 'collapsed' ? 'ml-16' : 'ml-64'}`}
       >
         <ResizablePanel defaultSize={50} minSize={30}>
-          <div className="h-full p-8">
+          <div className="h-full p-4">
             <div className="max-w-2xl mx-auto">
               <div className="text-center mb-8 animate-fade-in">
                 <h1 className="text-4xl font-bold mb-2">Leituras Bíblicas</h1>
@@ -141,7 +129,7 @@ const Index = () => {
         <ResizableHandle withHandle />
         
         <ResizablePanel defaultSize={50} minSize={30}>
-          <div className="h-full p-8">
+          <div className="h-full p-4">
             <div className="glass-card h-full rounded-lg p-6">
               <h2 className="text-2xl font-semibold mb-4">Bíblia</h2>
               <p className="text-muted-foreground text-center mt-8">
