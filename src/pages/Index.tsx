@@ -83,7 +83,7 @@ const Index = () => {
           <ResizablePanel 
             defaultSize={50} 
             minSize={30}
-            className="overflow-auto bg-gradient-to-b from-background to-muted/20"
+            className="overflow-y-auto bg-gradient-to-b from-background to-muted/20"
           >
             <div className="px-8 py-8">
               <div className="max-w-4xl mx-auto space-y-8">
@@ -96,21 +96,21 @@ const Index = () => {
 
                 <div className="glass-card rounded-lg border border-border/40 shadow-sm">
                   <Tabs defaultValue="personal" className="w-full">
-                    <TabsList className="w-full grid grid-cols-2 p-1 gap-1">
+                    <TabsList className="w-full grid grid-cols-2 p-1 gap-1 bg-white">
                       <TabsTrigger 
                         value="personal"
-                        className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                        className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-black"
                       >
                         Minhas Leituras
                       </TabsTrigger>
                       <TabsTrigger 
                         value="chat"
-                        className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                        className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-black"
                       >
                         Chat
                       </TabsTrigger>
                     </TabsList>
-                    <div className="p-6">
+                    <div className="p-6 max-h-[calc(100vh-300px)] overflow-y-auto">
                       <TabsContent value="personal" className="mt-0 space-y-6">
                         <CreateTask onCreateTask={handleCreateTask} />
                         <div className="space-y-4">
