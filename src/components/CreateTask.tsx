@@ -49,8 +49,8 @@ export const CreateTask = ({ onCreateTask }: CreateTaskProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="glass-card rounded-lg p-4 mb-6">
-      <div className="flex items-center gap-2 mb-2">
+    <form onSubmit={handleSubmit} className="glass-card rounded-lg p-6">
+      <div className="flex items-center gap-3 mb-4">
         <Book className="h-5 w-5 text-primary" />
         <Input
           placeholder="Adicionar novo estudo ou anotação..."
@@ -64,7 +64,7 @@ export const CreateTask = ({ onCreateTask }: CreateTaskProps) => {
       </div>
       {isExpanded && (
         <>
-          <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-2 gap-4 mb-6">
             <Input
               placeholder="Versículo inicial"
               value={verseStart}
@@ -81,12 +81,12 @@ export const CreateTask = ({ onCreateTask }: CreateTaskProps) => {
             />
           </div>
 
-          <div className="mb-4">
+          <div className="mb-6">
             <RichTextEditor value={description} onChange={setDescription} />
           </div>
 
-          <div className="space-y-2 mb-4">
-            <div className="flex items-center gap-2">
+          <div className="space-y-4 mb-6">
+            <div className="flex items-center gap-3">
               <Input
                 placeholder="Adicionar tag..."
                 value={newTag}
@@ -113,7 +113,7 @@ export const CreateTask = ({ onCreateTask }: CreateTaskProps) => {
                   <Badge
                     key={tag}
                     variant="secondary"
-                    className="flex items-center gap-1"
+                    className="flex items-center gap-2 px-3 py-1"
                   >
                     <Tag className="h-3 w-3" />
                     {tag}
@@ -130,7 +130,7 @@ export const CreateTask = ({ onCreateTask }: CreateTaskProps) => {
             )}
           </div>
 
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-3">
             <Button
               type="button"
               variant="ghost"

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import { Book, Tag } from "lucide-react";
 
 export interface Subtask {
@@ -43,16 +42,15 @@ export const TaskCard = ({ task, onUpdate, onComplete }: TaskCardProps) => {
     onUpdate({ ...task, tags: newTags });
   };
 
-  // Get first two lines of description
   const previewDescription = task.description?.split('\n').slice(0, 2).join('\n');
 
   return (
     <>
       <div 
-        className="glass-card rounded-lg p-4 mb-4 hover-scale cursor-pointer"
+        className="glass-card rounded-lg p-6 hover-scale cursor-pointer"
         onClick={() => setIsDetailsOpen(true)}
       >
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-4">
           <h3 className="font-medium text-lg">{task.title}</h3>
           
           {task.verses && (
@@ -70,12 +68,12 @@ export const TaskCard = ({ task, onUpdate, onComplete }: TaskCardProps) => {
           )}
 
           {task.tags && task.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
+            <div className="flex flex-wrap gap-2">
               {task.tags.map((tag) => (
                 <Badge
                   key={tag}
                   variant="secondary"
-                  className="flex items-center gap-1"
+                  className="flex items-center gap-1 px-3 py-1"
                 >
                   <Tag className="h-3 w-3" />
                   {tag}
@@ -89,9 +87,9 @@ export const TaskCard = ({ task, onUpdate, onComplete }: TaskCardProps) => {
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
         <DialogContent className="sm:max-w-[725px]">
           <DialogHeader>
-            <DialogTitle>{task.title}</DialogTitle>
+            <DialogTitle className="text-xl">{task.title}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-4">
+          <div className="space-y-6 py-6">
             {task.verses && (
               <div className="flex items-center gap-2 text-sm">
                 <Book className="h-4 w-4" />
@@ -107,14 +105,14 @@ export const TaskCard = ({ task, onUpdate, onComplete }: TaskCardProps) => {
             )}
             
             {task.tags && task.tags.length > 0 && (
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <h4 className="font-medium">Tags</h4>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-3">
                   {task.tags.map((tag) => (
                     <Badge
                       key={tag}
                       variant="secondary"
-                      className="cursor-pointer"
+                      className="cursor-pointer px-3 py-1"
                       onClick={() => toggleTag(tag)}
                     >
                       {tag}

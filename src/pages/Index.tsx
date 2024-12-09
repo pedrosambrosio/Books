@@ -60,35 +60,35 @@ const Index = () => {
             className="min-h-[300px]"
           >
             <ScrollArea className="h-full">
-              <div className="p-4 pl-12 md:p-8 md:pl-16">
-                <div className="max-w-2xl mx-auto">
-                  <div className="text-center mb-8 animate-fade-in">
-                    <h1 className="text-3xl md:text-4xl font-bold mb-2">Leituras Bíblicas</h1>
-                    <p className="text-muted-foreground">
+              <div className="p-6 pl-12 md:p-8 md:pl-16">
+                <div className="max-w-2xl mx-auto space-y-8">
+                  <div className="text-center animate-fade-in">
+                    <h1 className="text-3xl md:text-4xl font-bold mb-4">Leituras Bíblicas</h1>
+                    <p className="text-muted-foreground mb-8">
                       Organize suas leituras com datas e temporizadores
                     </p>
                   </div>
 
                   <Tabs defaultValue="personal" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 h-auto">
+                    <TabsList className="grid w-full grid-cols-2 h-auto mb-6">
                       <TabsTrigger 
                         value="personal"
-                        className="data-[state=active]:bg-white data-[state=active]:text-black px-4 py-2"
+                        className="data-[state=active]:bg-white data-[state=active]:text-black px-6 py-3"
                       >
                         Minhas Leituras
                       </TabsTrigger>
                       <TabsTrigger 
                         value="chat"
-                        className="data-[state=active]:bg-white data-[state=active]:text-black px-4 py-2"
+                        className="data-[state=active]:bg-white data-[state=active]:text-black px-6 py-3"
                       >
                         Chat
                       </TabsTrigger>
                     </TabsList>
                     <TabsContent value="personal">
-                      <div className="space-y-4">
+                      <div className="space-y-6">
                         <CreateTask onCreateTask={handleCreateTask} />
                         
-                        <div className="space-y-2">
+                        <div className="space-y-4">
                           {tasks.map((task) => (
                             <div key={task.id} className="animate-fade-in">
                               <TaskCard
@@ -102,7 +102,7 @@ const Index = () => {
                       </div>
                     </TabsContent>
                     <TabsContent value="chat">
-                      <div className="p-4 text-center text-muted-foreground">
+                      <div className="p-6 text-center text-muted-foreground">
                         Chat em breve...
                       </div>
                     </TabsContent>
@@ -116,10 +116,10 @@ const Index = () => {
           
           <ResizablePanel defaultSize={50} minSize={30} className="min-h-[300px]">
             <ScrollArea className="h-full">
-              <div className="p-4 md:p-8">
-                <div className="glass-card h-full rounded-lg p-6">
-                  <h2 className="text-2xl font-semibold mb-4">Bíblia</h2>
-                  <p className="text-muted-foreground text-center mt-8">
+              <div className="p-6">
+                <div className="glass-card h-full rounded-lg p-8">
+                  <h2 className="text-2xl font-semibold mb-6">Bíblia</h2>
+                  <p className="text-muted-foreground text-center">
                     Conteúdo bíblico em breve...
                   </p>
                 </div>
