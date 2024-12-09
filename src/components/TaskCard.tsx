@@ -24,6 +24,8 @@ export interface Task {
   priority?: "urgent" | "moderate" | "low";
   category?: string;
   subtasks?: Subtask[];
+  notes?: string;
+  suggestedTime?: number;
 }
 
 interface TaskCardProps {
