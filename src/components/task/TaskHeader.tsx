@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ListTodo, CheckCircle, Circle } from "lucide-react";
+import { ListTodo, CheckCircle, Circle, Book } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Task } from "../TaskCard";
 
@@ -28,7 +28,8 @@ export const TaskHeader = ({ task, onComplete, onOpenDetails }: TaskHeaderProps)
       )}>
         {task.title}
         {task.category && (
-          <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+          <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full flex items-center gap-1">
+            <Book className="h-3 w-3" />
             {task.category}
           </span>
         )}
