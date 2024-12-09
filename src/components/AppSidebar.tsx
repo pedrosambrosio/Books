@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Folder, FolderPlus, Search, Book } from "lucide-react";
+import { Book, ChevronLeft } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -30,7 +30,6 @@ const BIBLE_BOOKS = [
   "João",
   "Atos",
   "Romanos",
-  // Adicione mais livros conforme necessário
 ];
 
 export function AppSidebar() {
@@ -38,6 +37,7 @@ export function AppSidebar() {
     { id: "default", name: "Todas as Leituras", tasks: [] },
   ]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const { toast } = useToast();
 
   const handleCreateFolder = () => {
@@ -62,42 +62,69 @@ export function AppSidebar() {
   );
 
   return (
-    <Sidebar variant="floating">
+    <Sidebar variant="floating" className={isCollapsed ? "w-16" : ""}>
       <SidebarHeader>
         <div className="flex items-center gap-2 p-2">
-          <SidebarInput
-            type="text"
-            placeholder="Buscar livros..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1"
-          />
+          {!isCollapsed && (
+            <>
+              <SidebarInput
+                type="text"
+                placeholder="Buscar livros..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1"
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleCreateFolder}
+                className="shrink-0"
+              >
+                <Book className="h-4 w-4" />
+              </Button>
+            </>
+          )}
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
-            onClick={handleCreateFolder}
-            className="shrink-0"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="shrink-0 ml-auto"
+            title={isCollapsed ? "Expandir menu" : "Recolher menu"}
           >
-            <Book className="h-4 w-4" />
+            <ChevronLeft className={`h-4 w-4 transition-transform ${isCollapsed ? "rotate-180" : ""}`} />
           </Button>
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Livros da Bíblia</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {filteredFolders.map((folder) => (
-                <SidebarMenuItem key={folder.id}>
-                  <SidebarMenuButton>
-                    <Book className="h-4 w-4" />
-                    <span>{folder.name}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {!isCollapsed && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Livros da Bíblia</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {filteredFolders.map((folder) => (
+                  <SidebarMenuItem key={folder.id}>
+                    <SidebarMenuButton>
+                      <Book className="h-4 w-4" />
+                      <span>{folder.name}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+        {isCollapsed && (
+          <div className="flex flex-col items-center gap-4 mt-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleCreateFolder}
+              title="Adicionar livro"
+            >
+              <Book className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </SidebarContent>
     </Sidebar>
   );
