@@ -62,7 +62,7 @@ export function AppSidebar() {
   );
 
   return (
-    <Sidebar variant="floating" className={isCollapsed ? "w-16" : ""}>
+    <Sidebar variant="inset" className={isCollapsed ? "w-16" : "w-[15%]"}>
       <SidebarHeader>
         <div className="flex items-center gap-2 p-2">
           {!isCollapsed && (

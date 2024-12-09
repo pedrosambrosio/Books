@@ -5,27 +5,13 @@ import { TaskCard, Task } from "@/components/TaskCard";
 import { useToast } from "@/components/ui/use-toast";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { GroupTask, GroupMember } from "@/types/GroupTask";
+import { GroupTask } from "@/types/GroupTask";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
-import { useSidebar } from "@/components/ui/sidebar";
-
-// Mock data for demonstration
-const mockGroup = {
-  id: "group-1",
-  name: "Study Group A",
-  description: "Physics study group",
-  members: [
-    { id: "1", name: "John Doe" },
-    { id: "2", name: "Jane Smith" },
-  ],
-  inviteCode: "ABC123"
-};
 
 const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [groupTasks, setGroupTasks] = useState<GroupTask[]>([]);
   const { toast } = useToast();
-  const { state } = useSidebar();
 
   const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress" | "isPaused">) => {
     const task: Task = {
@@ -50,7 +36,7 @@ const Index = () => {
       completed: false,
       inProgress: false,
       isPaused: false,
-      groupId: mockGroup.id,
+      groupId: "mock-group-id",
       category: 'group'
     };
 
@@ -91,21 +77,16 @@ const Index = () => {
   };
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-gradient-to-b from-background to-muted/20">
+    <div className="flex h-screen w-full overflow-hidden">
       <AppSidebar />
-      <main className={`flex-1 transition-all duration-300 ease-in-out ${
-        state === "collapsed" ? "ml-16" : "ml-64"
-      }`}>
-        <ResizablePanelGroup 
-          direction="horizontal" 
-          className="h-full"
-        >
+      <div className="flex-1 flex flex-col">
+        <ResizablePanelGroup direction="horizontal" className="flex-1">
           <ResizablePanel 
             defaultSize={50} 
             minSize={30}
-            className="overflow-auto"
+            className="overflow-auto bg-gradient-to-b from-background to-muted/20"
           >
-            <div className="px-8 py-8">
+            <div className="px-6 py-6">
               <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-8 animate-fade-in">
                   <h1 className="text-4xl font-bold mb-2">Leituras Bíblicas</h1>
@@ -153,7 +134,7 @@ const Index = () => {
             minSize={30}
             className="overflow-auto"
           >
-            <div className="h-full p-8">
+            <div className="h-full p-6">
               <div className="glass-card h-full rounded-lg p-6">
                 <h2 className="text-2xl font-semibold mb-4">Bíblia</h2>
                 <p className="text-muted-foreground text-center mt-8">
@@ -163,7 +144,7 @@ const Index = () => {
             </div>
           </ResizablePanel>
         </ResizablePanelGroup>
-      </main>
+      </div>
     </div>
   );
 };
