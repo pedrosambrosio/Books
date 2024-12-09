@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { TaskHeader } from "./task/TaskHeader";
@@ -18,12 +17,17 @@ export interface Task {
   description?: string;
   completed: boolean;
   inProgress: boolean;
+  isPaused?: boolean;
+  startDate?: Date;
+  endDate?: Date;
   category?: string;
   chapter?: string;
   verses?: string;
   notes?: string;
   tags?: string[];
   type?: "study" | "devotional" | "sermon" | "other";
+  priority?: "urgent" | "moderate" | "low";
+  subtasks?: Subtask[];
 }
 
 interface TaskCardProps {
