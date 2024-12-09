@@ -1,19 +1,20 @@
-import { Book, Users } from "lucide-react";
+import { useState } from "react";
+import { Book, ChevronLeft } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
+  SidebarHeader,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuButton,
   SidebarInput,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { TaskFolder } from "@/types/TaskFolder";
-import { useState } from "react";
 
 const BIBLE_BOOKS = [
   "Gênesis",
@@ -36,6 +37,7 @@ export function AppSidebar() {
     { id: "default", name: "Todas as Leituras", tasks: [] },
   ]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const { toast } = useToast();
 
   const handleCreateFolder = () => {
@@ -60,43 +62,69 @@ export function AppSidebar() {
   );
 
   return (
-    <Sidebar className="w-[15%] min-w-[200px] border-r border-border/40 shadow-sm">
-      <SidebarContent className="px-2 py-4">
-        <div className="flex items-center gap-2 p-4">
-          <SidebarInput
-            type="text"
-            placeholder="Buscar livros..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1"
-          />
+    <Sidebar variant="floating" className={isCollapsed ? "w-16" : ""}>
+      <SidebarHeader>
+        <div className="flex items-center gap-2 p-2">
+          {!isCollapsed && (
+            <>
+              <SidebarInput
+                type="text"
+                placeholder="Buscar livros..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1"
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleCreateFolder}
+                className="shrink-0"
+              >
+                <Book className="h-4 w-4" />
+              </Button>
+            </>
+          )}
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
-            onClick={handleCreateFolder}
-            className="shrink-0"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="shrink-0 ml-auto"
+            title={isCollapsed ? "Expandir menu" : "Recolher menu"}
           >
-            <Book className="h-4 w-4" />
+            <ChevronLeft className={`h-4 w-4 transition-transform ${isCollapsed ? "rotate-180" : ""}`} />
           </Button>
         </div>
-
-        <SidebarGroup>
-          <SidebarGroupLabel className="px-2 text-sm font-semibold text-muted-foreground mb-2">
-            Livros da Bíblia
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {filteredFolders.map((folder) => (
-                <SidebarMenuItem key={folder.id}>
-                  <SidebarMenuButton className="w-full px-2 py-2 rounded-md hover:bg-muted transition-colors">
-                    <Book className="h-4 w-4 mr-2" />
-                    <span className="text-sm">{folder.name}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+      </SidebarHeader>
+      <SidebarContent>
+        {!isCollapsed && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Livros da Bíblia</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {filteredFolders.map((folder) => (
+                  <SidebarMenuItem key={folder.id}>
+                    <SidebarMenuButton>
+                      <Book className="h-4 w-4" />
+                      <span>{folder.name}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+        {isCollapsed && (
+          <div className="flex flex-col items-center gap-4 mt-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleCreateFolder}
+              title="Adicionar livro"
+            >
+              <Book className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </SidebarContent>
     </Sidebar>
   );
