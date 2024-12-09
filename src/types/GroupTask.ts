@@ -14,7 +14,7 @@ export interface Group {
   inviteCode: string;
 }
 
-export interface GroupTask extends Omit<Task, 'category'> {
+export interface GroupTask extends Task {
   groupId: string;
   assignedTo?: string[];
   category: 'group' | string;

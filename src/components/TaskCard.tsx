@@ -4,6 +4,12 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Book, Tag } from "lucide-react";
 
+export interface Subtask {
+  id: string;
+  title: string;
+  completed: boolean;
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -12,14 +18,21 @@ export interface Task {
   inProgress?: boolean;
   verses?: string;
   tags?: string[];
+  startDate?: Date;
+  endDate?: Date;
+  isPaused?: boolean;
+  category?: string;
+  priority?: string;
+  subtasks?: Subtask[];
 }
 
 interface TaskCardProps {
   task: Task;
   onUpdate: (task: Task) => void;
+  onComplete?: (taskId: string) => void;
 }
 
-export const TaskCard = ({ task, onUpdate }: TaskCardProps) => {
+export const TaskCard = ({ task, onUpdate, onComplete }: TaskCardProps) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   const toggleTag = (tag: string) => {
