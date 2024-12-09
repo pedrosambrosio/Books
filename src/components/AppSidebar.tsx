@@ -62,9 +62,14 @@ export function AppSidebar() {
   );
 
   return (
-    <Sidebar variant="inset" className={isCollapsed ? "w-16" : "w-[15%]"}>
-      <SidebarHeader>
-        <div className="flex items-center gap-2 p-2">
+    <Sidebar 
+      variant="inset" 
+      className={`border-r border-border/40 shadow-sm transition-all duration-300 ${
+        isCollapsed ? "w-16" : "w-[15%] min-w-[240px]"
+      }`}
+    >
+      <SidebarHeader className="border-b border-border/40">
+        <div className="flex items-center gap-2 p-4">
           {!isCollapsed && (
             <>
               <SidebarInput
@@ -88,24 +93,26 @@ export function AppSidebar() {
             variant="ghost"
             size="icon"
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="shrink-0 ml-auto"
+            className="shrink-0 ml-auto hover:bg-muted"
             title={isCollapsed ? "Expandir menu" : "Recolher menu"}
           >
-            <ChevronLeft className={`h-4 w-4 transition-transform ${isCollapsed ? "rotate-180" : ""}`} />
+            <ChevronLeft className={`h-5 w-5 transition-transform ${isCollapsed ? "rotate-180" : ""}`} />
           </Button>
         </div>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="px-2 py-4">
         {!isCollapsed && (
           <SidebarGroup>
-            <SidebarGroupLabel>Livros da Bíblia</SidebarGroupLabel>
+            <SidebarGroupLabel className="px-2 text-sm font-semibold text-muted-foreground mb-2">
+              Livros da Bíblia
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {filteredFolders.map((folder) => (
                   <SidebarMenuItem key={folder.id}>
-                    <SidebarMenuButton>
-                      <Book className="h-4 w-4" />
-                      <span>{folder.name}</span>
+                    <SidebarMenuButton className="w-full px-2 py-2 rounded-md hover:bg-muted transition-colors">
+                      <Book className="h-4 w-4 mr-2" />
+                      <span className="text-sm">{folder.name}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
@@ -120,6 +127,7 @@ export function AppSidebar() {
               size="icon"
               onClick={handleCreateFolder}
               title="Adicionar livro"
+              className="hover:bg-muted"
             >
               <Book className="h-4 w-4" />
             </Button>
