@@ -2,8 +2,6 @@ import { useState } from "react";
 import { CreateTask } from "@/components/CreateTask";
 import { TaskCard, Task } from "@/components/TaskCard";
 import { useToast } from "@/components/ui/use-toast";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/AppSidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -47,88 +45,85 @@ const Index = () => {
   };
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gradient-to-b from-background to-muted/20">
-        <AppSidebar />
-        <ResizablePanelGroup 
-          direction={isMobile ? "vertical" : "horizontal"} 
-          className="flex-1"
+    <div className="min-h-screen flex w-full bg-gradient-to-b from-background to-muted/20">
+      <ResizablePanelGroup 
+        direction={isMobile ? "vertical" : "horizontal"} 
+        className="flex-1"
+      >
+        <ResizablePanel 
+          defaultSize={50} 
+          minSize={30}
+          className="min-h-[300px]"
         >
-          <ResizablePanel 
-            defaultSize={50} 
-            minSize={30}
-            className="min-h-[300px]"
-          >
-            <ScrollArea className="h-full">
-              <div className="p-6 pl-12 md:p-8 md:pl-16">
-                <div className="max-w-2xl mx-auto space-y-8">
-                  <div className="text-center animate-fade-in">
-                    <h1 className="text-3xl md:text-4xl font-bold mb-4">Leituras Bíblicas</h1>
-                    <p className="text-muted-foreground mb-8">
-                      Organize suas leituras com datas e temporizadores
-                    </p>
-                  </div>
-
-                  <Tabs defaultValue="personal" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 h-auto mb-6">
-                      <TabsTrigger 
-                        value="personal"
-                        className="data-[state=active]:bg-white data-[state=active]:text-black px-6 py-3"
-                      >
-                        Minhas Leituras
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="chat"
-                        className="data-[state=active]:bg-white data-[state=active]:text-black px-6 py-3"
-                      >
-                        Chat
-                      </TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="personal">
-                      <div className="space-y-6">
-                        <CreateTask onCreateTask={handleCreateTask} />
-                        
-                        <div className="space-y-4">
-                          {tasks.map((task) => (
-                            <div key={task.id} className="animate-fade-in">
-                              <TaskCard
-                                task={task}
-                                onUpdate={handleUpdateTask}
-                                onComplete={handleCompleteTask}
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </TabsContent>
-                    <TabsContent value="chat">
-                      <div className="p-6 text-center text-muted-foreground">
-                        Chat em breve...
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </div>
-              </div>
-            </ScrollArea>
-          </ResizablePanel>
-          
-          <ResizableHandle withHandle />
-          
-          <ResizablePanel defaultSize={50} minSize={30} className="min-h-[300px]">
-            <ScrollArea className="h-full">
-              <div className="p-6">
-                <div className="glass-card h-full rounded-lg p-8">
-                  <h2 className="text-2xl font-semibold mb-6">Bíblia</h2>
-                  <p className="text-muted-foreground text-center">
-                    Conteúdo bíblico em breve...
+          <ScrollArea className="h-full">
+            <div className="p-6 md:p-8">
+              <div className="max-w-2xl mx-auto space-y-8">
+                <div className="text-center animate-fade-in">
+                  <h1 className="text-3xl md:text-4xl font-bold mb-4">Leituras Bíblicas</h1>
+                  <p className="text-muted-foreground mb-8">
+                    Organize suas leituras com datas e temporizadores
                   </p>
                 </div>
+
+                <Tabs defaultValue="personal" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 h-auto mb-6">
+                    <TabsTrigger 
+                      value="personal"
+                      className="data-[state=active]:bg-white data-[state=active]:text-black px-6 py-3"
+                    >
+                      Minhas Leituras
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="chat"
+                      className="data-[state=active]:bg-white data-[state=active]:text-black px-6 py-3"
+                    >
+                      Chat
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="personal">
+                    <div className="space-y-6">
+                      <CreateTask onCreateTask={handleCreateTask} />
+                      
+                      <div className="space-y-4">
+                        {tasks.map((task) => (
+                          <div key={task.id} className="animate-fade-in">
+                            <TaskCard
+                              task={task}
+                              onUpdate={handleUpdateTask}
+                              onComplete={handleCompleteTask}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="chat">
+                    <div className="p-6 text-center text-muted-foreground">
+                      Chat em breve...
+                    </div>
+                  </TabsContent>
+                </Tabs>
               </div>
-            </ScrollArea>
-          </ResizablePanel>
-        </ResizablePanelGroup>
-      </div>
-    </SidebarProvider>
+            </div>
+          </ScrollArea>
+        </ResizablePanel>
+        
+        <ResizableHandle withHandle />
+        
+        <ResizablePanel defaultSize={50} minSize={30} className="min-h-[300px]">
+          <ScrollArea className="h-full">
+            <div className="p-6">
+              <div className="glass-card h-full rounded-lg p-8">
+                <h2 className="text-2xl font-semibold mb-6">Bíblia</h2>
+                <p className="text-muted-foreground text-center">
+                  Conteúdo bíblico em breve...
+                </p>
+              </div>
+            </div>
+          </ScrollArea>
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    </div>
   );
 };
 
