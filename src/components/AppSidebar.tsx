@@ -11,7 +11,6 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarInput,
-  useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -38,7 +37,7 @@ export function AppSidebar() {
     { id: "default", name: "Todas as Leituras", tasks: [] },
   ]);
   const [searchQuery, setSearchQuery] = useState("");
-  const { state, setOpen } = useSidebar();
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const { toast } = useToast();
 
   const handleCreateFolder = () => {
@@ -61,8 +60,6 @@ export function AppSidebar() {
   const filteredFolders = folders.filter((folder) =>
     folder.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const isCollapsed = state === 'collapsed';
 
   return (
     <Sidebar variant="floating" className={isCollapsed ? "w-16" : ""}>
@@ -90,8 +87,8 @@ export function AppSidebar() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setOpen(!isCollapsed)}
-            className={`shrink-0 ${isCollapsed ? 'mx-auto' : 'ml-auto'}`}
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="shrink-0 ml-auto"
             title={isCollapsed ? "Expandir menu" : "Recolher menu"}
           >
             <ChevronLeft className={`h-4 w-4 transition-transform ${isCollapsed ? "rotate-180" : ""}`} />
@@ -115,6 +112,18 @@ export function AppSidebar() {
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
+        )}
+        {isCollapsed && (
+          <div className="flex flex-col items-center gap-4 mt-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleCreateFolder}
+              title="Adicionar livro"
+            >
+              <Book className="h-4 w-4" />
+            </Button>
+          </div>
         )}
       </SidebarContent>
     </Sidebar>
