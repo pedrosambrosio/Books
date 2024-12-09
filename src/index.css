@@ -33,7 +33,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-['Inter'];
+    @apply bg-background text-foreground font-['Inter'] overflow-hidden;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
@@ -43,5 +43,32 @@
 
   .hover-scale {
     @apply transition-transform duration-200 hover:scale-[1.02];
+  }
+
+  /* Touch-friendly styles */
+  @media (hover: none) {
+    .touch-manipulation {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+  }
+
+  /* Responsive text sizes */
+  @screen sm {
+    h1 {
+      @apply text-3xl;
+    }
+    h2 {
+      @apply text-2xl;
+    }
+  }
+
+  @screen md {
+    h1 {
+      @apply text-4xl;
+    }
+    h2 {
+      @apply text-3xl;
+    }
   }
 }

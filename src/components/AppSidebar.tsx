@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Book, ChevronLeft } from "lucide-react";
+import { Book } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { TaskFolder } from "@/types/TaskFolder";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const BIBLE_BOOKS = [
   "Gênesis",
@@ -37,7 +38,6 @@ export function AppSidebar() {
     { id: "default", name: "Todas as Leituras", tasks: [] },
   ]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const { toast } = useToast();
 
   const handleCreateFolder = () => {
@@ -62,49 +62,36 @@ export function AppSidebar() {
   );
 
   return (
-    <Sidebar variant="floating" className={isCollapsed ? "w-16" : ""}>
+    <Sidebar className="w-[15%] min-w-[200px] border-r border-border">
       <SidebarHeader>
-        <div className="flex items-center gap-2 p-2">
-          {!isCollapsed && (
-            <>
-              <SidebarInput
-                type="text"
-                placeholder="Buscar livros..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1"
-              />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={handleCreateFolder}
-                className="shrink-0"
-              >
-                <Book className="h-4 w-4" />
-              </Button>
-            </>
-          )}
+        <div className="flex items-center gap-2 p-4">
+          <SidebarInput
+            type="text"
+            placeholder="Buscar livros..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1"
+          />
           <Button
-            variant="ghost"
+            variant="outline"
             size="icon"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="shrink-0 ml-auto"
-            title={isCollapsed ? "Expandir menu" : "Recolher menu"}
+            onClick={handleCreateFolder}
+            className="shrink-0 touch-manipulation"
           >
-            <ChevronLeft className={`h-4 w-4 transition-transform ${isCollapsed ? "rotate-180" : ""}`} />
+            <Book className="h-4 w-4" />
           </Button>
         </div>
       </SidebarHeader>
       <SidebarContent>
-        {!isCollapsed && (
+        <ScrollArea className="h-[calc(100vh-5rem)]">
           <SidebarGroup>
-            <SidebarGroupLabel>Livros da Bíblia</SidebarGroupLabel>
+            <SidebarGroupLabel className="px-4 py-2">Livros da Bíblia</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {filteredFolders.map((folder) => (
                   <SidebarMenuItem key={folder.id}>
-                    <SidebarMenuButton>
-                      <Book className="h-4 w-4" />
+                    <SidebarMenuButton className="w-full px-4 py-2 hover:bg-accent rounded-lg transition-colors">
+                      <Book className="h-4 w-4 mr-2" />
                       <span>{folder.name}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -112,19 +99,7 @@ export function AppSidebar() {
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
-        )}
-        {isCollapsed && (
-          <div className="flex flex-col items-center gap-4 mt-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleCreateFolder}
-              title="Adicionar livro"
-            >
-              <Book className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
+        </ScrollArea>
       </SidebarContent>
     </Sidebar>
   );
