@@ -42,6 +42,7 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
     ],
     content: value,
     onUpdate: ({ editor }) => {
+      // Prevent the event from bubbling up to form submission
       onChange(editor.getHTML());
     },
   });
@@ -50,15 +51,23 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
     return null;
   }
 
-  const addLink = () => {
+  const addLink = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent event bubbling
+    e.stopPropagation(); // Ensure the event doesn't propagate
     const url = window.prompt('URL:');
     if (url) {
       editor.chain().focus().setLink({ href: url }).run();
     }
   };
 
+  const handleFormatting = (e: React.MouseEvent, action: () => void) => {
+    e.preventDefault(); // Prevent event bubbling
+    e.stopPropagation(); // Ensure the event doesn't propagate
+    action();
+  };
+
   return (
-    <div className="rich-text-editor border rounded-md min-h-[400px]">
+    <div className="rich-text-editor border rounded-md min-h-[400px]" onClick={e => e.stopPropagation()}>
       {editor && (
         <BubbleMenu 
           editor={editor} 
@@ -69,12 +78,13 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
           className="bg-white rounded-lg shadow-lg border p-2 flex gap-1 items-center"
         >
           <button
-            onClick={() => editor.chain().focus().toggleBold().run()}
+            onClick={(e) => handleFormatting(e, () => editor.chain().focus().toggleBold().run())}
             className={`p-1.5 rounded hover:bg-gray-100 ${editor.isActive('bold') ? 'bg-primary/20' : ''}`}
             title="Bold"
           >
             <Bold className="h-4 w-4" />
           </button>
+          
           <button
             onClick={() => editor.chain().focus().toggleItalic().run()}
             className={`p-1.5 rounded hover:bg-gray-100 ${editor.isActive('italic') ? 'bg-primary/20' : ''}`}
@@ -191,11 +201,12 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
               </div>
             </PopoverContent>
           </Popover>
+          
         </BubbleMenu>
       )}
       <EditorContent 
         editor={editor} 
-        className="p-4 prose prose-sm max-w-none min-h-[400px]" 
+        className="p-4 prose prose-sm max-w-none min-h-[400px]"
       />
     </div>
   );
