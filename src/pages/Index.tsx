@@ -8,7 +8,6 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GroupTask } from "@/types/GroupTask";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
-import { useSidebar } from "@/components/ui/sidebar";
 
 // Mock data for demonstration
 const mockGroup = {
@@ -26,7 +25,6 @@ const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [groupTasks, setGroupTasks] = useState<GroupTask[]>([]);
   const { toast } = useToast();
-  const { state } = useSidebar();
 
   const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress" | "isPaused">) => {
     const task: Task = {
@@ -92,13 +90,10 @@ const Index = () => {
   };
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-gradient-to-b from-background to-muted/20">
         <AppSidebar />
-        <ResizablePanelGroup 
-          direction="horizontal" 
-          className={`flex-1 transition-all duration-300 ${state === 'collapsed' ? 'ml-16' : 'ml-64'}`}
-        >
+        <ResizablePanelGroup direction="horizontal" className="flex-1">
           <ResizablePanel defaultSize={50} minSize={30}>
             <div className="h-full p-8">
               <div className="max-w-2xl mx-auto">
