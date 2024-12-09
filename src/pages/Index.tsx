@@ -60,7 +60,7 @@ const Index = () => {
             className="min-h-[300px]"
           >
             <ScrollArea className="h-full">
-              <div className="p-4 md:p-8">
+              <div className="p-4 pl-12 md:p-8 md:pl-16">
                 <div className="max-w-2xl mx-auto">
                   <div className="text-center mb-8 animate-fade-in">
                     <h1 className="text-3xl md:text-4xl font-bold mb-2">Leituras Bíblicas</h1>
