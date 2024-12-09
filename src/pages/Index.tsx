@@ -45,22 +45,22 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex w-full bg-gradient-to-b from-background to-muted/20">
+    <div className="h-screen w-full bg-gradient-to-b from-background to-muted/20">
       <ResizablePanelGroup 
         direction={isMobile ? "vertical" : "horizontal"} 
-        className="flex-1"
+        className="h-screen w-full"
       >
         <ResizablePanel 
           defaultSize={50} 
           minSize={30}
-          className="min-h-[300px]"
+          className="h-full"
         >
           <ScrollArea className="h-full">
-            <div className="p-6 md:p-8">
-              <div className="max-w-2xl mx-auto space-y-8">
-                <div className="text-center animate-fade-in">
+            <div className="p-4 md:p-6 flex justify-center">
+              <div className="w-full max-w-2xl">
+                <div className="text-center animate-fade-in mb-8">
                   <h1 className="text-3xl md:text-4xl font-bold mb-4">Leituras Bíblicas</h1>
-                  <p className="text-muted-foreground mb-8">
+                  <p className="text-muted-foreground">
                     Organize suas leituras com datas e temporizadores
                   </p>
                 </div>
@@ -108,16 +108,18 @@ const Index = () => {
           </ScrollArea>
         </ResizablePanel>
         
-        <ResizableHandle withHandle />
+        <ResizableHandle className="w-1.5 bg-border h-full" />
         
-        <ResizablePanel defaultSize={50} minSize={30} className="min-h-[300px]">
+        <ResizablePanel defaultSize={50} minSize={30} className="h-full">
           <ScrollArea className="h-full">
-            <div className="p-6">
-              <div className="glass-card h-full rounded-lg p-8">
-                <h2 className="text-2xl font-semibold mb-6">Bíblia</h2>
-                <p className="text-muted-foreground text-center">
-                  Conteúdo bíblico em breve...
-                </p>
+            <div className="p-4 md:p-6 flex justify-center">
+              <div className="w-full max-w-2xl">
+                <div className="glass-card h-full rounded-lg p-6">
+                  <h2 className="text-2xl font-semibold mb-6">Bíblia</h2>
+                  <p className="text-muted-foreground text-center">
+                    Conteúdo bíblico em breve...
+                  </p>
+                </div>
               </div>
             </div>
           </ScrollArea>
