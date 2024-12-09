@@ -24,7 +24,10 @@ interface RichTextEditorProps {
 export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        heading: false,
+        horizontalRule: false,
+      }),
       TextStyle,
       Color,
       Highlight.configure({ multicolor: true }),
@@ -42,8 +45,12 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
     ],
     content: value,
     onUpdate: ({ editor }) => {
-      // Prevent the event from bubbling up to form submission
       onChange(editor.getHTML());
+    },
+    editorProps: {
+      attributes: {
+        class: 'prose prose-sm max-w-none focus:outline-none min-h-[400px] text-black caret-black',
+      },
     },
   });
 
@@ -51,19 +58,19 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
     return null;
   }
 
+  const handleFormatting = (e: React.MouseEvent, action: () => void) => {
+    e.preventDefault();
+    e.stopPropagation();
+    action();
+  };
+
   const addLink = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent event bubbling
-    e.stopPropagation(); // Ensure the event doesn't propagate
+    e.preventDefault();
+    e.stopPropagation();
     const url = window.prompt('URL:');
     if (url) {
       editor.chain().focus().setLink({ href: url }).run();
     }
-  };
-
-  const handleFormatting = (e: React.MouseEvent, action: () => void) => {
-    e.preventDefault(); // Prevent event bubbling
-    e.stopPropagation(); // Ensure the event doesn't propagate
-    action();
   };
 
   return (
@@ -86,14 +93,15 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
           </button>
           
           <button
-            onClick={() => editor.chain().focus().toggleItalic().run()}
+            onClick={(e) => handleFormatting(e, () => editor.chain().focus().toggleItalic().run())}
             className={`p-1.5 rounded hover:bg-gray-100 ${editor.isActive('italic') ? 'bg-primary/20' : ''}`}
             title="Italic"
           >
             <Italic className="h-4 w-4" />
           </button>
+
           <button
-            onClick={() => editor.chain().focus().toggleUnderline().run()}
+            onClick={(e) => handleFormatting(e, () => editor.chain().focus().toggleUnderline().run())}
             className={`p-1.5 rounded hover:bg-gray-100 ${editor.isActive('underline') ? 'bg-primary/20' : ''}`}
             title="Underline"
           >
@@ -105,6 +113,7 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
           <Popover>
             <PopoverTrigger asChild>
               <button
+                onClick={(e) => e.stopPropagation()}
                 className={`p-1.5 rounded hover:bg-gray-100 ${
                   editor.isActive('heading') ? 'bg-primary/20' : ''
                 }`}
@@ -113,10 +122,10 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
                 <Type className="h-4 w-4" />
               </button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-2">
+            <PopoverContent className="w-auto p-2" onClick={(e) => e.stopPropagation()}>
               <div className="flex flex-col gap-1">
                 <button
-                  onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+                  onClick={(e) => handleFormatting(e, () => editor.chain().focus().toggleHeading({ level: 1 }).run())}
                   className={`p-1.5 rounded hover:bg-gray-100 flex items-center gap-2 ${
                     editor.isActive('heading', { level: 1 }) ? 'bg-primary/20' : ''
                   }`}
@@ -125,7 +134,7 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
                   <span>Heading 1</span>
                 </button>
                 <button
-                  onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                  onClick={(e) => handleFormatting(e, () => editor.chain().focus().toggleHeading({ level: 2 }).run())}
                   className={`p-1.5 rounded hover:bg-gray-100 flex items-center gap-2 ${
                     editor.isActive('heading', { level: 2 }) ? 'bg-primary/20' : ''
                   }`}
@@ -134,7 +143,7 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
                   <span>Heading 2</span>
                 </button>
                 <button
-                  onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+                  onClick={(e) => handleFormatting(e, () => editor.chain().focus().toggleHeading({ level: 3 }).run())}
                   className={`p-1.5 rounded hover:bg-gray-100 flex items-center gap-2 ${
                     editor.isActive('heading', { level: 3 }) ? 'bg-primary/20' : ''
                   }`}
@@ -147,7 +156,7 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
           </Popover>
 
           <button
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
+            onClick={(e) => handleFormatting(e, () => editor.chain().focus().toggleBulletList().run())}
             className={`p-1.5 rounded hover:bg-gray-100 ${editor.isActive('bulletList') ? 'bg-primary/20' : ''}`}
             title="Bullet List"
           >
@@ -155,7 +164,7 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
           </button>
 
           <button
-            onClick={() => editor.chain().focus().setHorizontalRule().run()}
+            onClick={(e) => handleFormatting(e, () => editor.chain().focus().setHorizontalRule().run())}
             className="p-1.5 rounded hover:bg-gray-100"
             title="Horizontal Rule"
           >
@@ -171,7 +180,7 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
           </button>
 
           <button
-            onClick={() => editor.chain().focus().toggleCode().run()}
+            onClick={(e) => handleFormatting(e, () => editor.chain().focus().toggleCode().run())}
             className={`p-1.5 rounded hover:bg-gray-100 ${editor.isActive('code') ? 'bg-primary/20' : ''}`}
             title="Code"
           >
@@ -181,18 +190,19 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
           <Popover>
             <PopoverTrigger asChild>
               <button
+                onClick={(e) => e.stopPropagation()}
                 className={`p-1.5 rounded hover:bg-gray-100`}
                 title="Text Color"
               >
                 <Paintbrush className="h-4 w-4" />
               </button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-2">
+            <PopoverContent className="w-auto p-2" onClick={(e) => e.stopPropagation()}>
               <div className="grid grid-cols-5 gap-1">
                 {['#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFF00'].map((color) => (
                   <button
                     key={color}
-                    onClick={() => editor.chain().focus().setColor(color).run()}
+                    onClick={(e) => handleFormatting(e, () => editor.chain().focus().setColor(color).run())}
                     className="w-6 h-6 rounded"
                     style={{ backgroundColor: color }}
                     title={color}
@@ -201,13 +211,9 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
               </div>
             </PopoverContent>
           </Popover>
-          
         </BubbleMenu>
       )}
-      <EditorContent 
-        editor={editor} 
-        className="p-4 prose prose-sm max-w-none min-h-[400px]"
-      />
+      <EditorContent editor={editor} />
     </div>
   );
 };
