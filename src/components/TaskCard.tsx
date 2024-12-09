@@ -2,41 +2,24 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { TaskHeader } from "./task/TaskHeader";
 import { Book, Tag } from "lucide-react";
-
-export interface Subtask {
-  id: string;
-  title: string;
-  completed: boolean;
-}
 
 export interface Task {
   id: string;
   title: string;
   description?: string;
-  completed: boolean;
-  inProgress: boolean;
-  isPaused?: boolean;
-  startDate?: Date;
-  endDate?: Date;
-  category?: string;
-  chapter?: string;
+  completed?: boolean;
+  inProgress?: boolean;
   verses?: string;
-  notes?: string;
   tags?: string[];
-  type?: "study" | "devotional" | "sermon" | "other";
-  priority?: "urgent" | "moderate" | "low";
-  subtasks?: Subtask[];
 }
 
 interface TaskCardProps {
   task: Task;
   onUpdate: (task: Task) => void;
-  onComplete: (id: string) => void;
 }
 
-export const TaskCard = ({ task, onUpdate, onComplete }: TaskCardProps) => {
+export const TaskCard = ({ task, onUpdate }: TaskCardProps) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   const toggleTag = (tag: string) => {
@@ -47,69 +30,69 @@ export const TaskCard = ({ task, onUpdate, onComplete }: TaskCardProps) => {
     onUpdate({ ...task, tags: newTags });
   };
 
+  // Get first two lines of description
+  const previewDescription = task.description?.split('\n').slice(0, 2).join('\n');
+
   return (
     <>
-      <div className={cn(
-        "glass-card rounded-lg p-4 mb-4 hover-scale",
-        task.completed && "opacity-75"
-      )}>
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1">
-            <TaskHeader
-              task={task}
-              onComplete={onComplete}
-              onOpenDetails={() => setIsDetailsOpen(true)}
+      <div 
+        className="glass-card rounded-lg p-4 mb-4 hover-scale cursor-pointer"
+        onClick={() => setIsDetailsOpen(true)}
+      >
+        <div className="flex flex-col gap-2">
+          <h3 className="font-medium text-lg">{task.title}</h3>
+          
+          {task.verses && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Book className="h-4 w-4" />
+              <span>Versículo {task.verses}</span>
+            </div>
+          )}
+
+          {previewDescription && (
+            <div 
+              className="text-sm text-muted-foreground line-clamp-2"
+              dangerouslySetInnerHTML={{ __html: previewDescription }}
             />
-            
-            {task.description && (
-              <p className="text-sm text-muted-foreground ml-7 mb-3">
-                {task.description}
-              </p>
-            )}
+          )}
 
-            {task.chapter && (
-              <div className="ml-7 flex items-center gap-2 mb-2">
-                <Book className="h-4 w-4 text-primary" />
-                <span className="text-sm">
-                  Capítulo {task.chapter}
-                  {task.verses && `, Versículos ${task.verses}`}
-                </span>
-              </div>
-            )}
-
-            {task.tags && task.tags.length > 0 && (
-              <div className="ml-7 flex flex-wrap gap-2 mt-2">
-                {task.tags.map((tag) => (
-                  <Badge
-                    key={tag}
-                    variant="secondary"
-                    className="flex items-center gap-1"
-                  >
-                    <Tag className="h-3 w-3" />
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            )}
-          </div>
+          {task.tags && task.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {task.tags.map((tag) => (
+                <Badge
+                  key={tag}
+                  variant="secondary"
+                  className="flex items-center gap-1"
+                >
+                  <Tag className="h-3 w-3" />
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[725px]">
           <DialogHeader>
             <DialogTitle>{task.title}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            {task.description && (
-              <p className="text-sm text-muted-foreground">{task.description}</p>
-            )}
-            {task.notes && (
-              <div className="space-y-2">
-                <h4 className="font-medium">Anotações</h4>
-                <p className="text-sm whitespace-pre-wrap">{task.notes}</p>
+            {task.verses && (
+              <div className="flex items-center gap-2 text-sm">
+                <Book className="h-4 w-4" />
+                <span>Versículo {task.verses}</span>
               </div>
             )}
+            
+            {task.description && (
+              <div 
+                className="prose prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ __html: task.description }}
+              />
+            )}
+            
             {task.tags && task.tags.length > 0 && (
               <div className="space-y-2">
                 <h4 className="font-medium">Tags</h4>
