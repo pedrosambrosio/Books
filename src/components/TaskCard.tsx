@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { TaskHeader } from "./task/TaskHeader";
-import { TaskDates } from "./task/TaskDates";
-import { TaskProgress } from "./task/TaskProgress";
+import { Book, Tag } from "lucide-react";
 
 export interface Subtask {
   id: string;
@@ -16,16 +16,14 @@ export interface Task {
   id: string;
   title: string;
   description?: string;
-  startDate?: Date;
-  endDate?: Date;
   completed: boolean;
   inProgress: boolean;
-  isPaused?: boolean;
-  priority?: "urgent" | "moderate" | "low";
   category?: string;
-  subtasks?: Subtask[];
+  chapter?: string;
+  verses?: string;
   notes?: string;
-  suggestedTime?: number;
+  tags?: string[];
+  type?: "study" | "devotional" | "sermon" | "other";
 }
 
 interface TaskCardProps {
@@ -37,40 +35,12 @@ interface TaskCardProps {
 export const TaskCard = ({ task, onUpdate, onComplete }: TaskCardProps) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
-  const handleDates = (startDate?: Date, endDate?: Date) => {
-    onUpdate({ ...task, startDate, endDate });
-  };
-
-  const toggleProgress = () => {
-    if (!task.startDate) return;
-    if (task.inProgress && !task.isPaused) {
-      onUpdate({ ...task, isPaused: true });
-    } else {
-      onUpdate({ ...task, inProgress: true, isPaused: false, startDate: task.inProgress ? task.startDate : new Date() });
-    }
-  };
-
-  const toggleSubtask = (subtaskId: string) => {
-    const updatedSubtasks = task.subtasks?.map(st => 
-      st.id === subtaskId ? { ...st, completed: !st.completed } : st
-    );
-    onUpdate({ ...task, subtasks: updatedSubtasks });
-  };
-
-  const calculatePriority = () => {
-    if (!task.endDate) return "low";
-    const daysUntilDue = Math.ceil((task.endDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-    if (daysUntilDue <= 2) return "urgent";
-    if (daysUntilDue <= 5) return "moderate";
-    return "low";
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "urgent": return "text-red-500";
-      case "moderate": return "text-yellow-500";
-      default: return "text-green-500";
-    }
+  const toggleTag = (tag: string) => {
+    const currentTags = task.tags || [];
+    const newTags = currentTags.includes(tag)
+      ? currentTags.filter(t => t !== tag)
+      : [...currentTags, tag];
+    onUpdate({ ...task, tags: newTags });
   };
 
   return (
@@ -93,10 +63,30 @@ export const TaskCard = ({ task, onUpdate, onComplete }: TaskCardProps) => {
               </p>
             )}
 
-            <div className="ml-7">
-              <TaskDates task={task} onUpdateDates={handleDates} />
-              <TaskProgress task={task} onToggleProgress={toggleProgress} />
-            </div>
+            {task.chapter && (
+              <div className="ml-7 flex items-center gap-2 mb-2">
+                <Book className="h-4 w-4 text-primary" />
+                <span className="text-sm">
+                  Capítulo {task.chapter}
+                  {task.verses && `, Versículos ${task.verses}`}
+                </span>
+              </div>
+            )}
+
+            {task.tags && task.tags.length > 0 && (
+              <div className="ml-7 flex flex-wrap gap-2 mt-2">
+                {task.tags.map((tag) => (
+                  <Badge
+                    key={tag}
+                    variant="secondary"
+                    className="flex items-center gap-1"
+                  >
+                    <Tag className="h-3 w-3" />
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -110,27 +100,27 @@ export const TaskCard = ({ task, onUpdate, onComplete }: TaskCardProps) => {
             {task.description && (
               <p className="text-sm text-muted-foreground">{task.description}</p>
             )}
-            {task.subtasks && task.subtasks.length > 0 && (
+            {task.notes && (
               <div className="space-y-2">
-                <h4 className="font-medium">Subtasks</h4>
-                {task.subtasks.map((subtask) => (
-                  <div key={subtask.id} className="flex items-center gap-2">
-                    <Checkbox
-                      id={subtask.id}
-                      checked={subtask.completed}
-                      onCheckedChange={() => toggleSubtask(subtask.id)}
-                    />
-                    <label
-                      htmlFor={subtask.id}
-                      className={cn(
-                        "text-sm",
-                        subtask.completed && "line-through text-muted-foreground"
-                      )}
+                <h4 className="font-medium">Anotações</h4>
+                <p className="text-sm whitespace-pre-wrap">{task.notes}</p>
+              </div>
+            )}
+            {task.tags && task.tags.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="font-medium">Tags</h4>
+                <div className="flex flex-wrap gap-2">
+                  {task.tags.map((tag) => (
+                    <Badge
+                      key={tag}
+                      variant="secondary"
+                      className="cursor-pointer"
+                      onClick={() => toggleTag(tag)}
                     >
-                      {subtask.title}
-                    </label>
-                  </div>
-                ))}
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
               </div>
             )}
           </div>
