@@ -1,5 +1,6 @@
+import React from 'react';
 import { Bold, Italic, Underline, Heading1, Heading2, Heading3, 
-         List, Minus, Link as LinkIcon, Code, Paintbrush, Type } from 'lucide-react';
+         List, Minus, Link as LinkIcon, Code, Paintbrush, Type, Highlighter, SmilePlus } from 'lucide-react';
 import { Editor } from '@tiptap/react';
 import {
   Popover,
@@ -17,6 +18,23 @@ export const EditorToolbar = ({ editor }: EditorToolbarProps) => {
     if (url) {
       editor.chain().focus().setLink({ href: url }).run();
     }
+  };
+
+  const addEmoji = () => {
+    const emojis = ["😀", "😂", "😊", "🥰", "😎", "🤔", "👍", "❤️", "✨", "🎉"];
+    return (
+      <div className="grid grid-cols-5 gap-2">
+        {emojis.map((emoji) => (
+          <button
+            key={emoji}
+            onClick={() => editor.chain().focus().insertContent(emoji).run()}
+            className="p-2 hover:bg-gray-100 rounded"
+          >
+            {emoji}
+          </button>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -58,33 +76,18 @@ export const EditorToolbar = ({ editor }: EditorToolbarProps) => {
         </PopoverTrigger>
         <PopoverContent className="w-auto p-2">
           <div className="flex flex-col gap-1">
-            <button
-              onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-              className={`p-1.5 rounded hover:bg-gray-100 flex items-center gap-2 ${
-                editor.isActive('heading', { level: 1 }) ? 'bg-primary/20' : ''
-              }`}
-            >
-              <Heading1 className="h-4 w-4" />
-              <span>Heading 1</span>
-            </button>
-            <button
-              onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-              className={`p-1.5 rounded hover:bg-gray-100 flex items-center gap-2 ${
-                editor.isActive('heading', { level: 2 }) ? 'bg-primary/20' : ''
-              }`}
-            >
-              <Heading2 className="h-4 w-4" />
-              <span>Heading 2</span>
-            </button>
-            <button
-              onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-              className={`p-1.5 rounded hover:bg-gray-100 flex items-center gap-2 ${
-                editor.isActive('heading', { level: 3 }) ? 'bg-primary/20' : ''
-              }`}
-            >
-              <Heading3 className="h-4 w-4" />
-              <span>Heading 3</span>
-            </button>
+            {[1, 2, 3, 4, 5, 6].map((level) => (
+              <button
+                key={level}
+                onClick={() => editor.chain().focus().toggleHeading({ level }).run()}
+                className={`p-1.5 rounded hover:bg-gray-100 flex items-center gap-2 ${
+                  editor.isActive('heading', { level }) ? 'bg-primary/20' : ''
+                }`}
+              >
+                <Type className="h-4 w-4" />
+                <span>Heading {level}</span>
+              </button>
+            ))}
           </div>
         </PopoverContent>
       </Popover>
@@ -121,6 +124,14 @@ export const EditorToolbar = ({ editor }: EditorToolbarProps) => {
         <Code className="h-4 w-4" />
       </button>
 
+      <button
+        onClick={() => editor.chain().focus().toggleHighlight().run()}
+        className={`p-1.5 rounded hover:bg-gray-100 ${editor.isActive('highlight') ? 'bg-primary/20' : ''}`}
+        title="Highlight"
+      >
+        <Highlighter className="h-4 w-4" />
+      </button>
+
       <Popover>
         <PopoverTrigger asChild>
           <button
@@ -142,6 +153,20 @@ export const EditorToolbar = ({ editor }: EditorToolbarProps) => {
               />
             ))}
           </div>
+        </PopoverContent>
+      </Popover>
+
+      <Popover>
+        <PopoverTrigger asChild>
+          <button
+            className="p-1.5 rounded hover:bg-gray-100"
+            title="Add Emoji"
+          >
+            <SmilePlus className="h-4 w-4" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-2">
+          {addEmoji()}
         </PopoverContent>
       </Popover>
     </div>
