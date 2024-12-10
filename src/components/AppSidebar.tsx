@@ -48,6 +48,23 @@ const MOCK_TAGS: TagType[] = [
   { id: "2", name: "Review", color: "#3b82f6" },
 ];
 
+// Create Bible book structure
+const BIBLE_BOOK: BookType = {
+  id: "bible",
+  title: "Bíblia",
+  type: "bible",
+  chapters: BIBLE_BOOKS.map(book => ({
+    id: book,
+    number: BIBLE_BOOKS.indexOf(book) + 1,
+    title: book,
+    pages: Array.from({ length: BIBLE_CHAPTERS[book] || 0 }, (_, i) => ({
+      id: `${book}-${i+1}`,
+      number: i + 1,
+      title: `Capítulo ${i + 1}`
+    })),
+  })),
+};
+
 export function AppSidebar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
@@ -71,16 +88,7 @@ export function AppSidebar() {
   };
 
   // Filter books based on search query
-  const filteredBooks = [...MOCK_BOOKS, ...BIBLE_BOOKS.map(book => ({
-    id: book,
-    title: book,
-    type: 'bible' as const,
-    chapters: Array.from({ length: BIBLE_CHAPTERS[book] || 0 }, (_, i) => ({
-      id: `${book}-${i+1}`,
-      number: i + 1,
-      pages: [{ id: `${book}-${i+1}-1`, number: 1 }],
-    })),
-  }))].filter(book => 
+  const filteredBooks = [...MOCK_BOOKS, BIBLE_BOOK].filter(book => 
     book.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -148,7 +156,7 @@ export function AppSidebar() {
                                 ) : (
                                   <ChevronRight className="h-4 w-4 mr-2" />
                                 )}
-                                {book.type === 'bible' ? 'Chapter' : 'Section'} {chapter.number}
+                                {chapter.title || `${book.type === 'bible' ? chapter.title : 'Section'} ${chapter.number}`}
                               </Button>
                             </CollapsibleTrigger>
                             <CollapsibleContent>
@@ -161,12 +169,12 @@ export function AppSidebar() {
                                     onClick={() => {
                                       // Handle page navigation
                                       toast({
-                                        title: "Page selected",
-                                        description: `Navigating to page ${page.number}`,
+                                        title: "Capítulo selecionado",
+                                        description: `Navegando para o capítulo ${page.number}`,
                                       });
                                     }}
                                   >
-                                    Page {page.number}
+                                    Capítulo {page.number}
                                   </Button>
                                 ))}
                               </div>
