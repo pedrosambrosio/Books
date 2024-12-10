@@ -43,7 +43,9 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
   });
 
   const addEmoji = (emoji: string) => {
-    editor?.chain().focus().insertContent(emoji).run();
+    if (editor) {
+      editor.chain().focus().insertContent(emoji).run();
+    }
   };
 
   if (!editor) {
@@ -56,17 +58,20 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
         <Popover>
           <PopoverTrigger asChild>
             <button
-              className="absolute right-3 top-3 p-1.5 rounded hover:bg-gray-100"
-              title="Add Emoji"
+              type="button"
+              className="absolute right-3 top-3 p-1.5 rounded hover:bg-gray-100 z-10"
+              title="Adicionar Emoji"
             >
               <SmilePlus className="h-4 w-4" />
             </button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-2">
             <div className="grid grid-cols-5 gap-2">
-              {["😀", "😂", "😊", "🥰", "😎", "🤔", "👍", "❤️", "✨", "🎉"].map((emoji) => (
+              {["😀", "😂", "😊", "🥰", "😎", "🤔", "👍", "❤️", "✨", "🎉", 
+                "🙏", "📖", "✝️", "⛪", "🕊️", "🌟", "🎵", "🌿", "🕯️", "📿"].map((emoji) => (
                 <button
                   key={emoji}
+                  type="button"
                   onClick={() => addEmoji(emoji)}
                   className="p-2 hover:bg-gray-100 rounded"
                 >

@@ -18,19 +18,22 @@ import { TaskFolder } from "@/types/TaskFolder";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const BIBLE_BOOKS = [
-  "Gênesis",
-  "Êxodo",
-  "Levítico",
-  "Números",
-  "Deuteronômio",
-  "Salmos",
-  "Provérbios",
-  "Mateus",
-  "Marcos",
-  "Lucas",
-  "João",
-  "Atos",
-  "Romanos",
+  // Antigo Testamento
+  "Gênesis", "Êxodo", "Levítico", "Números", "Deuteronômio",
+  "Josué", "Juízes", "Rute", "1 Samuel", "2 Samuel",
+  "1 Reis", "2 Reis", "1 Crônicas", "2 Crônicas", "Esdras",
+  "Neemias", "Ester", "Jó", "Salmos", "Provérbios",
+  "Eclesiastes", "Cânticos", "Isaías", "Jeremias", "Lamentações",
+  "Ezequiel", "Daniel", "Oséias", "Joel", "Amós",
+  "Obadias", "Jonas", "Miquéias", "Naum", "Habacuque",
+  "Sofonias", "Ageu", "Zacarias", "Malaquias",
+  // Novo Testamento
+  "Mateus", "Marcos", "Lucas", "João", "Atos",
+  "Romanos", "1 Coríntios", "2 Coríntios", "Gálatas", "Efésios",
+  "Filipenses", "Colossenses", "1 Tessalonicenses", "2 Tessalonicenses",
+  "1 Timóteo", "2 Timóteo", "Tito", "Filemom", "Hebreus",
+  "Tiago", "1 Pedro", "2 Pedro", "1 João", "2 João",
+  "3 João", "Judas", "Apocalipse"
 ];
 
 export function AppSidebar() {
@@ -62,7 +65,7 @@ export function AppSidebar() {
   );
 
   return (
-    <Sidebar className="w-[15%] min-w-[200px] border-r border-border">
+    <Sidebar className="w-[var(--sidebar-width)] min-w-[200px] border-r border-border">
       <SidebarHeader>
         <div className="flex items-center gap-2 p-4">
           <SidebarInput
