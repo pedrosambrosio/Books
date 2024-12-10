@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Book, Tag } from "lucide-react";
+import { Book, Tag, Edit2, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 
 export interface Subtask {
   id: string;
@@ -29,10 +31,12 @@ interface TaskCardProps {
   task: Task;
   onUpdate: (task: Task) => void;
   onComplete?: (taskId: string) => void;
+  onDelete?: (taskId: string) => void;
 }
 
-export const TaskCard = ({ task, onUpdate, onComplete }: TaskCardProps) => {
+export const TaskCard = ({ task, onUpdate, onComplete, onDelete }: TaskCardProps) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const { toast } = useToast();
 
   const toggleTag = (tag: string) => {
     const currentTags = task.tags || [];
@@ -42,15 +46,50 @@ export const TaskCard = ({ task, onUpdate, onComplete }: TaskCardProps) => {
     onUpdate({ ...task, tags: newTags });
   };
 
+  const handleDelete = () => {
+    if (onDelete) {
+      onDelete(task.id);
+      setIsDetailsOpen(false);
+      toast({
+        title: "Anotação excluída",
+        description: "A anotação foi excluída com sucesso.",
+      });
+    }
+  };
+
   const previewDescription = task.description?.split('\n').slice(0, 2).join('\n');
 
   return (
     <>
       <div 
-        className="rounded-lg p-6 hover-scale cursor-pointer bg-white border border-zinc-200"
-        onClick={() => setIsDetailsOpen(true)}
+        className="rounded-lg p-6 hover-scale cursor-pointer bg-white border border-zinc-200 relative group"
       >
-        <div className="flex flex-col gap-4">
+        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsDetailsOpen(true);
+            }}
+          >
+            <Edit2 className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-destructive"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDelete();
+            }}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <div className="flex flex-col gap-4" onClick={() => setIsDetailsOpen(true)}>
           <h3 className="font-medium text-lg">{task.title}</h3>
           
           {task.verses && (
@@ -87,7 +126,29 @@ export const TaskCard = ({ task, onUpdate, onComplete }: TaskCardProps) => {
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
         <DialogContent className="sm:max-w-[725px]">
           <DialogHeader>
-            <DialogTitle className="text-xl">{task.title}</DialogTitle>
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-xl">{task.title}</DialogTitle>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    // Implement edit functionality
+                    setIsDetailsOpen(false);
+                  }}
+                >
+                  <Edit2 className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-destructive"
+                  onClick={handleDelete}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </DialogHeader>
           <div className="space-y-6 py-6">
             {task.verses && (

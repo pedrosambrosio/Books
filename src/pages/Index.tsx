@@ -46,6 +46,14 @@ const Index = () => {
     );
   };
 
+  const handleDeleteTask = (taskId: string) => {
+    setTasks((prev) => prev.filter((task) => task.id !== taskId));
+    toast({
+      title: "Anotação excluída",
+      description: "A anotação foi excluída com sucesso.",
+    });
+  };
+
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full bg-gradient-to-b from-background to-muted/20">
@@ -95,6 +103,7 @@ const Index = () => {
                                 task={task}
                                 onUpdate={handleUpdateTask}
                                 onComplete={handleCompleteTask}
+                                onDelete={handleDeleteTask}
                               />
                             </div>
                           ))}
