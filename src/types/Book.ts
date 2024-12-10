@@ -2,6 +2,7 @@ export interface Page {
   id: string;
   number: number;
   title?: string;
+  completed?: boolean;
 }
 
 export interface Chapter {
@@ -9,6 +10,7 @@ export interface Chapter {
   number: number;
   title?: string;
   pages: Page[];
+  completedPages?: number;
 }
 
 export interface Book {
@@ -16,6 +18,7 @@ export interface Book {
   title: string;
   type: 'bible' | 'regular';
   chapters: Chapter[];
+  completedChapters?: number;
 }
 
 export interface Tag {

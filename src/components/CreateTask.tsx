@@ -14,8 +14,7 @@ export const CreateTask = ({ onCreateTask }: CreateTaskProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [verseStart, setVerseStart] = useState("");
-  const [verseEnd, setVerseEnd] = useState("");
+  const [reference, setReference] = useState("");
   const [newTag, setNewTag] = useState("");
   const [tags, setTags] = useState<string[]>([]);
 
@@ -36,14 +35,13 @@ export const CreateTask = ({ onCreateTask }: CreateTaskProps) => {
     onCreateTask({
       title: title.trim(),
       description: description.trim(),
-      verses: verseStart && verseEnd ? `${verseStart}-${verseEnd}` : verseStart || "",
+      reference: reference.trim(),
       tags,
     });
 
     setTitle("");
     setDescription("");
-    setVerseStart("");
-    setVerseEnd("");
+    setReference("");
     setTags([]);
     setIsExpanded(false);
   };
@@ -56,8 +54,7 @@ export const CreateTask = ({ onCreateTask }: CreateTaskProps) => {
     } else if (isExpanded && !newTitle) {
       setIsExpanded(false);
       setDescription("");
-      setVerseStart("");
-      setVerseEnd("");
+      setReference("");
       setTags([]);
     }
   };
@@ -75,24 +72,14 @@ export const CreateTask = ({ onCreateTask }: CreateTaskProps) => {
       </div>
       {isExpanded && (
         <div className="animate-fade-in">
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <Input
-              placeholder="Versículo inicial"
-              value={verseStart}
-              onChange={(e) => setVerseStart(e.target.value)}
-              type="number"
-              min="1"
-            />
-            <Input
-              placeholder="Versículo final (opcional)"
-              value={verseEnd}
-              onChange={(e) => setVerseEnd(e.target.value)}
-              type="number"
-              min="1"
-            />
-          </div>
-
           <div className="mb-6">
+            <Input
+              placeholder="Referência (opcional)"
+              value={reference}
+              onChange={(e) => setReference(e.target.value)}
+              maxLength={100}
+              className="mb-6"
+            />
             <RichTextEditor value={description} onChange={setDescription} />
           </div>
 
@@ -149,8 +136,7 @@ export const CreateTask = ({ onCreateTask }: CreateTaskProps) => {
                 setIsExpanded(false);
                 setTitle("");
                 setDescription("");
-                setVerseStart("");
-                setVerseEnd("");
+                setReference("");
                 setTags([]);
               }}
             >

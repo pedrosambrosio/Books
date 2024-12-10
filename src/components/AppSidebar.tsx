@@ -35,11 +35,13 @@ const MOCK_BOOKS: BookType[] = [
         number: 1,
         title: "Chapter One",
         pages: [
-          { id: "p1", number: 1 },
+          { id: "p1", number: 1, completed: true },
           { id: "p2", number: 2 },
         ],
+        completedPages: 1,
       },
     ],
+    completedChapters: 0,
   },
 ];
 
@@ -60,9 +62,11 @@ const BIBLE_BOOK: BookType = {
     pages: Array.from({ length: BIBLE_CHAPTERS[book] || 0 }, (_, i) => ({
       id: `${book}-${i+1}`,
       number: i + 1,
-      title: `Capítulo ${i + 1}`
+      title: `Página ${i + 1}`
     })),
+    completedPages: 0,
   })),
+  completedChapters: 0,
 };
 
 export function AppSidebar() {
@@ -74,16 +78,16 @@ export function AppSidebar() {
   const handleCreateBook = (title: string, type: 'bible' | 'regular' = 'regular') => {
     // Here you would typically make an API call to create a new book
     toast({
-      title: "Book added",
-      description: `Added "${title}" to your library`,
+      title: "Livro adicionado",
+      description: `"${title}" foi adicionado à sua biblioteca`,
     });
   };
 
   const handleCreateTag = (name: string) => {
     // Here you would typically make an API call to create a new tag
     toast({
-      title: "Tag created",
-      description: `Created tag "${name}"`,
+      title: "Tag criada",
+      description: `Tag "${name}" foi criada com sucesso`,
     });
   };
 
@@ -98,7 +102,7 @@ export function AppSidebar() {
         <div className="flex items-center gap-2 p-4">
           <SidebarInput
             type="text"
-            placeholder="Search books..."
+            placeholder="Pesquisar livros..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="flex-1"
@@ -109,12 +113,12 @@ export function AppSidebar() {
         <ScrollArea className="h-[calc(100vh-5rem)]">
           <SidebarGroup>
             <div className="flex items-center justify-between px-4 py-2">
-              <SidebarGroupLabel>Books</SidebarGroupLabel>
+              <SidebarGroupLabel>Livros</SidebarGroupLabel>
               <Button
                 variant="ghost"
                 size="icon"
                 className="h-5 w-5"
-                onClick={() => handleCreateBook("New Book")}
+                onClick={() => handleCreateBook("Novo Livro")}
               >
                 <Plus className="h-4 w-4" />
               </Button>
@@ -136,6 +140,9 @@ export function AppSidebar() {
                         )}
                         <Book className="h-4 w-4 mr-2" />
                         <span>{book.title}</span>
+                        <span className="ml-auto text-xs text-muted-foreground">
+                          {book.completedChapters}/{book.chapters.length}
+                        </span>
                       </SidebarMenuButton>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
@@ -156,7 +163,10 @@ export function AppSidebar() {
                                 ) : (
                                   <ChevronRight className="h-4 w-4 mr-2" />
                                 )}
-                                {chapter.title || `${book.type === 'bible' ? chapter.title : 'Section'} ${chapter.number}`}
+                                {chapter.title || `Capítulo ${chapter.number}`}
+                                <span className="ml-auto text-xs text-muted-foreground">
+                                  {chapter.completedPages}/{chapter.pages.length}
+                                </span>
                               </Button>
                             </CollapsibleTrigger>
                             <CollapsibleContent>
@@ -165,16 +175,17 @@ export function AppSidebar() {
                                   <Button
                                     key={page.id}
                                     variant="ghost"
-                                    className="w-full justify-start text-sm pl-8"
+                                    className={`w-full justify-start text-sm pl-8 ${
+                                      page.completed ? "text-green-500" : ""
+                                    }`}
                                     onClick={() => {
-                                      // Handle page navigation
                                       toast({
-                                        title: "Capítulo selecionado",
-                                        description: `Navegando para o capítulo ${page.number}`,
+                                        title: "Página selecionada",
+                                        description: `Navegando para a página ${page.number}`,
                                       });
                                     }}
                                   >
-                                    Capítulo {page.number}
+                                    Página {page.number}
                                   </Button>
                                 ))}
                               </div>
@@ -196,7 +207,7 @@ export function AppSidebar() {
                 variant="ghost"
                 size="icon"
                 className="h-5 w-5"
-                onClick={() => handleCreateTag("New Tag")}
+                onClick={() => handleCreateTag("Nova Tag")}
               >
                 <Plus className="h-4 w-4" />
               </Button>
@@ -208,10 +219,9 @@ export function AppSidebar() {
                     <SidebarMenuButton
                       className="w-full px-4 py-2 hover:bg-accent rounded-lg transition-colors"
                       onClick={() => {
-                        // Handle tag selection
                         toast({
-                          title: "Tag selected",
-                          description: `Showing items tagged with "${tag.name}"`,
+                          title: "Tag selecionada",
+                          description: `Mostrando itens com a tag "${tag.name}"`,
                         });
                       }}
                     >
