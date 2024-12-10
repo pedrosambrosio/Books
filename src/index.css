@@ -12,7 +12,7 @@
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 142 76% 36%;
+    --primary: 240 10% 3.9%;
     --primary-foreground: 355.7 100% 97.3%;
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
@@ -24,7 +24,7 @@
     --destructive-foreground: 0 0% 98%;
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 142 76% 36%;
+    --ring: 240 10% 3.9%;
     --radius: 0.75rem;
   }
  
@@ -97,4 +97,9 @@
 .rich-text-editor .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   @apply text-gray-400 float-left h-0 pointer-events-none;
+}
+
+/* Reduce outline thickness for focused elements */
+*:focus-visible {
+  @apply ring-1;
 }
