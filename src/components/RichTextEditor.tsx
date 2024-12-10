@@ -8,7 +8,9 @@ import TextAlign from '@tiptap/extension-text-align';
 import Heading from '@tiptap/extension-heading';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import Link from '@tiptap/extension-link';
+import { SmilePlus } from 'lucide-react';
 import { EditorToolbar } from './editor/EditorToolbar';
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface RichTextEditorProps {
   value: string;
@@ -40,27 +42,56 @@ export const RichTextEditor = ({ value, onChange }: RichTextEditorProps) => {
     },
   });
 
+  const addEmoji = (emoji: string) => {
+    editor?.chain().focus().insertContent(emoji).run();
+  };
+
   if (!editor) {
     return null;
   }
 
   return (
     <div className="rich-text-editor">
-      {editor && (
-        <BubbleMenu 
+      <div className="relative">
+        <Popover>
+          <PopoverTrigger asChild>
+            <button
+              className="absolute right-3 top-3 p-1.5 rounded hover:bg-gray-100"
+              title="Add Emoji"
+            >
+              <SmilePlus className="h-4 w-4" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-2">
+            <div className="grid grid-cols-5 gap-2">
+              {["😀", "😂", "😊", "🥰", "😎", "🤔", "👍", "❤️", "✨", "🎉"].map((emoji) => (
+                <button
+                  key={emoji}
+                  onClick={() => addEmoji(emoji)}
+                  className="p-2 hover:bg-gray-100 rounded"
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+        {editor && (
+          <BubbleMenu 
+            editor={editor} 
+            tippyOptions={{ 
+              duration: 100,
+              placement: 'top',
+            }}
+          >
+            <EditorToolbar editor={editor} />
+          </BubbleMenu>
+        )}
+        <EditorContent 
           editor={editor} 
-          tippyOptions={{ 
-            duration: 100,
-            placement: 'top',
-          }}
-        >
-          <EditorToolbar editor={editor} />
-        </BubbleMenu>
-      )}
-      <EditorContent 
-        editor={editor} 
-        className="prose prose-sm max-w-none min-h-[400px] focus:outline-none cursor-text"
-      />
+          className="prose prose-sm max-w-none min-h-[400px] focus:outline-none cursor-text"
+        />
+      </div>
     </div>
   );
 };
