@@ -48,22 +48,33 @@ export const CreateTask = ({ onCreateTask }: CreateTaskProps) => {
     setIsExpanded(false);
   };
 
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTitle = e.target.value;
+    setTitle(newTitle);
+    if (!isExpanded && newTitle) {
+      setIsExpanded(true);
+    } else if (isExpanded && !newTitle) {
+      setIsExpanded(false);
+      setDescription("");
+      setVerseStart("");
+      setVerseEnd("");
+      setTags([]);
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="glass-card rounded-lg p-6">
+    <form onSubmit={handleSubmit} className="rounded-lg p-6">
       <div className="flex items-center gap-3 mb-4">
         <Book className="h-5 w-5 text-primary" />
         <Input
           placeholder="Adicionar novo estudo ou anotação..."
           value={title}
-          onChange={(e) => {
-            setTitle(e.target.value);
-            if (!isExpanded && e.target.value) setIsExpanded(true);
-          }}
+          onChange={handleTitleChange}
           className="border-none bg-transparent px-0 text-base placeholder:text-muted-foreground focus-visible:ring-0"
         />
       </div>
       {isExpanded && (
-        <>
+        <div className="animate-fade-in">
           <div className="grid grid-cols-2 gap-4 mb-6">
             <Input
               placeholder="Versículo inicial"
@@ -147,7 +158,7 @@ export const CreateTask = ({ onCreateTask }: CreateTaskProps) => {
             </Button>
             <Button type="submit">Criar Anotação</Button>
           </div>
-        </>
+        </div>
       )}
     </form>
   );
