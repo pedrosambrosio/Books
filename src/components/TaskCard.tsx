@@ -47,7 +47,7 @@ export const TaskCard = ({ task, onUpdate, onComplete }: TaskCardProps) => {
   return (
     <>
       <div 
-        className="glass-card rounded-lg p-6 hover-scale cursor-pointer"
+        className="rounded-lg p-6 hover-scale cursor-pointer bg-white border border-zinc-200"
         onClick={() => setIsDetailsOpen(true)}
       >
         <div className="flex flex-col gap-4">
