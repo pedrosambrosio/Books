@@ -72,3 +72,16 @@
     }
   }
 }
+
+.rich-text-editor {
+  @apply relative;
+}
+
+.rich-text-editor .ProseMirror {
+  @apply min-h-[400px] p-4 outline-none;
+}
+
+.rich-text-editor .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  @apply text-gray-400 float-left h-0 pointer-events-none;
+}
