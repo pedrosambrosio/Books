@@ -8,11 +8,15 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { Star, ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = 10; // This should be dynamic based on your book's content
 
   const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress" | "isPaused">) => {
     const task: Task = {
@@ -54,6 +58,28 @@ const Index = () => {
     });
   };
 
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(prev => prev - 1);
+    }
+  };
+
+  const [isBookCompleted, setIsBookCompleted] = useState(false);
+
+  const handleMarkAsCompleted = () => {
+    setIsBookCompleted(!isBookCompleted);
+    toast({
+      title: isBookCompleted ? "Página marcada como pendente" : "Página marcada como concluída",
+      description: `A página foi marcada como ${isBookCompleted ? "pendente" : "concluída"}.`,
+    });
+  };
+
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full bg-gradient-to-b from-background to-muted/20">
@@ -71,9 +97,9 @@ const Index = () => {
               <div className="p-4 md:p-6 flex justify-center">
                 <div className="w-full max-w-2xl">
                   <div className="text-center animate-fade-in mb-8">
-                    <h1 className="text-3xl md:text-4xl font-bold mb-4">Leituras Bíblicas</h1>
+                    <h1 className="text-3xl md:text-4xl font-bold mb-4">Anote ou Pesquise..</h1>
                     <p className="text-muted-foreground">
-                      Organize suas leituras com datas e temporizadores
+                      Organize seu estudo e aprendizado
                     </p>
                   </div>
 
@@ -83,13 +109,13 @@ const Index = () => {
                         value="personal"
                         className="data-[state=active]:bg-white data-[state=active]:text-black px-6 py-3"
                       >
-                        Minhas Leituras
+                        Minhas Notas
                       </TabsTrigger>
                       <TabsTrigger 
                         value="chat"
-                        className="data-[state=active]:bg-white data-[state=active]:text-black px-6 py-3"
+                        className="data-[state=active]:bg-white data-[state=active]:text-black px-6 py-3 flex items-center gap-2"
                       >
-                        Chat
+                        Chat <Star className="h-4 w-4" />
                       </TabsTrigger>
                     </TabsList>
                     <TabsContent value="personal">
@@ -128,9 +154,40 @@ const Index = () => {
               <div className="p-4 md:p-6 flex justify-center">
                 <div className="w-full max-w-2xl">
                   <div className="glass-card h-full rounded-lg p-6">
-                    <h2 className="text-2xl font-semibold mb-6">Bíblia</h2>
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-2xl font-semibold">Livro</h2>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={handlePreviousPage}
+                          disabled={currentPage === 1}
+                        >
+                          <ArrowLeft className="h-4 w-4" />
+                        </Button>
+                        <span className="text-sm text-muted-foreground">
+                          {currentPage} / {totalPages}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={handleNextPage}
+                          disabled={currentPage === totalPages}
+                        >
+                          <ArrowRight className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={handleMarkAsCompleted}
+                          className={isBookCompleted ? "text-green-500" : ""}
+                        >
+                          <CheckCircle className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
                     <p className="text-muted-foreground text-center">
-                      Conteúdo bíblico em breve...
+                      Conteudo de livros em breve...
                     </p>
                   </div>
                 </div>
