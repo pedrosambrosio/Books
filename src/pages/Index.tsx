@@ -11,6 +11,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { Star, ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Book as BookType } from "@/types/Book";
+import { GENESIS_CONTENT } from "@/data/bibleContent";
 
 // Create Bible book structure with only Genesis
 const BIBLE_BOOK: BookType = {
@@ -39,7 +40,7 @@ const Index = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 10;
+  const totalPages = 3;
   const [isBookCompleted, setIsBookCompleted] = useState(false);
   const [currentBibleBook, setCurrentBibleBook] = useState(BIBLE_BOOK);
 
@@ -117,7 +118,13 @@ const Index = () => {
     });
   };
 
-  // ... keep existing code (render JSX)
+  // Get current page content
+  const getCurrentPageContent = () => {
+    if (currentPage >= 1 && currentPage <= 3) {
+      return GENESIS_CONTENT.chapter1[`page${currentPage}` as keyof typeof GENESIS_CONTENT.chapter1];
+    }
+    return "";
+  };
 
   return (
     <SidebarProvider>
@@ -194,7 +201,7 @@ const Index = () => {
                 <div className="w-full max-w-2xl">
                   <div className="glass-card h-full rounded-lg p-6">
                     <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-2xl font-semibold">Livro</h2>
+                      <h2 className="text-2xl font-semibold">Gênesis</h2>
                       <div className="flex items-center gap-2">
                         <Button
                           variant="ghost"
@@ -225,9 +232,9 @@ const Index = () => {
                         </Button>
                       </div>
                     </div>
-                    <p className="text-muted-foreground text-center">
-                      Conteudo de livros em breve...
-                    </p>
+                    <div className="prose prose-sm max-w-none">
+                      {getCurrentPageContent()}
+                    </div>
                   </div>
                 </div>
               </div>
