@@ -37,11 +37,13 @@ export function AppSidebar() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch books using the selected API
-  const { data: books = [], isLoading: isLoadingBooks } = useQuery({
+  // Fetch books using the selected API with proper typing
+  const { data: booksResponse, isLoading: isLoadingBooks } = useQuery<{ data: BookType[] }>({
     queryKey: ['books'],
-    queryFn: () => apiService.books.getAll().then(response => response.data || []),
+    queryFn: () => apiService.books.getAll(),
   });
+
+  const books = booksResponse?.data || [];
 
   const groupedBooks = books.reduce((acc: { [key: string]: GroupedBook }, book) => {
     const { description, title } = book;
