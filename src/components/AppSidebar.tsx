@@ -29,9 +29,10 @@ const MOCK_TAGS: TagType[] = [
 
 interface AppSidebarProps {
   currentBook: BookType;
+  onPageSelect?: (pageNumber: number) => void;
 }
 
-export function AppSidebar({ currentBook }: AppSidebarProps) {
+export function AppSidebar({ currentBook, onPageSelect }: AppSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
   const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
@@ -49,6 +50,16 @@ export function AppSidebar({ currentBook }: AppSidebarProps) {
       title: "Tag criada",
       description: `Tag "${name}" foi criada com sucesso`,
     });
+  };
+
+  const handlePageClick = (pageNumber: number) => {
+    if (onPageSelect) {
+      onPageSelect(pageNumber);
+      toast({
+        title: "Página selecionada",
+        description: `Navegando para a página ${pageNumber}`,
+      });
+    }
   };
 
   // Filter books based on search query
@@ -140,12 +151,7 @@ export function AppSidebar({ currentBook }: AppSidebarProps) {
                                     className={`w-full justify-start text-sm pl-8 ${
                                       page.completed ? "text-[#0EA5E9]" : ""
                                     }`}
-                                    onClick={() => {
-                                      toast({
-                                        title: "Página selecionada",
-                                        description: `Navegando para a página ${page.number}`,
-                                      });
-                                    }}
+                                    onClick={() => handlePageClick(page.number)}
                                   >
                                     <span className="flex items-center gap-2">
                                       Página {page.number}

@@ -126,10 +126,14 @@ const Index = () => {
     return "";
   };
 
+  const handlePageSelect = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full bg-gradient-to-b from-background to-muted/20">
-        <AppSidebar currentBook={currentBibleBook} />
+        <AppSidebar currentBook={currentBibleBook} onPageSelect={handlePageSelect} />
         <ResizablePanelGroup 
           direction={isMobile ? "vertical" : "horizontal"} 
           className="h-screen flex-1"
@@ -232,7 +236,7 @@ const Index = () => {
                         </Button>
                       </div>
                     </div>
-                    <div className="prose prose-sm max-w-none">
+                    <div className="prose prose-sm max-w-none whitespace-pre-line">
                       {getCurrentPageContent()}
                     </div>
                   </div>
