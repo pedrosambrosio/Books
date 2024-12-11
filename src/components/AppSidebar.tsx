@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Book, ChevronDown, ChevronRight, Plus, Tags } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Book, ChevronDown, ChevronRight, MessageSquare, Circle, CheckCircle } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -13,7 +13,6 @@ import {
   SidebarInput,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Collapsible,
@@ -21,21 +20,17 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Book as BookType, GroupedBook } from "@/types/Book";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/services/api";
+import { useQuery } from "@tanstack/react-query";
 import { mockApi } from "@/services/mockApi";
 
-// Use environment variable to determine which API to use
 const USE_MOCK_API = true;
-const apiService = USE_MOCK_API ? mockApi : api;
+const apiService = USE_MOCK_API ? mockApi : null;
 
 export function AppSidebar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
   const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
   const [selectedPage, setSelectedPage] = useState<string | null>(null);
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   // Fetch books using the selected API
   const { data: books = [], isLoading: isLoadingBooks } = useQuery({
@@ -46,60 +41,77 @@ export function AppSidebar() {
   const groupedBooks = books.reduce((acc: { [key: string]: GroupedBook }, book) => {
     const { description, title } = book;
 
-    if (!description) return acc; // Skip books without a description
+    if (!description) return acc;
 
-    // Initialize the group if it doesn't exist
     if (!acc[description]) {
       acc[description] = {
         description,
         chapters: [],
-        completedChapters: 0, // Assuming default as 0 if not present
+        completedChapters: 0,
+        annotations: 0,
       };
     }
 
-    // Add chapters to the grouped book (handle case where chapters may not exist)
     acc[description].chapters = [
       ...acc[description].chapters,
       ...(book.chapters || []).map(chapter => ({
         ...chapter,
-        title: title || 'Untitled Book', // Fallback title
-        pages: chapter.pages || [], // Ensure pages array exists
+        title: title || 'Untitled Book',
+        pages: chapter.pages || [],
       })),
     ];
 
-    // Update completed chapters count
     acc[description].completedChapters += book.completedChapters || 0;
+    acc[description].annotations += book.annotations || 0;
 
     return acc;
   }, {});
 
-  // Handle page selection with navigation
-  const handlePageSelect = (pageId: string, verses: string[] = [], chapterId: string) => {
+  useEffect(() => {
+    const handlePageCompleted = (event: CustomEvent<{
+      currentPage: number;
+      completed: boolean;
+    }>) => {
+      // Update the completion status in the local state
+      const { currentPage, completed } = event.detail;
+      // You would typically update this through your API
+      console.log(`Page ${currentPage} marked as ${completed ? 'completed' : 'incomplete'}`);
+    };
+
+    window.addEventListener('pageCompleted', handlePageCompleted as EventListener);
+
+    return () => {
+      window.removeEventListener('pageCompleted', handlePageCompleted as EventListener);
+    };
+  }, []);
+
+  const handlePageSelect = (pageId: string, verses: string[] = [], chapterId: string, isCompleted: boolean = false) => {
     setSelectedPage(pageId);
-    // Find all pages in the current chapter
+    
     const currentChapter = books
       .flatMap(book => book.chapters)
       .find(chapter => chapter.id === chapterId);
     
     if (currentChapter) {
       const currentPageIndex = currentChapter.pages.findIndex(page => page.id === pageId);
-      // Emit an event with page navigation data
+      
       const event = new CustomEvent('pageSelected', { 
         detail: { 
           verses,
           currentPage: currentPageIndex + 1,
           totalPages: currentChapter.pages.length,
           chapterId,
+          isCompleted,
           onNextPage: () => {
             if (currentPageIndex < currentChapter.pages.length - 1) {
               const nextPage = currentChapter.pages[currentPageIndex + 1];
-              handlePageSelect(nextPage.id, nextPage.verses, chapterId);
+              handlePageSelect(nextPage.id, nextPage.verses, chapterId, nextPage.completed);
             }
           },
           onPreviousPage: () => {
             if (currentPageIndex > 0) {
               const prevPage = currentChapter.pages[currentPageIndex - 1];
-              handlePageSelect(prevPage.id, prevPage.verses, chapterId);
+              handlePageSelect(prevPage.id, prevPage.verses, chapterId, prevPage.completed);
             }
           }
         } 
@@ -108,7 +120,6 @@ export function AppSidebar() {
     }
   };
 
-  // Filter books based on search query
   const filteredBooks = Object.values(groupedBooks).filter(book => 
     book.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -146,17 +157,31 @@ export function AppSidebar() {
                       onOpenChange={() => setExpandedBook(expandedBook === book.description ? null : book.description)}
                     >
                       <CollapsibleTrigger asChild>
-                        <SidebarMenuButton className="w-full px-4 py-2 hover:bg-accent rounded-lg transition-colors">
-                          {expandedBook === book.description ? (
-                            <ChevronDown className="h-4 w-4 mr-2" />
-                          ) : (
-                            <ChevronRight className="h-4 w-4 mr-2" />
-                          )}
-                          <Book className="h-4 w-4 mr-2" />
-                          <span>{book.description}</span>
-                          <span className="ml-auto text-xs text-muted-foreground">
-                            {book.completedChapters}/{book.chapters.length}
-                          </span>
+                        <SidebarMenuButton 
+                          className={`w-full px-4 py-2 hover:bg-accent rounded-lg transition-colors flex items-center justify-between ${
+                            expandedBook === book.description ? 'bg-primary text-white' : ''
+                          }`}
+                        >
+                          <div className="flex items-center">
+                            {expandedBook === book.description ? (
+                              <ChevronDown className="h-4 w-4 mr-2" />
+                            ) : (
+                              <ChevronRight className="h-4 w-4 mr-2" />
+                            )}
+                            <Book className="h-4 w-4 mr-2" />
+                            <span>{book.description}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs">
+                            {book.annotations > 0 && (
+                              <span className="flex items-center gap-1">
+                                <MessageSquare className="h-3 w-3" />
+                                {book.annotations}
+                              </span>
+                            )}
+                            <span>
+                              {book.completedChapters}/{book.chapters.length}
+                            </span>
+                          </div>
                         </SidebarMenuButton>
                       </CollapsibleTrigger>
                       <CollapsibleContent>
@@ -170,17 +195,29 @@ export function AppSidebar() {
                               <CollapsibleTrigger asChild>
                                 <Button
                                   variant="ghost"
-                                  className="w-full justify-start text-sm"
+                                  className={`w-full justify-between text-sm ${
+                                    expandedChapter === chapter.id ? 'bg-primary text-white' : ''
+                                  }`}
                                 >
-                                  {expandedChapter === chapter.id ? (
-                                    <ChevronDown className="h-4 w-4 mr-2" />
-                                  ) : (
-                                    <ChevronRight className="h-4 w-4 mr-2" />
-                                  )}
-                                  {chapter.title}
-                                  <span className="ml-auto text-xs text-muted-foreground">
-                                    {chapter.completedPages || 0}/{(chapter.pages || []).length}
-                                  </span>
+                                  <div className="flex items-center">
+                                    {expandedChapter === chapter.id ? (
+                                      <ChevronDown className="h-4 w-4 mr-2" />
+                                    ) : (
+                                      <ChevronRight className="h-4 w-4 mr-2" />
+                                    )}
+                                    {chapter.title}
+                                  </div>
+                                  <div className="flex items-center gap-2 text-xs">
+                                    {chapter.annotations > 0 && (
+                                      <span className="flex items-center gap-1">
+                                        <MessageSquare className="h-3 w-3" />
+                                        {chapter.annotations}
+                                      </span>
+                                    )}
+                                    <span>
+                                      {chapter.completedPages || 0}/{(chapter.pages || []).length}
+                                    </span>
+                                  </div>
                                 </Button>
                               </CollapsibleTrigger>
                               <CollapsibleContent>
@@ -189,12 +226,25 @@ export function AppSidebar() {
                                     <Button
                                       key={page.id}
                                       variant="ghost"
-                                      className={`w-full justify-start text-sm pl-8 ${
-                                        page.completed ? "text-green-500" : ""
+                                      className={`w-full justify-between text-sm pl-8 ${
+                                        selectedPage === page.id ? 'bg-primary text-white' : ''
                                       }`}
-                                      onClick={() => handlePageSelect(page.id, page.verses, chapter.id)}
+                                      onClick={() => handlePageSelect(page.id, page.verses, chapter.id, page.completed)}
                                     >
-                                      Página {page.number}
+                                      <div className="flex items-center gap-2">
+                                        {page.completed ? (
+                                          <CheckCircle className="h-4 w-4" />
+                                        ) : (
+                                          <Circle className="h-4 w-4" />
+                                        )}
+                                        <span>Página {page.number}</span>
+                                      </div>
+                                      {page.annotations > 0 && (
+                                        <span className="flex items-center gap-1 text-xs">
+                                          <MessageSquare className="h-3 w-3" />
+                                          {page.annotations}
+                                        </span>
+                                      )}
                                     </Button>
                                   ))}
                                 </div>
