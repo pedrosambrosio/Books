@@ -19,7 +19,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
-import { Book as BookType } from "@/types/Book";
+import { Book as BookType, GroupedBook } from "@/types/Book";
 import { useQuery } from "@tanstack/react-query";
 import { mockApi } from "@/services/mockApi";
 
