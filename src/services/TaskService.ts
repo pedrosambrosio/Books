@@ -1,29 +1,16 @@
-import { BASE_URL, getApiUrl, logApiCall } from '../lib/utils';
+import { api } from './api';
+import { Task } from '@/components/TaskCard';
 
 export const TaskService = {
-  async getTasks() {
-    const url = getApiUrl('/tasks');
-    logApiCall(url);
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return await response.json();
+  getTasks: async () => {
+    const response = await api.tasks.getAll();
+    return response.data || [];
   },
 
-  async createTask(task: any) {
-    const url = getApiUrl('/tasks');
-    logApiCall(url);
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(task),
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return await response.json();
+  createTask: async (task: Omit<Task, "id">) => {
+    const response = await api.tasks.create(task);
+    return response.data;
   }
 };
+
+export default TaskService;
