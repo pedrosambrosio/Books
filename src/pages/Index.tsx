@@ -18,6 +18,13 @@ const Index = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = 10; // This should be dynamic based on your book's content
   const [selectedVerses, setSelectedVerses] = useState<string[]>([]);
+  const [navigationHandlers, setNavigationHandlers] = useState<{
+    onNextPage: () => void;
+    onPreviousPage: () => void;
+  }>({
+    onNextPage: () => {},
+    onPreviousPage: () => {},
+  });
 
   const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress" | "isPaused">) => {
     const task: Task = {
@@ -59,31 +66,20 @@ const Index = () => {
     });
   };
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(prev => prev + 1);
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(prev => prev - 1);
-    }
-  };
-
-  const [isBookCompleted, setIsBookCompleted] = useState(false);
-
-  const handleMarkAsCompleted = () => {
-    setIsBookCompleted(!isBookCompleted);
-    toast({
-      title: isBookCompleted ? "Página marcada como pendente" : "Página marcada como concluída",
-      description: `A página foi marcada como ${isBookCompleted ? "pendente" : "concluída"}.`,
-    });
-  };
-
   useEffect(() => {
-    const handlePageSelected = (event: CustomEvent<{ verses: string[] }>) => {
+    const handlePageSelected = (event: CustomEvent<{
+      verses: string[];
+      currentPage: number;
+      totalPages: number;
+      onNextPage: () => void;
+      onPreviousPage: () => void;
+    }>) => {
       setSelectedVerses(event.detail.verses || []);
+      setCurrentPage(event.detail.currentPage);
+      setNavigationHandlers({
+        onNextPage: event.detail.onNextPage,
+        onPreviousPage: event.detail.onPreviousPage,
+      });
     };
 
     window.addEventListener('pageSelected', handlePageSelected as EventListener);
@@ -173,7 +169,7 @@ const Index = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={handlePreviousPage}
+                          onClick={navigationHandlers.onPreviousPage}
                           disabled={currentPage === 1}
                         >
                           <ArrowLeft className="h-4 w-4" />
@@ -184,18 +180,10 @@ const Index = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={handleNextPage}
+                          onClick={navigationHandlers.onNextPage}
                           disabled={currentPage === totalPages}
                         >
                           <ArrowRight className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={handleMarkAsCompleted}
-                          className={isBookCompleted ? "text-green-500" : ""}
-                        >
-                          <CheckCircle className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
