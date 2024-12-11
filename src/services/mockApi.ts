@@ -1,12 +1,13 @@
 import { MOCK_BOOKS } from "@/mocks/bibleData";
 import { Book } from "@/types/Book";
+import { ApiResponse } from "./api";
 
 export const mockApi = {
   books: {
-    getAll: async (): Promise<{ data: Book[] }> => {
+    getAll: async (): Promise<ApiResponse<Book[]>> => {
       return new Promise((resolve) => {
         setTimeout(() => {
-          resolve({ data: MOCK_BOOKS as Book[] });
+          resolve({ data: MOCK_BOOKS });
         }, 500);
       });
     }

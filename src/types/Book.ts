@@ -30,7 +30,7 @@ export interface GroupedBook {
   description: string;
   chapters: Chapter[];
   completedChapters: number;
-  annotationCount?: number;
+  annotationCount: number;
 }
 
 export interface Tag {
