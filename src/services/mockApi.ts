@@ -6,8 +6,8 @@ export const mockApi = {
     getAll: async (): Promise<{ data: Book[] }> => {
       return new Promise((resolve) => {
         setTimeout(() => {
-          resolve({ data: MOCK_BOOKS });
-        }, 500); // Simulate network delay
+          resolve({ data: MOCK_BOOKS as Book[] });
+        }, 500);
       });
     }
   }

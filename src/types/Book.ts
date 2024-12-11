@@ -4,6 +4,7 @@ export interface Page {
   title?: string;
   completed?: boolean;
   verses?: string[];
+  annotationCount?: number;
 }
 
 export interface Chapter {
@@ -12,6 +13,7 @@ export interface Chapter {
   title: string;
   pages: Page[];
   completedPages?: number;
+  annotationCount?: number;
 }
 
 export interface Book {
@@ -21,12 +23,14 @@ export interface Book {
   description: string;
   chapters: Chapter[];
   completedChapters?: number;
+  annotationCount?: number;
 }
 
 export interface GroupedBook {
   description: string;
   chapters: Chapter[];
   completedChapters: number;
+  annotationCount?: number;
 }
 
 export interface Tag {

@@ -10,13 +10,16 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Star, ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 10; // This should be dynamic based on your book's content
+  const [currentPageId, setCurrentPageId] = useState<string | null>(null);
+  const [currentChapterId, setCurrentChapterId] = useState<string | null>(null);
+  const totalPages = 10;
   const [selectedVerses, setSelectedVerses] = useState<string[]>([]);
   const [navigationHandlers, setNavigationHandlers] = useState<{
     onNextPage: () => void;
@@ -25,6 +28,8 @@ const Index = () => {
     onNextPage: () => {},
     onPreviousPage: () => {},
   });
+
+  const queryClient = useQueryClient();
 
   const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress" | "isPaused">) => {
     const task: Task = {
@@ -36,6 +41,35 @@ const Index = () => {
     };
 
     setTasks((prev) => [task, ...prev]);
+    
+    // Update annotation count in the books data
+    queryClient.setQueryData(['books'], (oldData: any) => {
+      const books = oldData.data;
+      const updatedBooks = books.map((book: any) => ({
+        ...book,
+        annotationCount: (book.annotationCount || 0) + 1,
+        chapters: book.chapters.map((chapter: any) => {
+          if (chapter.id === currentChapterId) {
+            return {
+              ...chapter,
+              annotationCount: (chapter.annotationCount || 0) + 1,
+              pages: chapter.pages.map((page: any) => {
+                if (page.id === currentPageId) {
+                  return {
+                    ...page,
+                    annotationCount: (page.annotationCount || 0) + 1,
+                  };
+                }
+                return page;
+              }),
+            };
+          }
+          return chapter;
+        }),
+      }));
+      return { data: updatedBooks };
+    });
+
     toast({
       title: "Task created",
       description: "Your new task has been created successfully.",
@@ -60,9 +94,83 @@ const Index = () => {
 
   const handleDeleteTask = (taskId: string) => {
     setTasks((prev) => prev.filter((task) => task.id !== taskId));
+    
+    // Update annotation count in the books data
+    queryClient.setQueryData(['books'], (oldData: any) => {
+      const books = oldData.data;
+      const updatedBooks = books.map((book: any) => ({
+        ...book,
+        annotationCount: Math.max((book.annotationCount || 0) - 1, 0),
+        chapters: book.chapters.map((chapter: any) => {
+          if (chapter.id === currentChapterId) {
+            return {
+              ...chapter,
+              annotationCount: Math.max((chapter.annotationCount || 0) - 1, 0),
+              pages: chapter.pages.map((page: any) => {
+                if (page.id === currentPageId) {
+                  return {
+                    ...page,
+                    annotationCount: Math.max((page.annotationCount || 0) - 1, 0),
+                  };
+                }
+                return page;
+              }),
+            };
+          }
+          return chapter;
+        }),
+      }));
+      return { data: updatedBooks };
+    });
+
     toast({
       title: "Anotação excluída",
       description: "A anotação foi excluída com sucesso.",
+    });
+  };
+
+  const handleCompletePage = () => {
+    if (!currentPageId || !currentChapterId) return;
+
+    queryClient.setQueryData(['books'], (oldData: any) => {
+      const books = oldData.data;
+      const updatedBooks = books.map((book: any) => {
+        const updatedChapters = book.chapters.map((chapter: any) => {
+          if (chapter.id === currentChapterId) {
+            const updatedPages = chapter.pages.map((page: any) => {
+              if (page.id === currentPageId) {
+                return { ...page, completed: true };
+              }
+              return page;
+            });
+            
+            const completedPages = updatedPages.filter((page: any) => page.completed).length;
+            return {
+              ...chapter,
+              pages: updatedPages,
+              completedPages,
+            };
+          }
+          return chapter;
+        });
+
+        const completedChapters = updatedChapters.filter(
+          (chapter: any) => chapter.completedPages === chapter.pages.length
+        ).length;
+
+        return {
+          ...book,
+          chapters: updatedChapters,
+          completedChapters,
+        };
+      });
+
+      return { data: updatedBooks };
+    });
+
+    toast({
+      title: "Página concluída",
+      description: "A página foi marcada como concluída com sucesso.",
     });
   };
 
@@ -71,11 +179,15 @@ const Index = () => {
       verses: string[];
       currentPage: number;
       totalPages: number;
+      chapterId: string;
+      pageId: string;
       onNextPage: () => void;
       onPreviousPage: () => void;
     }>) => {
       setSelectedVerses(event.detail.verses || []);
       setCurrentPage(event.detail.currentPage);
+      setCurrentChapterId(event.detail.chapterId);
+      setCurrentPageId(event.detail.pageId);
       setNavigationHandlers({
         onNextPage: event.detail.onNextPage,
         onPreviousPage: event.detail.onPreviousPage,
@@ -184,6 +296,15 @@ const Index = () => {
                           disabled={currentPage === totalPages}
                         >
                           <ArrowRight className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="ml-4"
+                          onClick={handleCompletePage}
+                        >
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Concluir
                         </Button>
                       </div>
                     </div>

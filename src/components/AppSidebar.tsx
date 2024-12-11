@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Book, ChevronDown, ChevronRight, Plus, Tags } from "lucide-react";
+import { Book, ChevronDown, ChevronRight, Plus, Tags, Circle, CheckCircle, MessageSquare } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -46,29 +46,28 @@ export function AppSidebar() {
   const groupedBooks = books.reduce((acc: { [key: string]: GroupedBook }, book) => {
     const { description, title } = book;
 
-    if (!description) return acc; // Skip books without a description
+    if (!description) return acc;
 
-    // Initialize the group if it doesn't exist
     if (!acc[description]) {
       acc[description] = {
         description,
         chapters: [],
-        completedChapters: 0, // Assuming default as 0 if not present
+        completedChapters: 0,
+        annotationCount: 0,
       };
     }
 
-    // Add chapters to the grouped book (handle case where chapters may not exist)
     acc[description].chapters = [
       ...acc[description].chapters,
       ...(book.chapters || []).map(chapter => ({
         ...chapter,
-        title: title || 'Untitled Book', // Fallback title
-        pages: chapter.pages || [], // Ensure pages array exists
+        title: title || 'Untitled Book',
+        pages: chapter.pages || [],
       })),
     ];
 
-    // Update completed chapters count
     acc[description].completedChapters += book.completedChapters || 0;
+    acc[description].annotationCount += book.annotationCount || 0;
 
     return acc;
   }, {});
@@ -90,6 +89,7 @@ export function AppSidebar() {
           currentPage: currentPageIndex + 1,
           totalPages: currentChapter.pages.length,
           chapterId,
+          pageId,
           onNextPage: () => {
             if (currentPageIndex < currentChapter.pages.length - 1) {
               const nextPage = currentChapter.pages[currentPageIndex + 1];
@@ -154,9 +154,17 @@ export function AppSidebar() {
                           )}
                           <Book className="h-4 w-4 mr-2" />
                           <span>{book.description}</span>
-                          <span className="ml-auto text-xs text-muted-foreground">
-                            {book.completedChapters}/{book.chapters.length}
-                          </span>
+                          <div className="ml-auto flex items-center gap-2">
+                            <span className="text-xs text-muted-foreground">
+                              {book.completedChapters}/{book.chapters.length}
+                            </span>
+                            {book.annotationCount > 0 && (
+                              <div className="flex items-center gap-1 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                                <MessageSquare className="h-3 w-3" />
+                                {book.annotationCount}
+                              </div>
+                            )}
+                          </div>
                         </SidebarMenuButton>
                       </CollapsibleTrigger>
                       <CollapsibleContent>
@@ -178,9 +186,17 @@ export function AppSidebar() {
                                     <ChevronRight className="h-4 w-4 mr-2" />
                                   )}
                                   {chapter.title}
-                                  <span className="ml-auto text-xs text-muted-foreground">
-                                    {chapter.completedPages || 0}/{(chapter.pages || []).length}
-                                  </span>
+                                  <div className="ml-auto flex items-center gap-2">
+                                    <span className="text-xs text-muted-foreground">
+                                      {chapter.completedPages || 0}/{(chapter.pages || []).length}
+                                    </span>
+                                    {(chapter.annotationCount || 0) > 0 && (
+                                      <div className="flex items-center gap-1 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                                        <MessageSquare className="h-3 w-3" />
+                                        {chapter.annotationCount}
+                                      </div>
+                                    )}
+                                  </div>
                                 </Button>
                               </CollapsibleTrigger>
                               <CollapsibleContent>
@@ -190,11 +206,22 @@ export function AppSidebar() {
                                       key={page.id}
                                       variant="ghost"
                                       className={`w-full justify-start text-sm pl-8 ${
-                                        page.completed ? "text-green-500" : ""
+                                        selectedPage === page.id ? "bg-accent text-accent-foreground" : ""
                                       }`}
                                       onClick={() => handlePageSelect(page.id, page.verses, chapter.id)}
                                     >
+                                      {page.completed ? (
+                                        <CheckCircle className="h-4 w-4 mr-2 text-primary" />
+                                      ) : (
+                                        <Circle className="h-4 w-4 mr-2" />
+                                      )}
                                       Página {page.number}
+                                      {(page.annotationCount || 0) > 0 && (
+                                        <div className="ml-auto flex items-center gap-1 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                                          <MessageSquare className="h-3 w-3" />
+                                          {page.annotationCount}
+                                        </div>
+                                      )}
                                     </Button>
                                   ))}
                                 </div>
