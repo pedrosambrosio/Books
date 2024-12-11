@@ -10,13 +10,38 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Star, ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Book as BookType } from "@/types/Book";
+
+// Create Bible book structure with only Genesis
+const BIBLE_BOOK: BookType = {
+  id: "bible",
+  title: "Bíblia",
+  type: "bible",
+  chapters: [
+    {
+      id: "genesis",
+      number: 1,
+      title: "Genesis",
+      pages: Array.from({ length: 3 }, (_, i) => ({
+        id: `genesis-${i+1}`,
+        number: i + 1,
+        title: `Página ${i + 1}`,
+        completed: false
+      })),
+      completedPages: 0,
+    }
+  ],
+  completedChapters: 0,
+};
 
 const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 10; // This should be dynamic based on your book's content
+  const totalPages = 10;
+  const [isBookCompleted, setIsBookCompleted] = useState(false);
+  const [currentBibleBook, setCurrentBibleBook] = useState(BIBLE_BOOK);
 
   const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress" | "isPaused">) => {
     const task: Task = {
@@ -70,25 +95,34 @@ const Index = () => {
     }
   };
 
-  const [isBookCompleted, setIsBookCompleted] = useState(false);
-
   const handleMarkAsCompleted = () => {
     setIsBookCompleted(!isBookCompleted);
+    
     // Update the current page as completed in the Bible book
-    const currentChapter = BIBLE_BOOK.chapters[0]; // Genesis
+    const updatedBook = { ...currentBibleBook };
+    const currentChapter = updatedBook.chapters[0]; // Genesis
     if (currentChapter && currentChapter.pages[currentPage - 1]) {
       currentChapter.pages[currentPage - 1].completed = !isBookCompleted;
+      currentChapter.completedPages = currentChapter.pages.filter(page => page.completed).length;
     }
+    updatedBook.completedChapters = updatedBook.chapters.filter(
+      chapter => chapter.completedPages === chapter.pages.length
+    ).length;
+    
+    setCurrentBibleBook(updatedBook);
+    
     toast({
       title: isBookCompleted ? "Página marcada como pendente" : "Página marcada como concluída",
       description: `A página foi marcada como ${isBookCompleted ? "pendente" : "concluída"}.`,
     });
   };
 
+  // ... keep existing code (render JSX)
+
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full bg-gradient-to-b from-background to-muted/20">
-        <AppSidebar />
+        <AppSidebar currentBook={currentBibleBook} />
         <ResizablePanelGroup 
           direction={isMobile ? "vertical" : "horizontal"} 
           className="h-screen flex-1"

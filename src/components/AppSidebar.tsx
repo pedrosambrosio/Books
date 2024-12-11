@@ -27,29 +27,11 @@ const MOCK_TAGS: TagType[] = [
   { id: "2", name: "Review", color: "#3b82f6" },
 ];
 
-// Create Bible book structure with only Genesis
-const BIBLE_BOOK: BookType = {
-  id: "bible",
-  title: "Bíblia",
-  type: "bible",
-  chapters: [
-    {
-      id: "genesis",
-      number: 1,
-      title: "Genesis",
-      pages: Array.from({ length: 3 }, (_, i) => ({
-        id: `genesis-${i+1}`,
-        number: i + 1,
-        title: `Página ${i + 1}`,
-        completed: false
-      })),
-      completedPages: 0,
-    }
-  ],
-  completedChapters: 0,
-};
+interface AppSidebarProps {
+  currentBook: BookType;
+}
 
-export function AppSidebar() {
+export function AppSidebar({ currentBook }: AppSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
   const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
@@ -70,7 +52,7 @@ export function AppSidebar() {
   };
 
   // Filter books based on search query
-  const filteredBooks = [BIBLE_BOOK].filter(book => 
+  const filteredBooks = [currentBook].filter(book => 
     book.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
