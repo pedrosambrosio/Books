@@ -8,16 +8,16 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Star } from "lucide-react";
-import { ContentPanel } from "@/components/content/ContentPanel";
+import { Star, ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = 10; // This should be dynamic based on your book's content
   const [selectedVerses, setSelectedVerses] = useState<string[]>([]);
-  const [isPageCompleted, setIsPageCompleted] = useState(false);
   const [navigationHandlers, setNavigationHandlers] = useState<{
     onNextPage: () => void;
     onPreviousPage: () => void;
@@ -73,11 +73,9 @@ const Index = () => {
       totalPages: number;
       onNextPage: () => void;
       onPreviousPage: () => void;
-      isCompleted?: boolean;
     }>) => {
       setSelectedVerses(event.detail.verses || []);
       setCurrentPage(event.detail.currentPage);
-      setIsPageCompleted(event.detail.isCompleted || false);
       setNavigationHandlers({
         onNextPage: event.detail.onNextPage,
         onPreviousPage: event.detail.onPreviousPage,
@@ -90,18 +88,6 @@ const Index = () => {
       window.removeEventListener('pageSelected', handlePageSelected as EventListener);
     };
   }, []);
-
-  const handlePageComplete = () => {
-    setIsPageCompleted(!isPageCompleted);
-    // Dispatch event to update sidebar
-    const event = new CustomEvent('pageCompleted', {
-      detail: {
-        currentPage,
-        completed: !isPageCompleted
-      }
-    });
-    window.dispatchEvent(event);
-  };
 
   return (
     <SidebarProvider>
@@ -174,17 +160,47 @@ const Index = () => {
           
           <ResizablePanel defaultSize={50} minSize={30} className="h-full">
             <ScrollArea className="h-full">
-              <div className="p-4 md:p-6">
-                <div className="max-w-2xl mx-auto">
-                  <ContentPanel
-                    verses={selectedVerses}
-                    currentPage={currentPage}
-                    totalPages={10}
-                    onNextPage={navigationHandlers.onNextPage}
-                    onPreviousPage={navigationHandlers.onPreviousPage}
-                    onComplete={handlePageComplete}
-                    isCompleted={isPageCompleted}
-                  />
+              <div className="p-4 md:p-6 flex justify-center">
+                <div className="w-full max-w-2xl">
+                  <div className="glass-card h-full rounded-lg p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-2xl font-semibold">Conteúdo</h2>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={navigationHandlers.onPreviousPage}
+                          disabled={currentPage === 1}
+                        >
+                          <ArrowLeft className="h-4 w-4" />
+                        </Button>
+                        <span className="text-sm text-muted-foreground">
+                          {currentPage} / {totalPages}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={navigationHandlers.onNextPage}
+                          disabled={currentPage === totalPages}
+                        >
+                          <ArrowRight className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    {selectedVerses.length > 0 ? (
+                      <div className="space-y-4">
+                        {selectedVerses.map((verse, index) => (
+                          <p key={index} className="text-muted-foreground">
+                            {verse}
+                          </p>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground text-center">
+                        Selecione uma página para ver seu conteúdo
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </ScrollArea>
