@@ -38,29 +38,34 @@ export function AppSidebar() {
     queryFn: () => api.books.getAll().then(response => response.data || []),
   });
 
-  // Group books by description
+  // Adjusted data structure to handle grouping
   const groupedBooks = books.reduce((acc: { [key: string]: GroupedBook }, book) => {
-    if (!acc[book.description]) {
-      acc[book.description] = {
-        description: book.description,
+    const { description, title } = book;
+
+    if (!description) return acc; // Skip books without a description
+
+    // Initialize the group if it doesn't exist
+    if (!acc[description]) {
+      acc[description] = {
+        description,
         chapters: [],
-        completedChapters: 0
+        completedChapters: 0, // Assuming default as 0 if not present
       };
     }
-    
-    // Add book's chapters to the grouped book
-    acc[book.description].chapters = [
-      ...acc[book.description].chapters,
+
+    // Add chapters to the grouped book (handle case where chapters may not exist)
+    acc[description].chapters = [
+      ...acc[description].chapters,
       ...(book.chapters || []).map(chapter => ({
         ...chapter,
-        title: book.title, // Use book title as chapter title
-        pages: chapter.pages || []
-      }))
+        title: title || 'Untitled Book', // Fallback title
+        pages: chapter.pages || [], // Ensure pages array exists
+      })),
     ];
-    
+
     // Update completed chapters count
-    acc[book.description].completedChapters += book.completedChapters || 0;
-    
+    acc[description].completedChapters += book.completedChapters || 0;
+
     return acc;
   }, {});
 
