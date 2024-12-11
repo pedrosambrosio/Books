@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Book, ChevronDown, ChevronRight, Plus, Tag, Tags } from "lucide-react";
 import {
   Sidebar,
@@ -21,78 +21,61 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Book as BookType, Tag as TagType } from "@/types/Book";
-import { BIBLE_BOOKS, BIBLE_CHAPTERS } from "@/data/bible";
-
-// Mock data for testing - replace with actual data from your backend
-const MOCK_BOOKS: BookType[] = [
-  {
-    id: "1",
-    title: "The Great Gatsby",
-    type: "regular",
-    chapters: [
-      {
-        id: "c1",
-        number: 1,
-        title: "Chapter One",
-        pages: [
-          { id: "p1", number: 1, completed: true },
-          { id: "p2", number: 2 },
-        ],
-        completedPages: 1,
-      },
-    ],
-    completedChapters: 0,
-  },
-];
-
-const MOCK_TAGS: TagType[] = [
-  { id: "1", name: "Important", color: "#ef4444" },
-  { id: "2", name: "Review", color: "#3b82f6" },
-];
-
-// Create Bible book structure
-const BIBLE_BOOK: BookType = {
-  id: "bible",
-  title: "Bíblia",
-  type: "bible",
-  chapters: BIBLE_BOOKS.map(book => ({
-    id: book,
-    number: BIBLE_BOOKS.indexOf(book) + 1,
-    title: book,
-    pages: Array.from({ length: BIBLE_CHAPTERS[book] || 0 }, (_, i) => ({
-      id: `${book}-${i+1}`,
-      number: i + 1,
-      title: `Página ${i + 1}`
-    })),
-    completedPages: 0,
-  })),
-  completedChapters: 0,
-};
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/services/api";
 
 export function AppSidebar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
   const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const handleCreateBook = (title: string, type: 'bible' | 'regular' = 'regular') => {
-    // Here you would typically make an API call to create a new book
-    toast({
-      title: "Livro adicionado",
-      description: `"${title}" foi adicionado à sua biblioteca`,
-    });
-  };
+  // Fetch books
+  const { data: books = [], isLoading: isLoadingBooks } = useQuery({
+    queryKey: ['books'],
+    queryFn: () => api.books.getAll().then(response => response.data || []),
+  });
 
-  const handleCreateTag = (name: string) => {
-    // Here you would typically make an API call to create a new tag
-    toast({
-      title: "Tag criada",
-      description: `Tag "${name}" foi criada com sucesso`,
-    });
-  };
+  // Create book mutation
+  const createBookMutation = useMutation({
+    mutationFn: (title: string) => 
+      api.books.create({ 
+        title, 
+        type: 'regular',
+        chapters: [],
+        completedChapters: 0
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['books'] });
+      toast({
+        title: "Livro adicionado",
+        description: "O livro foi adicionado com sucesso",
+      });
+    },
+  });
+
+  // Create tag mutation
+  const createTagMutation = useMutation({
+    mutationFn: (name: string) => 
+      api.tags.create({ name, color: '#3b82f6' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tags'] });
+      toast({
+        title: "Tag criada",
+        description: "A tag foi criada com sucesso",
+      });
+    },
+  });
+
+  // Fetch tags
+  const { data: tags = [], isLoading: isLoadingTags } = useQuery({
+    queryKey: ['tags'],
+    queryFn: () => api.tags.getAll().then(response => response.data || []),
+  });
 
   // Filter books based on search query
-  const filteredBooks = [...MOCK_BOOKS, BIBLE_BOOK].filter(book => 
+  const filteredBooks = books.filter(book => 
     book.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -118,84 +101,90 @@ export function AppSidebar() {
                 variant="ghost"
                 size="icon"
                 className="h-5 w-5"
-                onClick={() => handleCreateBook("Novo Livro")}
+                onClick={() => createBookMutation.mutate("Novo Livro")}
               >
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
             <SidebarGroupContent>
               <SidebarMenu>
-                {filteredBooks.map((book) => (
-                  <Collapsible
-                    key={book.id}
-                    open={expandedBook === book.id}
-                    onOpenChange={() => setExpandedBook(expandedBook === book.id ? null : book.id)}
-                  >
-                    <CollapsibleTrigger asChild>
-                      <SidebarMenuButton className="w-full px-4 py-2 hover:bg-accent rounded-lg transition-colors">
-                        {expandedBook === book.id ? (
-                          <ChevronDown className="h-4 w-4 mr-2" />
-                        ) : (
-                          <ChevronRight className="h-4 w-4 mr-2" />
-                        )}
-                        <Book className="h-4 w-4 mr-2" />
-                        <span>{book.title}</span>
-                        <span className="ml-auto text-xs text-muted-foreground">
-                          {book.completedChapters}/{book.chapters.length}
-                        </span>
-                      </SidebarMenuButton>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <div className="ml-8 space-y-1">
-                        {book.chapters.map((chapter) => (
-                          <Collapsible
-                            key={chapter.id}
-                            open={expandedChapter === chapter.id}
-                            onOpenChange={() => setExpandedChapter(expandedChapter === chapter.id ? null : chapter.id)}
-                          >
-                            <CollapsibleTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                className="w-full justify-start text-sm"
-                              >
-                                {expandedChapter === chapter.id ? (
-                                  <ChevronDown className="h-4 w-4 mr-2" />
-                                ) : (
-                                  <ChevronRight className="h-4 w-4 mr-2" />
-                                )}
-                                {chapter.title || `Capítulo ${chapter.number}`}
-                                <span className="ml-auto text-xs text-muted-foreground">
-                                  {chapter.completedPages}/{chapter.pages.length}
-                                </span>
-                              </Button>
-                            </CollapsibleTrigger>
-                            <CollapsibleContent>
-                              <div className="ml-6 space-y-1">
-                                {chapter.pages.map((page) => (
-                                  <Button
-                                    key={page.id}
-                                    variant="ghost"
-                                    className={`w-full justify-start text-sm pl-8 ${
-                                      page.completed ? "text-green-500" : ""
-                                    }`}
-                                    onClick={() => {
-                                      toast({
-                                        title: "Página selecionada",
-                                        description: `Navegando para a página ${page.number}`,
-                                      });
-                                    }}
-                                  >
-                                    Página {page.number}
-                                  </Button>
-                                ))}
-                              </div>
-                            </CollapsibleContent>
-                          </Collapsible>
-                        ))}
-                      </div>
-                    </CollapsibleContent>
-                  </Collapsible>
-                ))}
+                {isLoadingBooks ? (
+                  <div className="px-4 py-2 text-sm text-muted-foreground">
+                    Carregando livros...
+                  </div>
+                ) : (
+                  filteredBooks.map((book) => (
+                    <Collapsible
+                      key={book.id}
+                      open={expandedBook === book.id}
+                      onOpenChange={() => setExpandedBook(expandedBook === book.id ? null : book.id)}
+                    >
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton className="w-full px-4 py-2 hover:bg-accent rounded-lg transition-colors">
+                          {expandedBook === book.id ? (
+                            <ChevronDown className="h-4 w-4 mr-2" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4 mr-2" />
+                          )}
+                          <Book className="h-4 w-4 mr-2" />
+                          <span>{book.title}</span>
+                          <span className="ml-auto text-xs text-muted-foreground">
+                            {book.completedChapters}/{book.chapters.length}
+                          </span>
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <div className="ml-8 space-y-1">
+                          {book.chapters.map((chapter) => (
+                            <Collapsible
+                              key={chapter.id}
+                              open={expandedChapter === chapter.id}
+                              onOpenChange={() => setExpandedChapter(expandedChapter === chapter.id ? null : chapter.id)}
+                            >
+                              <CollapsibleTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  className="w-full justify-start text-sm"
+                                >
+                                  {expandedChapter === chapter.id ? (
+                                    <ChevronDown className="h-4 w-4 mr-2" />
+                                  ) : (
+                                    <ChevronRight className="h-4 w-4 mr-2" />
+                                  )}
+                                  {chapter.title || `Capítulo ${chapter.number}`}
+                                  <span className="ml-auto text-xs text-muted-foreground">
+                                    {chapter.completedPages}/{chapter.pages.length}
+                                  </span>
+                                </Button>
+                              </CollapsibleTrigger>
+                              <CollapsibleContent>
+                                <div className="ml-6 space-y-1">
+                                  {chapter.pages.map((page) => (
+                                    <Button
+                                      key={page.id}
+                                      variant="ghost"
+                                      className={`w-full justify-start text-sm pl-8 ${
+                                        page.completed ? "text-green-500" : ""
+                                      }`}
+                                      onClick={() => {
+                                        toast({
+                                          title: "Página selecionada",
+                                          description: `Navegando para a página ${page.number}`,
+                                        });
+                                      }}
+                                    >
+                                      Página {page.number}
+                                    </Button>
+                                  ))}
+                                </div>
+                              </CollapsibleContent>
+                            </Collapsible>
+                          ))}
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  ))
+                )}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
@@ -207,29 +196,35 @@ export function AppSidebar() {
                 variant="ghost"
                 size="icon"
                 className="h-5 w-5"
-                onClick={() => handleCreateTag("Nova Tag")}
+                onClick={() => createTagMutation.mutate("Nova Tag")}
               >
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
             <SidebarGroupContent>
               <SidebarMenu>
-                {MOCK_TAGS.map((tag) => (
-                  <SidebarMenuItem key={tag.id}>
-                    <SidebarMenuButton
-                      className="w-full px-4 py-2 hover:bg-accent rounded-lg transition-colors"
-                      onClick={() => {
-                        toast({
-                          title: "Tag selecionada",
-                          description: `Mostrando itens com a tag "${tag.name}"`,
-                        });
-                      }}
-                    >
-                      <Tags className="h-4 w-4 mr-2" style={{ color: tag.color }} />
-                      <span>{tag.name}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                {isLoadingTags ? (
+                  <div className="px-4 py-2 text-sm text-muted-foreground">
+                    Carregando tags...
+                  </div>
+                ) : (
+                  tags.map((tag) => (
+                    <SidebarMenuItem key={tag.id}>
+                      <SidebarMenuButton
+                        className="w-full px-4 py-2 hover:bg-accent rounded-lg transition-colors"
+                        onClick={() => {
+                          toast({
+                            title: "Tag selecionada",
+                            description: `Mostrando itens com a tag "${tag.name}"`,
+                          });
+                        }}
+                      >
+                        <Tags className="h-4 w-4 mr-2" style={{ color: tag.color }} />
+                        <span>{tag.name}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))
+                )}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
