@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Book, ChevronDown, ChevronRight } from "lucide-react";
+import { Book, ChevronDown, ChevronRight, Plus, Tags } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -12,78 +12,78 @@ import {
   SidebarMenuButton,
   SidebarInput,
 } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Button } from "@/components/ui/button";
 import { Book as BookType, GroupedBook } from "@/types/Book";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/services/api";
 import { mockApi } from "@/services/mockApi";
 
-interface Selection {
-  bookId: string | null;
-  chapterId: string | null;
-  pageId: string | null;
-}
+// Use environment variable to determine which API to use
+const USE_MOCK_API = true;
+const apiService = USE_MOCK_API ? mockApi : api;
 
 export function AppSidebar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
   const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
-  const [selection, setSelection] = useState<Selection>({
-    bookId: null,
-    chapterId: null,
-    pageId: null,
-  });
+  const [selectedPage, setSelectedPage] = useState<string | null>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const { data: books = [], isLoading: isLoadingBooks } = useQuery<BookType[]>({
+  // Fetch books using the selected API
+  const { data: books = [], isLoading: isLoadingBooks } = useQuery({
     queryKey: ['books'],
-    queryFn: () => mockApi.books.getAll().then(response => response.data || []),
+    queryFn: () => apiService.books.getAll().then(response => response.data || []),
   });
 
   const groupedBooks = books.reduce((acc: { [key: string]: GroupedBook }, book) => {
     const { description, title } = book;
 
-    if (!description) return acc;
+    if (!description) return acc; // Skip books without a description
 
+    // Initialize the group if it doesn't exist
     if (!acc[description]) {
       acc[description] = {
         description,
         chapters: [],
-        completedChapters: 0,
+        completedChapters: 0, // Assuming default as 0 if not present
       };
     }
 
+    // Add chapters to the grouped book (handle case where chapters may not exist)
     acc[description].chapters = [
       ...acc[description].chapters,
       ...(book.chapters || []).map(chapter => ({
         ...chapter,
-        title: title || 'Untitled Book',
-        pages: chapter.pages || [],
+        title: title || 'Untitled Book', // Fallback title
+        pages: chapter.pages || [], // Ensure pages array exists
       })),
     ];
 
+    // Update completed chapters count
     acc[description].completedChapters += book.completedChapters || 0;
 
     return acc;
   }, {});
 
-  const handlePageSelect = (pageId: string, verses: string[] = [], chapterId: string, bookDescription: string) => {
-    setSelection({
-      bookId: bookDescription,
-      chapterId,
-      pageId,
-    });
-
+  // Handle page selection with navigation
+  const handlePageSelect = (pageId: string, verses: string[] = [], chapterId: string) => {
+    setSelectedPage(pageId);
+    // Find all pages in the current chapter
     const currentChapter = books
       .flatMap(book => book.chapters)
       .find(chapter => chapter.id === chapterId);
     
     if (currentChapter) {
       const currentPageIndex = currentChapter.pages.findIndex(page => page.id === pageId);
+      // Emit an event with page navigation data
       const event = new CustomEvent('pageSelected', { 
         detail: { 
           verses,
@@ -93,13 +93,13 @@ export function AppSidebar() {
           onNextPage: () => {
             if (currentPageIndex < currentChapter.pages.length - 1) {
               const nextPage = currentChapter.pages[currentPageIndex + 1];
-              handlePageSelect(nextPage.id, nextPage.verses, chapterId, bookDescription);
+              handlePageSelect(nextPage.id, nextPage.verses, chapterId);
             }
           },
           onPreviousPage: () => {
             if (currentPageIndex > 0) {
               const prevPage = currentChapter.pages[currentPageIndex - 1];
-              handlePageSelect(prevPage.id, prevPage.verses, chapterId, bookDescription);
+              handlePageSelect(prevPage.id, prevPage.verses, chapterId);
             }
           }
         } 
@@ -108,18 +108,9 @@ export function AppSidebar() {
     }
   };
 
-  const getButtonClassName = (type: 'book' | 'chapter' | 'page', id: string) => {
-    const isSelected = type === 'book' ? selection.bookId === id :
-                      type === 'chapter' ? selection.chapterId === id :
-                      selection.pageId === id;
-
-    return `w-full justify-start text-sm ${
-      isSelected ? 'bg-[#09090B] text-white hover:bg-[#09090B] hover:text-white' : ''
-    }`;
-  };
-
-  const filteredBooks = Object.entries(groupedBooks).filter(([description]) => 
-    description.toLowerCase().includes(searchQuery.toLowerCase())
+  // Filter books based on search query
+  const filteredBooks = Object.values(groupedBooks).filter(book => 
+    book.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -148,21 +139,21 @@ export function AppSidebar() {
                     Carregando livros...
                   </div>
                 ) : (
-                  filteredBooks.map(([description, book]) => (
+                  filteredBooks.map((book) => (
                     <Collapsible
-                      key={description}
-                      open={expandedBook === description}
-                      onOpenChange={() => setExpandedBook(expandedBook === description ? null : description)}
+                      key={book.description}
+                      open={expandedBook === book.description}
+                      onOpenChange={() => setExpandedBook(expandedBook === book.description ? null : book.description)}
                     >
                       <CollapsibleTrigger asChild>
-                        <SidebarMenuButton className={getButtonClassName('book', description)}>
-                          {expandedBook === description ? (
+                        <SidebarMenuButton className="w-full px-4 py-2 hover:bg-accent rounded-lg transition-colors">
+                          {expandedBook === book.description ? (
                             <ChevronDown className="h-4 w-4 mr-2" />
                           ) : (
                             <ChevronRight className="h-4 w-4 mr-2" />
                           )}
                           <Book className="h-4 w-4 mr-2" />
-                          <span>{description}</span>
+                          <span>{book.description}</span>
                           <span className="ml-auto text-xs text-muted-foreground">
                             {book.completedChapters}/{book.chapters.length}
                           </span>
@@ -179,7 +170,7 @@ export function AppSidebar() {
                               <CollapsibleTrigger asChild>
                                 <Button
                                   variant="ghost"
-                                  className={getButtonClassName('chapter', chapter.id)}
+                                  className="w-full justify-start text-sm"
                                 >
                                   {expandedChapter === chapter.id ? (
                                     <ChevronDown className="h-4 w-4 mr-2" />
@@ -188,18 +179,20 @@ export function AppSidebar() {
                                   )}
                                   {chapter.title}
                                   <span className="ml-auto text-xs text-muted-foreground">
-                                    {chapter.completedPages || 0}/{chapter.pages.length}
+                                    {chapter.completedPages || 0}/{(chapter.pages || []).length}
                                   </span>
                                 </Button>
                               </CollapsibleTrigger>
                               <CollapsibleContent>
                                 <div className="ml-6 space-y-1">
-                                  {chapter.pages.map((page) => (
+                                  {(chapter.pages || []).map((page) => (
                                     <Button
                                       key={page.id}
                                       variant="ghost"
-                                      className={getButtonClassName('page', page.id)}
-                                      onClick={() => handlePageSelect(page.id, page.verses, chapter.id, description)}
+                                      className={`w-full justify-start text-sm pl-8 ${
+                                        page.completed ? "text-green-500" : ""
+                                      }`}
+                                      onClick={() => handlePageSelect(page.id, page.verses, chapter.id)}
                                     >
                                       Página {page.number}
                                     </Button>
