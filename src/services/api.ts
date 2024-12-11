@@ -19,7 +19,7 @@ export interface ApiError {
 }
 
 export interface ApiResponse<T> {
-  data?: T;
+  data: T; // Changed from optional to required
   error?: ApiError;
 }
 

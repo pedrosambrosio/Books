@@ -24,6 +24,7 @@ import { Book as BookType, GroupedBook } from "@/types/Book";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/services/api";
 import { mockApi } from "@/services/mockApi";
+import { ApiResponse } from "@/services/api";
 
 const USE_MOCK_API = true;
 const apiService = USE_MOCK_API ? mockApi : api;
@@ -36,7 +37,7 @@ export function AppSidebar() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: booksResponse, isLoading: isLoadingBooks } = useQuery<{ data: BookType[] }>({
+  const { data: booksResponse, isLoading: isLoadingBooks } = useQuery<ApiResponse<BookType[]>>({
     queryKey: ['books'],
     queryFn: () => apiService.books.getAll(),
   });
