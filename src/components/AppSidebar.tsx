@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Book, ChevronDown, ChevronRight, Plus, Tag, Tags } from "lucide-react";
+import { Book, ChevronDown, ChevronRight, Plus, Tags } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -20,7 +20,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Book as BookType, Tag as TagType } from "@/types/Book";
+import { Book as BookType, GroupedBook } from "@/types/Book";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/services/api";
 
@@ -28,6 +28,7 @@ export function AppSidebar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
   const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
+  const [selectedPage, setSelectedPage] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -37,12 +38,39 @@ export function AppSidebar() {
     queryFn: () => api.books.getAll().then(response => response.data || []),
   });
 
+  // Group books by description
+  const groupedBooks = books.reduce((acc: { [key: string]: GroupedBook }, book) => {
+    if (!acc[book.description]) {
+      acc[book.description] = {
+        description: book.description,
+        chapters: [],
+        completedChapters: 0
+      };
+    }
+    
+    // Add book's chapters to the grouped book
+    acc[book.description].chapters = [
+      ...acc[book.description].chapters,
+      ...(book.chapters || []).map(chapter => ({
+        ...chapter,
+        title: book.title, // Use book title as chapter title
+        pages: chapter.pages || []
+      }))
+    ];
+    
+    // Update completed chapters count
+    acc[book.description].completedChapters += book.completedChapters || 0;
+    
+    return acc;
+  }, {});
+
   // Create book mutation
   const createBookMutation = useMutation({
     mutationFn: (title: string) => 
       api.books.create({ 
         title, 
         type: 'regular',
+        description: 'New Book Group',
         chapters: [],
         completedChapters: 0
       }),
@@ -75,9 +103,19 @@ export function AppSidebar() {
   });
 
   // Filter books based on search query
-  const filteredBooks = books.filter(book => 
-    book.title.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredBooks = Object.values(groupedBooks).filter(book => 
+    book.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Handle page selection
+  const handlePageSelect = (pageId: string, verses: string[] = []) => {
+    setSelectedPage(pageId);
+    // Emit an event to update the content area
+    const event = new CustomEvent('pageSelected', { 
+      detail: { verses } 
+    });
+    window.dispatchEvent(event);
+  };
 
   return (
     <Sidebar className="w-[var(--sidebar-width)] min-w-[200px] border-r border-border">
@@ -115,27 +153,27 @@ export function AppSidebar() {
                 ) : (
                   filteredBooks.map((book) => (
                     <Collapsible
-                      key={book.id}
-                      open={expandedBook === book.id}
-                      onOpenChange={() => setExpandedBook(expandedBook === book.id ? null : book.id)}
+                      key={book.description}
+                      open={expandedBook === book.description}
+                      onOpenChange={() => setExpandedBook(expandedBook === book.description ? null : book.description)}
                     >
                       <CollapsibleTrigger asChild>
                         <SidebarMenuButton className="w-full px-4 py-2 hover:bg-accent rounded-lg transition-colors">
-                          {expandedBook === book.id ? (
+                          {expandedBook === book.description ? (
                             <ChevronDown className="h-4 w-4 mr-2" />
                           ) : (
                             <ChevronRight className="h-4 w-4 mr-2" />
                           )}
                           <Book className="h-4 w-4 mr-2" />
-                          <span>{book.title}</span>
+                          <span>{book.description}</span>
                           <span className="ml-auto text-xs text-muted-foreground">
-                            {book.completedChapters || 0}/{(book.chapters || []).length}
+                            {book.completedChapters}/{book.chapters.length}
                           </span>
                         </SidebarMenuButton>
                       </CollapsibleTrigger>
                       <CollapsibleContent>
                         <div className="ml-8 space-y-1">
-                          {(book.chapters || []).map((chapter) => (
+                          {book.chapters.map((chapter) => (
                             <Collapsible
                               key={chapter.id}
                               open={expandedChapter === chapter.id}
@@ -151,7 +189,7 @@ export function AppSidebar() {
                                   ) : (
                                     <ChevronRight className="h-4 w-4 mr-2" />
                                   )}
-                                  {chapter.title || `Capítulo ${chapter.number}`}
+                                  {chapter.title}
                                   <span className="ml-auto text-xs text-muted-foreground">
                                     {chapter.completedPages || 0}/{(chapter.pages || []).length}
                                   </span>
@@ -166,12 +204,7 @@ export function AppSidebar() {
                                       className={`w-full justify-start text-sm pl-8 ${
                                         page.completed ? "text-green-500" : ""
                                       }`}
-                                      onClick={() => {
-                                        toast({
-                                          title: "Página selecionada",
-                                          description: `Navegando para a página ${page.number}`,
-                                        });
-                                      }}
+                                      onClick={() => handlePageSelect(page.id, page.verses)}
                                     >
                                       Página {page.number}
                                     </Button>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CreateTask } from "@/components/CreateTask";
 import { TaskCard, Task } from "@/components/TaskCard";
 import { useToast } from "@/components/ui/use-toast";
@@ -17,6 +17,7 @@ const Index = () => {
   const isMobile = useIsMobile();
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = 10; // This should be dynamic based on your book's content
+  const [selectedVerses, setSelectedVerses] = useState<string[]>([]);
 
   const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress" | "isPaused">) => {
     const task: Task = {
@@ -79,6 +80,18 @@ const Index = () => {
       description: `A página foi marcada como ${isBookCompleted ? "pendente" : "concluída"}.`,
     });
   };
+
+  useEffect(() => {
+    const handlePageSelected = (event: CustomEvent<{ verses: string[] }>) => {
+      setSelectedVerses(event.detail.verses || []);
+    };
+
+    window.addEventListener('pageSelected', handlePageSelected as EventListener);
+
+    return () => {
+      window.removeEventListener('pageSelected', handlePageSelected as EventListener);
+    };
+  }, []);
 
   return (
     <SidebarProvider>
@@ -155,7 +168,7 @@ const Index = () => {
                 <div className="w-full max-w-2xl">
                   <div className="glass-card h-full rounded-lg p-6">
                     <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-2xl font-semibold">Livro</h2>
+                      <h2 className="text-2xl font-semibold">Conteúdo</h2>
                       <div className="flex items-center gap-2">
                         <Button
                           variant="ghost"
@@ -186,9 +199,19 @@ const Index = () => {
                         </Button>
                       </div>
                     </div>
-                    <p className="text-muted-foreground text-center">
-                      Conteudo de livros em breve...
-                    </p>
+                    {selectedVerses.length > 0 ? (
+                      <div className="space-y-4">
+                        {selectedVerses.map((verse, index) => (
+                          <p key={index} className="text-muted-foreground">
+                            {verse}
+                          </p>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground text-center">
+                        Selecione uma página para ver seu conteúdo
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
