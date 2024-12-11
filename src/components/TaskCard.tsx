@@ -25,6 +25,7 @@ export interface Task {
   category?: string;
   priority?: string;
   subtasks?: Subtask[];
+  pageNumber?: number; // New field to track which page the note belongs to
 }
 
 interface TaskCardProps {

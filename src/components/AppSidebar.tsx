@@ -30,9 +30,14 @@ const MOCK_TAGS: TagType[] = [
 interface AppSidebarProps {
   currentBook: BookType;
   onPageSelect?: (pageNumber: number) => void;
+  noteCounts?: {
+    bookNotes: number;
+    chapterNotes: number;
+    pageNotes: number;
+  };
 }
 
-export function AppSidebar({ currentBook, onPageSelect }: AppSidebarProps) {
+export function AppSidebar({ currentBook, onPageSelect, noteCounts }: AppSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
   const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
@@ -85,14 +90,21 @@ export function AppSidebar({ currentBook, onPageSelect }: AppSidebarProps) {
           <SidebarGroup>
             <div className="flex items-center justify-between px-4 py-2">
               <SidebarGroupLabel>Livros</SidebarGroupLabel>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-5 w-5"
-                onClick={() => handleCreateBook("Novo Livro")}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-2">
+                {noteCounts && (
+                  <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                    {noteCounts.bookNotes} notas
+                  </span>
+                )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-5 w-5"
+                  onClick={() => handleCreateBook("Novo Livro")}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
             <SidebarGroupContent>
               <SidebarMenu>
@@ -111,9 +123,11 @@ export function AppSidebar({ currentBook, onPageSelect }: AppSidebarProps) {
                         )}
                         <Book className="h-4 w-4 mr-2" />
                         <span className="text-[#0EA5E9]">{book.title}</span>
-                        <span className="ml-auto text-xs text-muted-foreground">
-                          {book.completedChapters}/{book.chapters.length}
-                        </span>
+                        <div className="ml-auto flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">
+                            {book.completedChapters}/{book.chapters.length}
+                          </span>
+                        </div>
                       </SidebarMenuButton>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
@@ -137,9 +151,16 @@ export function AppSidebar({ currentBook, onPageSelect }: AppSidebarProps) {
                                 <span className="text-[#0EA5E9]">
                                   {chapter.title || `Capítulo ${chapter.number}`}
                                 </span>
-                                <span className="ml-auto text-xs text-muted-foreground">
-                                  {chapter.completedPages}/{chapter.pages.length}
-                                </span>
+                                <div className="ml-auto flex items-center gap-2">
+                                  {noteCounts && (
+                                    <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                                      {noteCounts.chapterNotes} notas
+                                    </span>
+                                  )}
+                                  <span className="text-xs text-muted-foreground">
+                                    {chapter.completedPages}/{chapter.pages.length}
+                                  </span>
+                                </div>
                               </Button>
                             </CollapsibleTrigger>
                             <CollapsibleContent>
@@ -156,6 +177,11 @@ export function AppSidebar({ currentBook, onPageSelect }: AppSidebarProps) {
                                     <span className="flex items-center gap-2">
                                       Página {page.number}
                                       {page.completed && <Check className="h-4 w-4" />}
+                                      {noteCounts && (
+                                        <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full ml-auto">
+                                          {noteCounts.pageNotes} notas
+                                        </span>
+                                      )}
                                     </span>
                                   </Button>
                                 ))}

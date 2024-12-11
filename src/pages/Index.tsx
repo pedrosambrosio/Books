@@ -51,13 +51,32 @@ const Index = () => {
       completed: false,
       inProgress: false,
       isPaused: false,
+      pageNumber: currentPage, // Add current page number to the task
     };
 
     setTasks((prev) => [task, ...prev]);
     toast({
-      title: "Task created",
-      description: "Your new task has been created successfully.",
+      title: "Anotação criada",
+      description: "Sua nova anotação foi criada com sucesso.",
     });
+  };
+
+  // Filter tasks based on current page
+  const currentPageTasks = tasks.filter(task => task.pageNumber === currentPage);
+
+  // Calculate note counts for the current book
+  const getNoteCounts = () => {
+    const bookNotes = tasks.length;
+    const chapterNotes = tasks.filter(task => 
+      task.pageNumber && task.pageNumber >= 1 && task.pageNumber <= 3
+    ).length;
+    const pageNotes = tasks.filter(task => task.pageNumber === currentPage).length;
+
+    return {
+      bookNotes,
+      chapterNotes,
+      pageNotes
+    };
   };
 
   const handleUpdateTask = (updatedTask: Task) => {
@@ -133,16 +152,16 @@ const Index = () => {
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full bg-gradient-to-b from-background to-muted/20">
-        <AppSidebar currentBook={currentBibleBook} onPageSelect={handlePageSelect} />
+        <AppSidebar 
+          currentBook={currentBibleBook} 
+          onPageSelect={handlePageSelect}
+          noteCounts={getNoteCounts()} // Pass note counts to sidebar
+        />
         <ResizablePanelGroup 
           direction={isMobile ? "vertical" : "horizontal"} 
           className="h-screen flex-1"
         >
-          <ResizablePanel 
-            defaultSize={50} 
-            minSize={30}
-            className="h-full"
-          >
+          <ResizablePanel defaultSize={50} minSize={30} className="h-full">
             <ScrollArea className="h-full">
               <div className="p-4 md:p-6 flex justify-center">
                 <div className="w-full max-w-2xl">
@@ -173,7 +192,7 @@ const Index = () => {
                         <CreateTask onCreateTask={handleCreateTask} />
                         
                         <div className="space-y-4">
-                          {tasks.map((task) => (
+                          {currentPageTasks.map((task) => (
                             <div key={task.id} className="animate-fade-in">
                               <TaskCard
                                 task={task}
