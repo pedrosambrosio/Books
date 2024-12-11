@@ -5,6 +5,9 @@ export interface Page {
   completed?: boolean;
   verses?: string[];
   annotationCount?: number;
+  tags?: string[];
+  notes?: string[];
+  reference?: string;
 }
 
 export interface Chapter {
@@ -14,6 +17,8 @@ export interface Chapter {
   pages: Page[];
   completedPages?: number;
   annotationCount?: number;
+  tags?: string[];
+  notes?: string[];
 }
 
 export interface Book {
@@ -24,6 +29,8 @@ export interface Book {
   chapters: Chapter[];
   completedChapters: number;
   annotationCount: number;
+  tags?: string[];
+  notes?: string[];
 }
 
 export interface GroupedBook {
@@ -31,6 +38,8 @@ export interface GroupedBook {
   chapters: Chapter[];
   completedChapters: number;
   annotationCount: number;
+  tags?: string[];
+  notes?: string[];
 }
 
 export interface Tag {

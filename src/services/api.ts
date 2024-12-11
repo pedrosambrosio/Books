@@ -1,7 +1,6 @@
 import { Book, Chapter, Page } from "@/types/Book";
 import { Task } from "@/components/TaskCard";
 import { toast } from "@/components/ui/use-toast";
-import { User, Annotation, Tag } from "../types/AdditionalTypes"; // Correct import path
 
 // Configuration
 const API_CONFIG = {
