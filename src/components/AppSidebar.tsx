@@ -129,13 +129,13 @@ export function AppSidebar() {
                           <Book className="h-4 w-4 mr-2" />
                           <span>{book.title}</span>
                           <span className="ml-auto text-xs text-muted-foreground">
-                            {book.completedChapters}/{book.chapters.length}
+                            {book.completedChapters || 0}/{(book.chapters || []).length}
                           </span>
                         </SidebarMenuButton>
                       </CollapsibleTrigger>
                       <CollapsibleContent>
                         <div className="ml-8 space-y-1">
-                          {book.chapters.map((chapter) => (
+                          {(book.chapters || []).map((chapter) => (
                             <Collapsible
                               key={chapter.id}
                               open={expandedChapter === chapter.id}
@@ -153,13 +153,13 @@ export function AppSidebar() {
                                   )}
                                   {chapter.title || `Capítulo ${chapter.number}`}
                                   <span className="ml-auto text-xs text-muted-foreground">
-                                    {chapter.completedPages}/{chapter.pages.length}
+                                    {chapter.completedPages || 0}/{(chapter.pages || []).length}
                                   </span>
                                 </Button>
                               </CollapsibleTrigger>
                               <CollapsibleContent>
                                 <div className="ml-6 space-y-1">
-                                  {chapter.pages.map((page) => (
+                                  {(chapter.pages || []).map((page) => (
                                     <Button
                                       key={page.id}
                                       variant="ghost"
