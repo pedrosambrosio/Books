@@ -74,6 +74,11 @@ const Index = () => {
 
   const handleMarkAsCompleted = () => {
     setIsBookCompleted(!isBookCompleted);
+    // Update the current page as completed in the Bible book
+    const currentChapter = BIBLE_BOOK.chapters[0]; // Genesis
+    if (currentChapter && currentChapter.pages[currentPage - 1]) {
+      currentChapter.pages[currentPage - 1].completed = !isBookCompleted;
+    }
     toast({
       title: isBookCompleted ? "Página marcada como pendente" : "Página marcada como concluída",
       description: `A página foi marcada como ${isBookCompleted ? "pendente" : "concluída"}.`,

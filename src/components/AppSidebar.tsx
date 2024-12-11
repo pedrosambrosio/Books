@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Book, ChevronDown, ChevronRight, Plus, Tag, Tags } from "lucide-react";
+import { Book, ChevronDown, ChevronRight, Plus, Tag, Tags, Check } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -21,51 +21,31 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Book as BookType, Tag as TagType } from "@/types/Book";
-import { BIBLE_BOOKS, BIBLE_CHAPTERS } from "@/data/bible";
-
-// Mock data for testing - replace with actual data from your backend
-const MOCK_BOOKS: BookType[] = [
-  {
-    id: "1",
-    title: "The Great Gatsby",
-    type: "regular",
-    chapters: [
-      {
-        id: "c1",
-        number: 1,
-        title: "Chapter One",
-        pages: [
-          { id: "p1", number: 1, completed: true },
-          { id: "p2", number: 2 },
-        ],
-        completedPages: 1,
-      },
-    ],
-    completedChapters: 0,
-  },
-];
 
 const MOCK_TAGS: TagType[] = [
   { id: "1", name: "Important", color: "#ef4444" },
   { id: "2", name: "Review", color: "#3b82f6" },
 ];
 
-// Create Bible book structure
+// Create Bible book structure with only Genesis
 const BIBLE_BOOK: BookType = {
   id: "bible",
   title: "Bíblia",
   type: "bible",
-  chapters: BIBLE_BOOKS.map(book => ({
-    id: book,
-    number: BIBLE_BOOKS.indexOf(book) + 1,
-    title: book,
-    pages: Array.from({ length: BIBLE_CHAPTERS[book] || 0 }, (_, i) => ({
-      id: `${book}-${i+1}`,
-      number: i + 1,
-      title: `Página ${i + 1}`
-    })),
-    completedPages: 0,
-  })),
+  chapters: [
+    {
+      id: "genesis",
+      number: 1,
+      title: "Genesis",
+      pages: Array.from({ length: 3 }, (_, i) => ({
+        id: `genesis-${i+1}`,
+        number: i + 1,
+        title: `Página ${i + 1}`,
+        completed: false
+      })),
+      completedPages: 0,
+    }
+  ],
   completedChapters: 0,
 };
 
@@ -76,7 +56,6 @@ export function AppSidebar() {
   const { toast } = useToast();
 
   const handleCreateBook = (title: string, type: 'bible' | 'regular' = 'regular') => {
-    // Here you would typically make an API call to create a new book
     toast({
       title: "Livro adicionado",
       description: `"${title}" foi adicionado à sua biblioteca`,
@@ -84,7 +63,6 @@ export function AppSidebar() {
   };
 
   const handleCreateTag = (name: string) => {
-    // Here you would typically make an API call to create a new tag
     toast({
       title: "Tag criada",
       description: `Tag "${name}" foi criada com sucesso`,
@@ -92,7 +70,7 @@ export function AppSidebar() {
   };
 
   // Filter books based on search query
-  const filteredBooks = [...MOCK_BOOKS, BIBLE_BOOK].filter(book => 
+  const filteredBooks = [BIBLE_BOOK].filter(book => 
     book.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -139,7 +117,7 @@ export function AppSidebar() {
                           <ChevronRight className="h-4 w-4 mr-2" />
                         )}
                         <Book className="h-4 w-4 mr-2" />
-                        <span>{book.title}</span>
+                        <span className="text-[#0EA5E9]">{book.title}</span>
                         <span className="ml-auto text-xs text-muted-foreground">
                           {book.completedChapters}/{book.chapters.length}
                         </span>
@@ -163,7 +141,9 @@ export function AppSidebar() {
                                 ) : (
                                   <ChevronRight className="h-4 w-4 mr-2" />
                                 )}
-                                {chapter.title || `Capítulo ${chapter.number}`}
+                                <span className="text-[#0EA5E9]">
+                                  {chapter.title || `Capítulo ${chapter.number}`}
+                                </span>
                                 <span className="ml-auto text-xs text-muted-foreground">
                                   {chapter.completedPages}/{chapter.pages.length}
                                 </span>
@@ -176,7 +156,7 @@ export function AppSidebar() {
                                     key={page.id}
                                     variant="ghost"
                                     className={`w-full justify-start text-sm pl-8 ${
-                                      page.completed ? "text-green-500" : ""
+                                      page.completed ? "text-[#0EA5E9]" : ""
                                     }`}
                                     onClick={() => {
                                       toast({
@@ -185,7 +165,10 @@ export function AppSidebar() {
                                       });
                                     }}
                                   >
-                                    Página {page.number}
+                                    <span className="flex items-center gap-2">
+                                      Página {page.number}
+                                      {page.completed && <Check className="h-4 w-4" />}
+                                    </span>
                                   </Button>
                                 ))}
                               </div>
