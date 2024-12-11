@@ -22,8 +22,8 @@ export interface Book {
   type: 'bible' | 'regular';
   description: string;
   chapters: Chapter[];
-  completedChapters?: number;
-  annotationCount?: number;
+  completedChapters: number;
+  annotationCount: number;
 }
 
 export interface GroupedBook {

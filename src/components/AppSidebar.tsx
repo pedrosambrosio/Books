@@ -25,7 +25,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/services/api";
 import { mockApi } from "@/services/mockApi";
 
-// Use environment variable to determine which API to use
 const USE_MOCK_API = true;
 const apiService = USE_MOCK_API ? mockApi : api;
 
@@ -37,7 +36,6 @@ export function AppSidebar() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch books using the selected API with proper typing
   const { data: booksResponse, isLoading: isLoadingBooks } = useQuery<{ data: BookType[] }>({
     queryKey: ['books'],
     queryFn: () => apiService.books.getAll(),
@@ -74,7 +72,6 @@ export function AppSidebar() {
     return acc;
   }, {});
 
-  // Handle page selection with navigation
   const handlePageSelect = (pageId: string, verses: string[] = [], chapterId: string) => {
     setSelectedPage(pageId);
     // Find all pages in the current chapter
@@ -110,7 +107,6 @@ export function AppSidebar() {
     }
   };
 
-  // Filter books based on search query
   const filteredBooks = Object.values(groupedBooks).filter(book => 
     book.description.toLowerCase().includes(searchQuery.toLowerCase())
   );

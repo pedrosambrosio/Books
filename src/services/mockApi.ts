@@ -4,7 +4,7 @@ import { ApiResponse } from "./api";
 
 export const mockApi = {
   books: {
-    getAll: async (): Promise<ApiResponse<Book[]>> => {
+    getAll: async (): Promise<{ data: Book[] }> => {
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve({ data: MOCK_BOOKS });
