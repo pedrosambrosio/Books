@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Book, ChevronDown, ChevronRight, Plus, Tags, Circle, CheckCircle, MessageSquare } from "lucide-react";
+import { Book, ChevronDown, ChevronRight, Plus, Tag, Tags } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -20,96 +20,80 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Book as BookType, GroupedBook } from "@/types/Book";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/services/api";
-import { mockApi } from "@/services/mockApi";
-import { ApiResponse } from "@/services/api";
+import { Book as BookType, Tag as TagType } from "@/types/Book";
+import { BIBLE_BOOKS, BIBLE_CHAPTERS } from "@/data/bible";
 
-const USE_MOCK_API = true;
-const apiService = USE_MOCK_API ? mockApi : api;
+// Mock data for testing - replace with actual data from your backend
+const MOCK_BOOKS: BookType[] = [
+  {
+    id: "1",
+    title: "The Great Gatsby",
+    type: "regular",
+    chapters: [
+      {
+        id: "c1",
+        number: 1,
+        title: "Chapter One",
+        pages: [
+          { id: "p1", number: 1, completed: true },
+          { id: "p2", number: 2 },
+        ],
+        completedPages: 1,
+      },
+    ],
+    completedChapters: 0,
+  },
+];
+
+const MOCK_TAGS: TagType[] = [
+  { id: "1", name: "Important", color: "#ef4444" },
+  { id: "2", name: "Review", color: "#3b82f6" },
+];
+
+// Create Bible book structure
+const BIBLE_BOOK: BookType = {
+  id: "bible",
+  title: "Bíblia",
+  type: "bible",
+  chapters: BIBLE_BOOKS.map(book => ({
+    id: book,
+    number: BIBLE_BOOKS.indexOf(book) + 1,
+    title: book,
+    pages: Array.from({ length: BIBLE_CHAPTERS[book] || 0 }, (_, i) => ({
+      id: `${book}-${i+1}`,
+      number: i + 1,
+      title: `Página ${i + 1}`
+    })),
+    completedPages: 0,
+  })),
+  completedChapters: 0,
+};
 
 export function AppSidebar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
   const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
-  const [selectedPage, setSelectedPage] = useState<string | null>(null);
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
-  const { data: booksResponse, isLoading: isLoadingBooks } = useQuery<ApiResponse<BookType[]>>({
-    queryKey: ['books'],
-    queryFn: () => apiService.books.getAll(),
-  });
-
-  const books = booksResponse?.data || [];
-
-  const groupedBooks = books.reduce((acc: { [key: string]: GroupedBook }, book) => {
-    const { description, title } = book;
-
-    if (!description) return acc;
-
-    if (!acc[description]) {
-      acc[description] = {
-        description,
-        chapters: [],
-        completedChapters: 0,
-        annotationCount: 0,
-      };
-    }
-
-    acc[description].chapters = [
-      ...acc[description].chapters,
-      ...(book.chapters || []).map(chapter => ({
-        ...chapter,
-        title: title || 'Untitled Book',
-        pages: chapter.pages || [],
-      })),
-    ];
-
-    acc[description].completedChapters += book.completedChapters || 0;
-    acc[description].annotationCount += book.annotationCount || 0;
-
-    return acc;
-  }, {});
-
-  const handlePageSelect = (pageId: string, verses: string[] = [], chapterId: string) => {
-    setSelectedPage(pageId);
-    // Find all pages in the current chapter
-    const currentChapter = books
-      .flatMap(book => book.chapters)
-      .find(chapter => chapter.id === chapterId);
-    
-    if (currentChapter) {
-      const currentPageIndex = currentChapter.pages.findIndex(page => page.id === pageId);
-      // Emit an event with page navigation data
-      const event = new CustomEvent('pageSelected', { 
-        detail: { 
-          verses,
-          currentPage: currentPageIndex + 1,
-          totalPages: currentChapter.pages.length,
-          chapterId,
-          pageId,
-          onNextPage: () => {
-            if (currentPageIndex < currentChapter.pages.length - 1) {
-              const nextPage = currentChapter.pages[currentPageIndex + 1];
-              handlePageSelect(nextPage.id, nextPage.verses, chapterId);
-            }
-          },
-          onPreviousPage: () => {
-            if (currentPageIndex > 0) {
-              const prevPage = currentChapter.pages[currentPageIndex - 1];
-              handlePageSelect(prevPage.id, prevPage.verses, chapterId);
-            }
-          }
-        } 
-      });
-      window.dispatchEvent(event);
-    }
+  const handleCreateBook = (title: string, type: 'bible' | 'regular' = 'regular') => {
+    // Here you would typically make an API call to create a new book
+    toast({
+      title: "Livro adicionado",
+      description: `"${title}" foi adicionado à sua biblioteca`,
+    });
   };
 
-  const filteredBooks = Object.values(groupedBooks).filter(book => 
-    book.description.toLowerCase().includes(searchQuery.toLowerCase())
+  const handleCreateTag = (name: string) => {
+    // Here you would typically make an API call to create a new tag
+    toast({
+      title: "Tag criada",
+      description: `Tag "${name}" foi criada com sucesso`,
+    });
+  };
+
+  // Filter books based on search query
+  const filteredBooks = [...MOCK_BOOKS, BIBLE_BOOK].filter(book => 
+    book.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -130,108 +114,122 @@ export function AppSidebar() {
           <SidebarGroup>
             <div className="flex items-center justify-between px-4 py-2">
               <SidebarGroupLabel>Livros</SidebarGroupLabel>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-5 w-5"
+                onClick={() => handleCreateBook("Novo Livro")}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
             </div>
             <SidebarGroupContent>
               <SidebarMenu>
-                {isLoadingBooks ? (
-                  <div className="px-4 py-2 text-sm text-muted-foreground">
-                    Carregando livros...
-                  </div>
-                ) : (
-                  filteredBooks.map((book) => (
-                    <Collapsible
-                      key={book.description}
-                      open={expandedBook === book.description}
-                      onOpenChange={() => setExpandedBook(expandedBook === book.description ? null : book.description)}
-                    >
-                      <CollapsibleTrigger asChild>
-                        <SidebarMenuButton className="w-full px-4 py-2 hover:bg-accent rounded-lg transition-colors">
-                          {expandedBook === book.description ? (
-                            <ChevronDown className="h-4 w-4 mr-2" />
-                          ) : (
-                            <ChevronRight className="h-4 w-4 mr-2" />
-                          )}
-                          <Book className="h-4 w-4 mr-2" />
-                          <span>{book.description}</span>
-                          <div className="ml-auto flex items-center gap-2">
-                            <span className="text-xs text-muted-foreground">
-                              {book.completedChapters}/{book.chapters.length}
-                            </span>
-                            {book.annotationCount > 0 && (
-                              <div className="flex items-center gap-1 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                                <MessageSquare className="h-3 w-3" />
-                                {book.annotationCount}
+                {filteredBooks.map((book) => (
+                  <Collapsible
+                    key={book.id}
+                    open={expandedBook === book.id}
+                    onOpenChange={() => setExpandedBook(expandedBook === book.id ? null : book.id)}
+                  >
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton className="w-full px-4 py-2 hover:bg-accent rounded-lg transition-colors">
+                        {expandedBook === book.id ? (
+                          <ChevronDown className="h-4 w-4 mr-2" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4 mr-2" />
+                        )}
+                        <Book className="h-4 w-4 mr-2" />
+                        <span>{book.title}</span>
+                        <span className="ml-auto text-xs text-muted-foreground">
+                          {book.completedChapters}/{book.chapters.length}
+                        </span>
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="ml-8 space-y-1">
+                        {book.chapters.map((chapter) => (
+                          <Collapsible
+                            key={chapter.id}
+                            open={expandedChapter === chapter.id}
+                            onOpenChange={() => setExpandedChapter(expandedChapter === chapter.id ? null : chapter.id)}
+                          >
+                            <CollapsibleTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                className="w-full justify-start text-sm"
+                              >
+                                {expandedChapter === chapter.id ? (
+                                  <ChevronDown className="h-4 w-4 mr-2" />
+                                ) : (
+                                  <ChevronRight className="h-4 w-4 mr-2" />
+                                )}
+                                {chapter.title || `Capítulo ${chapter.number}`}
+                                <span className="ml-auto text-xs text-muted-foreground">
+                                  {chapter.completedPages}/{chapter.pages.length}
+                                </span>
+                              </Button>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent>
+                              <div className="ml-6 space-y-1">
+                                {chapter.pages.map((page) => (
+                                  <Button
+                                    key={page.id}
+                                    variant="ghost"
+                                    className={`w-full justify-start text-sm pl-8 ${
+                                      page.completed ? "text-green-500" : ""
+                                    }`}
+                                    onClick={() => {
+                                      toast({
+                                        title: "Página selecionada",
+                                        description: `Navegando para a página ${page.number}`,
+                                      });
+                                    }}
+                                  >
+                                    Página {page.number}
+                                  </Button>
+                                ))}
                               </div>
-                            )}
-                          </div>
-                        </SidebarMenuButton>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <div className="ml-8 space-y-1">
-                          {book.chapters.map((chapter) => (
-                            <Collapsible
-                              key={chapter.id}
-                              open={expandedChapter === chapter.id}
-                              onOpenChange={() => setExpandedChapter(expandedChapter === chapter.id ? null : chapter.id)}
-                            >
-                              <CollapsibleTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  className="w-full justify-start text-sm"
-                                >
-                                  {expandedChapter === chapter.id ? (
-                                    <ChevronDown className="h-4 w-4 mr-2" />
-                                  ) : (
-                                    <ChevronRight className="h-4 w-4 mr-2" />
-                                  )}
-                                  {chapter.title}
-                                  <div className="ml-auto flex items-center gap-2">
-                                    <span className="text-xs text-muted-foreground">
-                                      {chapter.completedPages || 0}/{(chapter.pages || []).length}
-                                    </span>
-                                    {(chapter.annotationCount || 0) > 0 && (
-                                      <div className="flex items-center gap-1 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                                        <MessageSquare className="h-3 w-3" />
-                                        {chapter.annotationCount}
-                                      </div>
-                                    )}
-                                  </div>
-                                </Button>
-                              </CollapsibleTrigger>
-                              <CollapsibleContent>
-                                <div className="ml-6 space-y-1">
-                                  {(chapter.pages || []).map((page) => (
-                                    <Button
-                                      key={page.id}
-                                      variant="ghost"
-                                      className={`w-full justify-start text-sm pl-8 ${
-                                        selectedPage === page.id ? "bg-accent text-accent-foreground" : ""
-                                      }`}
-                                      onClick={() => handlePageSelect(page.id, page.verses, chapter.id)}
-                                    >
-                                      {page.completed ? (
-                                        <CheckCircle className="h-4 w-4 mr-2 text-primary" />
-                                      ) : (
-                                        <Circle className="h-4 w-4 mr-2" />
-                                      )}
-                                      Página {page.number}
-                                      {(page.annotationCount || 0) > 0 && (
-                                        <div className="ml-auto flex items-center gap-1 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                                          <MessageSquare className="h-3 w-3" />
-                                          {page.annotationCount}
-                                        </div>
-                                      )}
-                                    </Button>
-                                  ))}
-                                </div>
-                              </CollapsibleContent>
-                            </Collapsible>
-                          ))}
-                        </div>
-                      </CollapsibleContent>
-                    </Collapsible>
-                  ))
-                )}
+                            </CollapsibleContent>
+                          </Collapsible>
+                        ))}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+
+          <SidebarGroup>
+            <div className="flex items-center justify-between px-4 py-2">
+              <SidebarGroupLabel>Tags</SidebarGroupLabel>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-5 w-5"
+                onClick={() => handleCreateTag("Nova Tag")}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {MOCK_TAGS.map((tag) => (
+                  <SidebarMenuItem key={tag.id}>
+                    <SidebarMenuButton
+                      className="w-full px-4 py-2 hover:bg-accent rounded-lg transition-colors"
+                      onClick={() => {
+                        toast({
+                          title: "Tag selecionada",
+                          description: `Mostrando itens com a tag "${tag.name}"`,
+                        });
+                      }}
+                    >
+                      <Tags className="h-4 w-4 mr-2" style={{ color: tag.color }} />
+                      <span>{tag.name}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

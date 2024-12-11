@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { CreateTask } from "@/components/CreateTask";
 import { TaskCard, Task } from "@/components/TaskCard";
 import { useToast } from "@/components/ui/use-toast";
@@ -10,28 +10,13 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Star, ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useQueryClient } from "@tanstack/react-query";
-import { mockApi } from "@/services/mockApi";
-import { Book } from "@/types/Book";
 
 const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const [currentPage, setCurrentPage] = useState(1);
-  const [currentPageId, setCurrentPageId] = useState<string | null>(null);
-  const [currentChapterId, setCurrentChapterId] = useState<string | null>(null);
-  const totalPages = 10;
-  const [selectedVerses, setSelectedVerses] = useState<string[]>([]);
-  const [navigationHandlers, setNavigationHandlers] = useState<{
-    onNextPage: () => void;
-    onPreviousPage: () => void;
-  }>({
-    onNextPage: () => {},
-    onPreviousPage: () => {},
-  });
-
-  const queryClient = useQueryClient();
+  const totalPages = 10; // This should be dynamic based on your book's content
 
   const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress" | "isPaused">) => {
     const task: Task = {
@@ -43,35 +28,6 @@ const Index = () => {
     };
 
     setTasks((prev) => [task, ...prev]);
-    
-    // Update annotation count in the books data
-    queryClient.setQueryData(['books'], (oldData: any) => {
-      const books = oldData.data;
-      const updatedBooks = books.map((book: any) => ({
-        ...book,
-        annotationCount: (book.annotationCount || 0) + 1,
-        chapters: book.chapters.map((chapter: any) => {
-          if (chapter.id === currentChapterId) {
-            return {
-              ...chapter,
-              annotationCount: (chapter.annotationCount || 0) + 1,
-              pages: chapter.pages.map((page: any) => {
-                if (page.id === currentPageId) {
-                  return {
-                    ...page,
-                    annotationCount: (page.annotationCount || 0) + 1,
-                  };
-                }
-                return page;
-              }),
-            };
-          }
-          return chapter;
-        }),
-      }));
-      return { data: updatedBooks };
-    });
-
     toast({
       title: "Task created",
       description: "Your new task has been created successfully.",
@@ -96,90 +52,33 @@ const Index = () => {
 
   const handleDeleteTask = (taskId: string) => {
     setTasks((prev) => prev.filter((task) => task.id !== taskId));
-    
-    // Update annotation count in the books data
-    queryClient.setQueryData(['books'], (oldData: any) => {
-      const books = oldData.data;
-      const updatedBooks = books.map((book: any) => ({
-        ...book,
-        annotationCount: Math.max((book.annotationCount || 0) - 1, 0),
-        chapters: book.chapters.map((chapter: any) => {
-          if (chapter.id === currentChapterId) {
-            return {
-              ...chapter,
-              annotationCount: Math.max((chapter.annotationCount || 0) - 1, 0),
-              pages: chapter.pages.map((page: any) => {
-                if (page.id === currentPageId) {
-                  return {
-                    ...page,
-                    annotationCount: Math.max((page.annotationCount || 0) - 1, 0),
-                  };
-                }
-                return page;
-              }),
-            };
-          }
-          return chapter;
-        }),
-      }));
-      return { data: updatedBooks };
-    });
-
     toast({
       title: "Anotação excluída",
       description: "A anotação foi excluída com sucesso.",
     });
   };
 
-  const handleCompletePage = () => {
-    if (!currentPageId || !currentChapterId) return;
-
-    // Find the current book
-    const currentBook = queryClient.getQueryData<{ data: Book[] }>(['books'])?.data?.find(
-      book => book.chapters.some(chapter => chapter.id === currentChapterId)
-    );
-
-    if (currentBook) {
-      // Update the page completion status using mock API
-      mockApi.pages.update(currentBook.id, currentChapterId, currentPageId, { completed: true })
-        .then(() => {
-          // Invalidate the books query to trigger a refetch
-          queryClient.invalidateQueries({ queryKey: ['books'] });
-          
-          toast({
-            title: "Página concluída",
-            description: "A página foi marcada como concluída com sucesso.",
-          });
-        });
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(prev => prev + 1);
     }
   };
 
-  useEffect(() => {
-    const handlePageSelected = (event: CustomEvent<{
-      verses: string[];
-      currentPage: number;
-      totalPages: number;
-      chapterId: string;
-      pageId: string;
-      onNextPage: () => void;
-      onPreviousPage: () => void;
-    }>) => {
-      setSelectedVerses(event.detail.verses || []);
-      setCurrentPage(event.detail.currentPage);
-      setCurrentChapterId(event.detail.chapterId);
-      setCurrentPageId(event.detail.pageId);
-      setNavigationHandlers({
-        onNextPage: event.detail.onNextPage,
-        onPreviousPage: event.detail.onPreviousPage,
-      });
-    };
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(prev => prev - 1);
+    }
+  };
 
-    window.addEventListener('pageSelected', handlePageSelected as EventListener);
+  const [isBookCompleted, setIsBookCompleted] = useState(false);
 
-    return () => {
-      window.removeEventListener('pageSelected', handlePageSelected as EventListener);
-    };
-  }, []);
+  const handleMarkAsCompleted = () => {
+    setIsBookCompleted(!isBookCompleted);
+    toast({
+      title: isBookCompleted ? "Página marcada como pendente" : "Página marcada como concluída",
+      description: `A página foi marcada como ${isBookCompleted ? "pendente" : "concluída"}.`,
+    });
+  };
 
   return (
     <SidebarProvider>
@@ -256,12 +155,12 @@ const Index = () => {
                 <div className="w-full max-w-2xl">
                   <div className="glass-card h-full rounded-lg p-6">
                     <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-2xl font-semibold">Conteúdo</h2>
+                      <h2 className="text-2xl font-semibold">Livro</h2>
                       <div className="flex items-center gap-2">
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={navigationHandlers.onPreviousPage}
+                          onClick={handlePreviousPage}
                           disabled={currentPage === 1}
                         >
                           <ArrowLeft className="h-4 w-4" />
@@ -272,35 +171,24 @@ const Index = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={navigationHandlers.onNextPage}
+                          onClick={handleNextPage}
                           disabled={currentPage === totalPages}
                         >
                           <ArrowRight className="h-4 w-4" />
                         </Button>
                         <Button
-                          variant="outline"
-                          size="sm"
-                          className="ml-4"
-                          onClick={handleCompletePage}
+                          variant="ghost"
+                          size="icon"
+                          onClick={handleMarkAsCompleted}
+                          className={isBookCompleted ? "text-green-500" : ""}
                         >
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Concluir
+                          <CheckCircle className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
-                    {selectedVerses.length > 0 ? (
-                      <div className="space-y-4">
-                        {selectedVerses.map((verse, index) => (
-                          <p key={index} className="text-muted-foreground">
-                            {verse}
-                          </p>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-muted-foreground text-center">
-                        Selecione uma página para ver seu conteúdo
-                      </p>
-                    )}
+                    <p className="text-muted-foreground text-center">
+                      Conteudo de livros em breve...
+                    </p>
                   </div>
                 </div>
               </div>

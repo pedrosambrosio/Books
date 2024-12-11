@@ -4,7 +4,7 @@ import { toast } from "@/components/ui/use-toast";
 
 // Configuration
 const API_CONFIG = {
-  baseURL:  "https://book-641882921109.us-central1.run.app/api",
+  baseURL: import.meta.env.VITE_API_URL || "https://api.example.com",
   headers: {
     "Content-Type": "application/json",
   },
@@ -18,7 +18,7 @@ export interface ApiError {
 }
 
 export interface ApiResponse<T> {
-  data: T; // Changed from optional to required
+  data?: T;
   error?: ApiError;
 }
 
@@ -180,87 +180,12 @@ export const TasksApi = {
     }),
 };
 
-// Users API
-export const UsersApi = {
-  getAll: () => request<User[]>("/users"),
-  
-  getById: (userId: string) => request<User>(`/users/${userId}`),
-  
-  create: (user: Omit<User, "id">) =>
-    request<User>("/users", {
-      method: "POST",
-      body: JSON.stringify(user),
-    }),
-  
-  update: (userId: string, user: Partial<User>) =>
-    request<User>(`/users/${userId}`, {
-      method: "PUT",
-      body: JSON.stringify(user),
-    }),
-  
-  delete: (userId: string) =>
-    request(`/users/${userId}`, {
-      method: "DELETE",
-    }),
-};
-
-// Annotations API
-export const AnnotationsApi = {
-  getAll: () => request<Annotation[]>("/annotations"),
-  
-  getById: (annotationId: string) => request<Annotation>(`/annotations/${annotationId}`),
-  
-  create: (annotation: Omit<Annotation, "id">) =>
-    request<Annotation>("/annotations", {
-      method: "POST",
-      body: JSON.stringify(annotation),
-    }),
-  
-  update: (annotationId: string, annotation: Partial<Annotation>) =>
-    request<Annotation>(`/annotations/${annotationId}`, {
-      method: "PUT",
-      body: JSON.stringify(annotation),
-    }),
-  
-  delete: (annotationId: string) =>
-    request(`/annotations/${annotationId}`, {
-      method: "DELETE",
-    }),
-};
-
-// Tags API
-export const TagsApi = {
-  getAll: () => request<Tag[]>("/tags"),
-  
-  getById: (tagId: string) => request<Tag>(`/tags/${tagId}`),
-  
-  create: (tag: Omit<Tag, "id">) =>
-    request<Tag>("/tags", {
-      method: "POST",
-      body: JSON.stringify(tag),
-    }),
-  
-  update: (tagId: string, tag: Partial<Tag>) =>
-    request<Tag>(`/tags/${tagId}`, {
-      method: "PUT",
-      body: JSON.stringify(tag),
-    }),
-  
-  delete: (tagId: string) =>
-    request(`/tags/${tagId}`, {
-      method: "DELETE",
-    }),
-};
-
 // Export all APIs
 export const api = {
   books: BooksApi,
   chapters: ChaptersApi,
   pages: PagesApi,
   tasks: TasksApi,
-  users: UsersApi,
-  annotations: AnnotationsApi,
-  tags: TagsApi,
 };
 
 export default api;
