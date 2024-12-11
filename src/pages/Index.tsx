@@ -11,6 +11,8 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { Star, ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQueryClient } from "@tanstack/react-query";
+import { mockApi } from "@/services/mockApi";
+import { Book } from "@/types/Book";
 
 const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -132,46 +134,24 @@ const Index = () => {
   const handleCompletePage = () => {
     if (!currentPageId || !currentChapterId) return;
 
-    queryClient.setQueryData(['books'], (oldData: any) => {
-      const books = oldData.data;
-      const updatedBooks = books.map((book: any) => {
-        const updatedChapters = book.chapters.map((chapter: any) => {
-          if (chapter.id === currentChapterId) {
-            const updatedPages = chapter.pages.map((page: any) => {
-              if (page.id === currentPageId) {
-                return { ...page, completed: true };
-              }
-              return page;
-            });
-            
-            const completedPages = updatedPages.filter((page: any) => page.completed).length;
-            return {
-              ...chapter,
-              pages: updatedPages,
-              completedPages,
-            };
-          }
-          return chapter;
+    // Find the current book
+    const currentBook = queryClient.getQueryData<{ data: Book[] }>(['books'])?.data?.find(
+      book => book.chapters.some(chapter => chapter.id === currentChapterId)
+    );
+
+    if (currentBook) {
+      // Update the page completion status using mock API
+      mockApi.pages.update(currentBook.id, currentChapterId, currentPageId, { completed: true })
+        .then(() => {
+          // Invalidate the books query to trigger a refetch
+          queryClient.invalidateQueries({ queryKey: ['books'] });
+          
+          toast({
+            title: "Página concluída",
+            description: "A página foi marcada como concluída com sucesso.",
+          });
         });
-
-        const completedChapters = updatedChapters.filter(
-          (chapter: any) => chapter.completedPages === chapter.pages.length
-        ).length;
-
-        return {
-          ...book,
-          chapters: updatedChapters,
-          completedChapters,
-        };
-      });
-
-      return { data: updatedBooks };
-    });
-
-    toast({
-      title: "Página concluída",
-      description: "A página foi marcada como concluída com sucesso.",
-    });
+    }
   };
 
   useEffect(() => {

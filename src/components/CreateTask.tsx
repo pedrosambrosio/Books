@@ -18,6 +18,15 @@ export const CreateTask = ({ onCreateTask }: CreateTaskProps) => {
   const [newTag, setNewTag] = useState("");
   const [tags, setTags] = useState<string[]>([]);
 
+  const resetForm = () => {
+    setTitle("");
+    setDescription("");
+    setReference("");
+    setTags([]);
+    setNewTag("");
+    setIsExpanded(false);
+  };
+
   const handleAddTag = () => {
     if (!newTag.trim() || tags.includes(newTag.trim())) return;
     setTags([...tags, newTag.trim()]);
@@ -39,11 +48,7 @@ export const CreateTask = ({ onCreateTask }: CreateTaskProps) => {
       tags,
     });
 
-    setTitle("");
-    setDescription("");
-    setReference("");
-    setTags([]);
-    setIsExpanded(false);
+    resetForm();
   };
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,11 +56,6 @@ export const CreateTask = ({ onCreateTask }: CreateTaskProps) => {
     setTitle(newTitle);
     if (!isExpanded && newTitle) {
       setIsExpanded(true);
-    } else if (isExpanded && !newTitle) {
-      setIsExpanded(false);
-      setDescription("");
-      setReference("");
-      setTags([]);
     }
   };
 

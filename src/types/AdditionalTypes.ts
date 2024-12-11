@@ -1,15 +1,15 @@
-
 export interface User {
   id: string;
-  username: string;
+  name: string;
   email: string;
-  passwordHash: string;
 }
 
 export interface Annotation {
   id: string;
   content: string;
-  verseId: string;
+  userId: string;
+  pageId: string;
+  createdAt: Date;
 }
 
 export interface Tag {
