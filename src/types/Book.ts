@@ -2,15 +2,15 @@ export interface Page {
   id: string;
   number: number;
   title?: string;
-  completed: boolean;
+  completed?: boolean;
 }
 
 export interface Chapter {
   id: string;
   number: number;
-  title: string;
+  title?: string;
   pages: Page[];
-  completedPages: number;
+  completedPages?: number;
 }
 
 export interface Book {
@@ -18,7 +18,7 @@ export interface Book {
   title: string;
   type: 'bible' | 'regular';
   chapters: Chapter[];
-  completedChapters: number;
+  completedChapters?: number;
 }
 
 export interface Tag {

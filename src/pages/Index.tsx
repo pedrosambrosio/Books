@@ -27,29 +27,18 @@ const Index = () => {
   const [allTags, setAllTags] = useState<string[]>([]);
   const [tagCounts, setTagCounts] = useState<{ [key: string]: number }>({});
 
-  const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress">) => {
-    const taskWithId = {
-      ...newTask,
-      id: crypto.randomUUID(),
-      completed: false,
-      inProgress: false,
-      pageNumber: currentPage,
-      chapterId: currentChapterId,
-      bookId: currentBibleBook.id,
-    };
-    setTasks([...tasks, taskWithId]);
-    
-    // Update tag counts
-    if (newTask.tags) {
-      const newTagCounts = { ...tagCounts };
-      newTask.tags.forEach(tag => {
-        newTagCounts[tag] = (newTagCounts[tag] || 0) + 1;
-        if (!allTags.includes(tag)) {
-          setAllTags([...allTags, tag]);
-        }
-      });
-      setTagCounts(newTagCounts);
+  const getCurrentPageContent = () => {
+    const currentChapter = currentBibleBook.chapters.find(c => c.id === currentChapterId);
+    if (!currentChapter) return "";
+
+    // Get content based on book, chapter and page
+    if (currentChapter.id === "genesis") {
+      return GENESIS_CONTENT[currentPage - 1] || "Conteúdo não disponível.";
+    } else if (currentChapter.id === "exodus") {
+      // Add Exodus content here when available
+      return "Conteúdo de Êxodo em breve...";
     }
+    return "Conteúdo não disponível.";
   };
 
   const handleTagCreate = (tag: string) => {
@@ -63,7 +52,6 @@ const Index = () => {
   };
 
   const handleUpdateTask = (updatedTask: Task) => {
-    const oldTask = tasks.find(t => t.id === updatedTask.id);
     setTasks(prevTasks => 
       prevTasks.map(task => 
         task.id === updatedTask.id ? updatedTask : task
@@ -71,6 +59,7 @@ const Index = () => {
     );
 
     // Update tag counts
+    const oldTask = tasks.find(t => t.id === updatedTask.id);
     if (oldTask?.tags) {
       const removedTags = oldTask.tags.filter(tag => !updatedTask.tags?.includes(tag));
       const addedTags = updatedTask.tags?.filter(tag => !oldTask.tags?.includes(tag)) || [];
@@ -155,41 +144,6 @@ const Index = () => {
       description: `A página ${currentPage} foi marcada como ${isBookCompleted ? "pendente" : "concluída"}.`,
     });
   };
-
-  const getCurrentPageContent = () => {
-    const currentChapter = currentBibleBook.chapters.find(c => c.id === currentChapterId);
-    if (!currentChapter) return "";
-
-    if (currentChapter.id === "genesis") {
-      return GENESIS_CONTENT[currentPage - 1] || "Conteúdo não disponível.";
-    } else if (currentChapter.id === "exodus") {
-      return "Conteúdo de Êxodo em breve...";
-    }
-    return "Conteúdo não disponível.";
-  };
-
-  const handlePageSelect = (pageNumber: number, chapterId: string) => {
-    setCurrentPage(pageNumber);
-    setCurrentChapterId(chapterId);
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(prev => prev + 1);
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(prev => prev - 1);
-    }
-  };
-
-  const getNoteCounts = () => ({
-    bookNotes: tasks.filter(t => t.bookId === currentBibleBook.id).length,
-    chapterNotes: tasks.filter(t => t.chapterId === currentChapterId).length,
-    pageNotes: tasks.filter(t => t.pageNumber === currentPage && t.chapterId === currentChapterId).length,
-  });
 
   const sidebarTags = Object.entries(tagCounts)
     .filter(([_, count]) => count > 0)
