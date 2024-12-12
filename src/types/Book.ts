@@ -2,7 +2,7 @@ export interface Page {
   id: string;
   number: number;
   title?: string;
-  completed: boolean;  // Changed from completed?: boolean to completed: boolean
+  completed: boolean;
 }
 
 export interface Chapter {
@@ -10,7 +10,7 @@ export interface Chapter {
   number: number;
   title: string;
   pages: Page[];
-  completedPages?: number;
+  completedPages: number;  // Changed from completedPages?: number to completedPages: number
 }
 
 export interface Book {
