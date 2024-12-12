@@ -43,6 +43,7 @@ const Index = () => {
   const totalPages = 3;
   const [isBookCompleted, setIsBookCompleted] = useState(false);
   const [currentBibleBook, setCurrentBibleBook] = useState(BIBLE_BOOK);
+  const [allTags, setAllTags] = useState<string[]>([]);
 
   const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress" | "isPaused">) => {
     const task: Task = {
@@ -55,6 +56,15 @@ const Index = () => {
     };
 
     setTasks((prev) => [task, ...prev]);
+    
+    // Update allTags with any new tags
+    if (newTask.tags) {
+      const newTags = newTask.tags.filter(tag => !allTags.includes(tag));
+      if (newTags.length > 0) {
+        setAllTags(prev => [...prev, ...newTags]);
+      }
+    }
+
     toast({
       title: "Anotação criada",
       description: "Sua nova anotação foi criada com sucesso.",
@@ -189,7 +199,7 @@ const Index = () => {
                     </TabsList>
                     <TabsContent value="personal">
                       <div className="space-y-6">
-                        <CreateTask onCreateTask={handleCreateTask} />
+                        <CreateTask onCreateTask={handleCreateTask} existingTags={allTags} />
                         
                         <div className="space-y-4">
                           {currentPageTasks.map((task) => (

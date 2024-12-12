@@ -125,6 +125,9 @@ export function AppSidebar({ currentBook, onPageSelect, noteCounts }: AppSidebar
                         <span className="text-[#0EA5E9]">{book.title}</span>
                         <div className="ml-auto flex items-center gap-2">
                           <span className="text-xs text-muted-foreground">
+                            {noteCounts?.bookNotes}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
                             {book.completedChapters}/{book.chapters.length}
                           </span>
                         </div>
@@ -152,11 +155,9 @@ export function AppSidebar({ currentBook, onPageSelect, noteCounts }: AppSidebar
                                   {chapter.title || `Capítulo ${chapter.number}`}
                                 </span>
                                 <div className="ml-auto flex items-center gap-2">
-                                  {noteCounts && (
-                                    <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                                      {noteCounts.chapterNotes} notas
-                                    </span>
-                                  )}
+                                  <span className="text-xs text-muted-foreground">
+                                    {noteCounts?.chapterNotes}
+                                  </span>
                                   <span className="text-xs text-muted-foreground">
                                     {chapter.completedPages}/{chapter.pages.length}
                                   </span>
@@ -177,11 +178,9 @@ export function AppSidebar({ currentBook, onPageSelect, noteCounts }: AppSidebar
                                     <span className="flex items-center gap-2">
                                       Página {page.number}
                                       {page.completed && <Check className="h-4 w-4" />}
-                                      {noteCounts && (
-                                        <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full ml-auto">
-                                          {noteCounts.pageNotes} notas
-                                        </span>
-                                      )}
+                                      <span className="text-xs text-muted-foreground ml-auto">
+                                        {noteCounts?.pageNotes}
+                                      </span>
                                     </span>
                                   </Button>
                                 ))}

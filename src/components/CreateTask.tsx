@@ -5,12 +5,14 @@ import { Badge } from "@/components/ui/badge";
 import { Book, Tag, Plus, X } from "lucide-react";
 import { Task } from "./TaskCard";
 import { RichTextEditor } from "./RichTextEditor";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface CreateTaskProps {
   onCreateTask: (task: Omit<Task, "id" | "completed" | "inProgress">) => void;
+  existingTags?: string[]; // Add this prop
 }
 
-export const CreateTask = ({ onCreateTask }: CreateTaskProps) => {
+export const CreateTask = ({ onCreateTask, existingTags = [] }: CreateTaskProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -85,8 +87,23 @@ export const CreateTask = ({ onCreateTask }: CreateTaskProps) => {
 
           <div className="space-y-4 mb-6">
             <div className="flex items-center gap-3">
+              <Select
+                value={newTag}
+                onValueChange={(value) => setNewTag(value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Adicionar tag..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {existingTags.map((tag) => (
+                    <SelectItem key={tag} value={tag}>
+                      {tag}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Input
-                placeholder="Adicionar tag..."
+                placeholder="Ou digite uma nova tag..."
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
                 onKeyPress={(e) => {
