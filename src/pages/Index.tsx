@@ -312,9 +312,19 @@ const Index = () => {
                           variant="ghost"
                           size="icon"
                           onClick={handleMarkAsCompleted}
-                          className={isBookCompleted ? "text-green-500" : ""}
+                          className={cn(
+                            "transition-colors",
+                            isBookCompleted 
+                              ? "bg-[#09090B] hover:bg-[#09090B]/90" 
+                              : "hover:bg-gray-100"
+                          )}
                         >
-                          <CheckCircle className="h-4 w-4" />
+                          <CheckCircle 
+                            className={cn(
+                              "h-4 w-4 transition-colors",
+                              isBookCompleted ? "text-white" : "text-gray-400"
+                            )} 
+                          />
                         </Button>
                       </div>
                     </div>
