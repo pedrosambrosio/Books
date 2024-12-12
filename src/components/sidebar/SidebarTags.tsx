@@ -17,17 +17,17 @@ interface SidebarTagsProps {
 
 export function SidebarTags({ tags = [] }: SidebarTagsProps) {
   const { toast } = useToast();
-  const [activeTags, setActiveTags] = useState(tags.filter(tag => tag.count > 0));
   const [lastSelectedTag, setLastSelectedTag] = useState<string | null>(null);
 
-  useEffect(() => {
-    setActiveTags(tags.filter(tag => tag.count > 0));
-  }, [tags]);
+  // Filter out tags with zero count
+  const activeTags = tags.filter(tag => tag.count > 0);
 
   const handleCreateTag = (name: string) => {
+    if (!name.trim()) return;
+    
     toast({
       title: "Tag criada",
-      description: `Tag "${name}" foi criada com sucesso`,
+      description: `Tag "${name}" foi criada com sucesso.`,
     });
   };
 
@@ -42,8 +42,26 @@ export function SidebarTags({ tags = [] }: SidebarTagsProps) {
     }
   };
 
+  // Show empty state when no tags are available
   if (activeTags.length === 0) {
-    return null;
+    return (
+      <SidebarGroup>
+        <div className="flex items-center justify-between px-4 py-2">
+          <SidebarGroupLabel>Tags</SidebarGroupLabel>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5"
+            onClick={() => handleCreateTag("Nova Tag")}
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
+        <p className="px-4 py-2 text-sm text-muted-foreground">
+          Nenhuma tag disponível.
+        </p>
+      </SidebarGroup>
+    );
   }
 
   return (
