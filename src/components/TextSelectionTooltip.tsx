@@ -1,20 +1,35 @@
 import { Button } from "@/components/ui/button";
-import { Edit, Tag, MessageSquare } from "lucide-react";
+import { Edit, Tag, MessageSquare, X } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface TextSelectionTooltipProps {
   onCreateNote: () => void;
   position: { x: number; y: number } | null;
+  existingTags?: string[];
+  onTagCreate?: (tag: string) => void;
+  onTagRemove?: () => void;
+  hasTag?: boolean;
 }
 
-export const TextSelectionTooltip = ({ onCreateNote, position }: TextSelectionTooltipProps) => {
+export const TextSelectionTooltip = ({ 
+  onCreateNote, 
+  position,
+  existingTags = [],
+  onTagCreate,
+  onTagRemove,
+  hasTag = false
+}: TextSelectionTooltipProps) => {
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [tagName, setTagName] = useState("");
   const { toast } = useToast();
-
-  if (!position) return null;
 
   const handleAddTag = () => {
     if (!tagName.trim()) {
@@ -22,20 +37,9 @@ export const TextSelectionTooltip = ({ onCreateNote, position }: TextSelectionTo
       return;
     }
 
-    // Apply highlight style to selected text
-    const selection = window.getSelection();
-    if (selection && !selection.isCollapsed) {
-      const range = selection.getRangeAt(0);
-      const span = document.createElement('span');
-      span.className = `bg-[${tagName}]/20 px-1 rounded`;
-      span.dataset.tag = tagName;
-      range.surroundContents(span);
+    if (onTagCreate) {
+      onTagCreate(tagName);
     }
-
-    toast({
-      title: "Tag adicionada",
-      description: `A tag "${tagName}" foi adicionada ao texto selecionado.`,
-    });
 
     setTagName("");
     setIsAddingTag(false);
@@ -48,38 +52,26 @@ export const TextSelectionTooltip = ({ onCreateNote, position }: TextSelectionTo
     });
   };
 
-  return (
-    <div
-      className="fixed z-50 bg-white rounded-lg shadow-lg border border-gray-200 py-2 px-3 animate-fade-in flex flex-col gap-2"
-      style={{
-        top: `${Math.max(position.y - 10, 10)}px`,
-        left: `${position.x}px`,
-        transform: 'translate(-50%, -100%)',
-        pointerEvents: 'auto',
-      }}
-    >
-      <Button
-        variant="ghost"
-        size="sm"
-        className="flex items-center gap-2 text-sm hover:bg-gray-100 w-full justify-start"
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          onCreateNote();
+  if (!position) return null;
+
+  if (isAddingTag) {
+    return (
+      <div
+        className="fixed z-50 bg-white rounded-lg shadow-lg border border-gray-200 p-2 animate-fade-in"
+        style={{
+          top: `${Math.max(position.y - 10, 10)}px`,
+          left: `${position.x}px`,
+          transform: 'translate(-50%, -100%)',
         }}
       >
-        <Edit className="h-4 w-4" />
-        Criar Anotação
-      </Button>
-
-      {isAddingTag ? (
-        <div className="flex items-center gap-2 px-2">
+        <div className="flex items-center gap-2">
           <Input
             value={tagName}
             onChange={(e) => setTagName(e.target.value)}
             placeholder="Nome da tag..."
-            className="h-8 text-sm"
+            className="h-8 text-sm min-w-[150px]"
             autoFocus
+            list="existing-tags"
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 handleAddTag();
@@ -89,6 +81,11 @@ export const TextSelectionTooltip = ({ onCreateNote, position }: TextSelectionTo
               }
             }}
           />
+          <datalist id="existing-tags">
+            {existingTags.map((tag) => (
+              <option key={tag} value={tag} />
+            ))}
+          </datalist>
           <Button
             variant="ghost"
             size="sm"
@@ -98,27 +95,96 @@ export const TextSelectionTooltip = ({ onCreateNote, position }: TextSelectionTo
             OK
           </Button>
         </div>
-      ) : (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="flex items-center gap-2 text-sm hover:bg-gray-100 w-full justify-start"
-          onClick={() => setIsAddingTag(true)}
-        >
-          <Tag className="h-4 w-4" />
-          Adicionar Tag
-        </Button>
-      )}
+      </div>
+    );
+  }
 
-      <Button
-        variant="ghost"
-        size="sm"
-        className="flex items-center gap-2 text-sm hover:bg-gray-100 w-full justify-start"
-        onClick={handleAskChat}
-      >
-        <MessageSquare className="h-4 w-4" />
-        Perguntar pro Chat
-      </Button>
+  return (
+    <div
+      className="fixed z-50 bg-white rounded-lg shadow-lg border border-gray-200 p-2 animate-fade-in"
+      style={{
+        top: `${Math.max(position.y - 10, 10)}px`,
+        left: `${position.x}px`,
+        transform: 'translate(-50%, -100%)',
+      }}
+    >
+      <div className="flex items-center gap-4">
+        {hasTag ? (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="p-1"
+                  onClick={onTagRemove}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="animate-fade-in">
+                <span className="text-sm">Remover Tag</span>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ) : (
+          <>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="p-1"
+                    onClick={onCreateNote}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="animate-fade-in">
+                  <span className="text-sm">Criar Anotação</span>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="p-1"
+                    onClick={() => setIsAddingTag(true)}
+                  >
+                    <Tag className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="animate-fade-in">
+                  <span className="text-sm">Adicionar Tag</span>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="p-1"
+                    onClick={handleAskChat}
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="animate-fade-in">
+                  <span className="text-sm">Perguntar pro Chat</span>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </>
+        )}
+      </div>
     </div>
   );
 };

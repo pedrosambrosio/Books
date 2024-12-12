@@ -14,6 +14,8 @@ interface ContentViewerProps {
   isCompleted: boolean;
   onMarkAsCompleted: () => void;
   onCreateNoteFromSelection: (selectedText: string) => void;
+  existingTags?: string[];
+  onTagCreate?: (tag: string) => void;
 }
 
 export const ContentViewer = ({
@@ -25,9 +27,20 @@ export const ContentViewer = ({
   isCompleted,
   onMarkAsCompleted,
   onCreateNoteFromSelection,
+  existingTags = [],
+  onTagCreate,
 }: ContentViewerProps) => {
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
   const [selectedText, setSelectedText] = useState("");
+  const [taggedVerses, setTaggedVerses] = useState<{ [key: string]: string }>(() => {
+    const saved = localStorage.getItem(`tagged-verses-page-${currentPage}`);
+    return saved ? JSON.parse(saved) : {};
+  });
+
+  useEffect(() => {
+    const saved = localStorage.getItem(`tagged-verses-page-${currentPage}`);
+    setTaggedVerses(saved ? JSON.parse(saved) : {});
+  }, [currentPage]);
 
   useEffect(() => {
     const handleSelectionChange = () => {
@@ -71,6 +84,55 @@ export const ContentViewer = ({
       window.getSelection()?.removeAllRanges();
     }
   };
+
+  const handleTagCreate = (tag: string, verseId: string) => {
+    const newTaggedVerses = {
+      ...taggedVerses,
+      [verseId]: tag
+    };
+    setTaggedVerses(newTaggedVerses);
+    localStorage.setItem(`tagged-verses-page-${currentPage}`, JSON.stringify(newTaggedVerses));
+    
+    if (onTagCreate) {
+      onTagCreate(tag);
+    }
+
+    const verseElement = document.getElementById(verseId);
+    if (verseElement) {
+      const span = document.createElement('span');
+      span.className = `bg-[${tag}]/20 px-1 rounded`;
+      span.dataset.tag = tag;
+      span.textContent = verseElement.textContent || '';
+      verseElement.innerHTML = '';
+      verseElement.appendChild(span);
+    }
+  };
+
+  const handleTagRemove = (verseId: string) => {
+    const { [verseId]: removedTag, ...remainingTags } = taggedVerses;
+    setTaggedVerses(remainingTags);
+    localStorage.setItem(`tagged-verses-page-${currentPage}`, JSON.stringify(remainingTags));
+
+    const verseElement = document.getElementById(verseId);
+    if (verseElement) {
+      verseElement.innerHTML = verseElement.textContent || '';
+    }
+  };
+
+  useEffect(() => {
+    // Apply tags when component mounts or page changes
+    Object.entries(taggedVerses).forEach(([verseId, tag]) => {
+      const verseElement = document.getElementById(verseId);
+      if (verseElement) {
+        const span = document.createElement('span');
+        span.className = `bg-[${tag}]/20 px-1 rounded`;
+        span.dataset.tag = tag;
+        span.textContent = verseElement.textContent || '';
+        verseElement.innerHTML = '';
+        verseElement.appendChild(span);
+      }
+    });
+  }, [taggedVerses, currentPage]);
 
   return (
     <div className="glass-card h-full rounded-lg p-6">
@@ -127,12 +189,32 @@ export const ContentViewer = ({
             verse={verse.verse}
             text={verse.text}
             onCreateNote={onCreateNoteFromSelection}
+            existingTags={existingTags}
+            onTagCreate={handleTagCreate}
+            onTagRemove={handleTagRemove}
+            hasTag={`verse-${verse.verse}` in taggedVerses}
           />
         ))}
       </div>
       <TextSelectionTooltip
         position={tooltipPosition}
         onCreateNote={handleCreateNote}
+        existingTags={existingTags}
+        onTagCreate={(tag) => {
+          const selection = window.getSelection();
+          if (selection) {
+            const range = selection.getRangeAt(0);
+            const span = document.createElement('span');
+            span.className = `bg-[${tag}]/20 px-1 rounded`;
+            span.dataset.tag = tag;
+            range.surroundContents(span);
+            if (onTagCreate) {
+              onTagCreate(tag);
+            }
+          }
+          setTooltipPosition(null);
+          setSelectedText("");
+        }}
       />
     </div>
   );
