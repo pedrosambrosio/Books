@@ -30,51 +30,38 @@ export const ContentViewer = ({
   const [selectedText, setSelectedText] = useState("");
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (!e.target || !(e.target as Element).closest('.text-selection-tooltip')) {
-        const selection = window.getSelection();
-        if (!selection || selection.isCollapsed) {
-          setTooltipPosition(null);
-          setSelectedText("");
-        }
+    const handleSelectionChange = () => {
+      const selection = window.getSelection();
+      if (!selection || selection.isCollapsed) {
+        setTooltipPosition(null);
+        setSelectedText("");
+        return;
       }
+
+      const text = selection.toString().trim();
+      if (!text) {
+        setTooltipPosition(null);
+        setSelectedText("");
+        return;
+      }
+
+      const range = selection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+      const tooltipX = rect.left + (rect.width / 2);
+      const tooltipY = rect.top + scrollTop;
+
+      setTooltipPosition({
+        x: tooltipX,
+        y: tooltipY,
+      });
+      setSelectedText(text);
     };
 
-    document.addEventListener("mouseup", handleClickOutside);
-    return () => document.removeEventListener("mouseup", handleClickOutside);
+    document.addEventListener("selectionchange", handleSelectionChange);
+    return () => document.removeEventListener("selectionchange", handleSelectionChange);
   }, []);
-
-  const handleTextSelection = (e: React.MouseEvent | React.TouchEvent) => {
-    const selection = window.getSelection();
-    
-    if (!selection || selection.isCollapsed) {
-      return;
-    }
-
-    const text = selection.toString().trim();
-    
-    if (!text) {
-      setTooltipPosition(null);
-      setSelectedText("");
-      return;
-    }
-
-    const range = selection.getRangeAt(0);
-    const rect = range.getBoundingClientRect();
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    
-    const tooltipX = rect.left + (rect.width / 2);
-    const tooltipY = rect.top + scrollTop;
-    
-    setTooltipPosition({
-      x: tooltipX,
-      y: tooltipY,
-    });
-    setSelectedText(text);
-
-    // Prevent default only after we've captured the selection
-    e.preventDefault();
-  };
 
   const handleCreateNote = () => {
     if (selectedText) {
