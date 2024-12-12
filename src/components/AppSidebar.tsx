@@ -123,7 +123,7 @@ export function AppSidebar({ currentBook, onPageSelect, noteCounts, tags = [] }:
                           <ChevronRight className="h-4 w-4 mr-2" />
                         )}
                         <Book className="h-4 w-4 mr-2" />
-                        <span className="text-[#0EA5E9]">{book.title}</span>
+                        <span className={expandedBook === book.id ? "text-[#09090B]" : "text-[#71717A]"}>{book.title}</span>
                         <div className="ml-auto flex items-center gap-2">
                           <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
                             {noteCounts?.bookNotes}
@@ -152,9 +152,7 @@ export function AppSidebar({ currentBook, onPageSelect, noteCounts, tags = [] }:
                                 ) : (
                                   <ChevronRight className="h-4 w-4 mr-2" />
                                 )}
-                                <span className="text-[#0EA5E9]">
-                                  {chapter.title || `Capítulo ${chapter.number}`}
-                                </span>
+                                <span className={expandedChapter === chapter.id ? "text-[#09090B]" : "text-[#71717A]"}>{chapter.title || `Capítulo ${chapter.number}`}</span>
                                 <div className="ml-auto flex items-center gap-2">
                                   <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
                                     {noteCounts?.chapterNotes}
@@ -171,9 +169,7 @@ export function AppSidebar({ currentBook, onPageSelect, noteCounts, tags = [] }:
                                   <Button
                                     key={page.id}
                                     variant="ghost"
-                                    className={`w-full justify-start text-sm pl-8 ${
-                                      page.completed ? "text-[#0EA5E9]" : ""
-                                    }`}
+                                    className={`w-full justify-start text-sm pl-8 ${page.completed ? "text-[#09090B]" : "text-[#71717A]"}`}
                                     onClick={() => handlePageClick(page.number)}
                                   >
                                     <span className="flex items-center gap-2">

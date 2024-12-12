@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Book, Tag, Edit2, Trash2, ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
+import { Book, Tag, Edit2, Trash2, ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -128,7 +128,7 @@ export const TaskCard = ({
               handleComplete();
             }}
           >
-            <CheckCircle className={`h-4 w-4 ${task.completed ? "text-green-500" : ""}`} />
+            <Check className={`h-4 w-4 ${task.completed ? "text-[#09090B]" : ""}`} />
           </Button>
           <Button
             variant="ghost"
@@ -199,7 +199,7 @@ export const TaskCard = ({
                   size="icon"
                   onClick={handleComplete}
                 >
-                  <CheckCircle className={`h-4 w-4 ${task.completed ? "text-green-500" : ""}`} />
+                  <Check className={`h-4 w-4 ${task.completed ? "text-[#09090B]" : ""}`} />
                 </Button>
                 <Button
                   variant="ghost"

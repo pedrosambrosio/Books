@@ -14,7 +14,7 @@ import { Book as BookType } from "@/types/Book";
 import { GENESIS_CONTENT } from "@/data/bibleContent";
 import { cn } from "@/lib/utils";
 
-// Create Bible book structure with only Genesis
+// Create Bible book structure with Genesis and Exodus
 const BIBLE_BOOK: BookType = {
   id: "bible",
   title: "Bíblia",
@@ -26,6 +26,18 @@ const BIBLE_BOOK: BookType = {
       title: "Genesis",
       pages: Array.from({ length: 3 }, (_, i) => ({
         id: `genesis-${i+1}`,
+        number: i + 1,
+        title: `Página ${i + 1}`,
+        completed: false
+      })),
+      completedPages: 0,
+    },
+    {
+      id: "exodus",
+      number: 2,
+      title: "Exodus",
+      pages: Array.from({ length: 2 }, (_, i) => ({
+        id: `exodus-${i+1}`,
         number: i + 1,
         title: `Página ${i + 1}`,
         completed: false
@@ -122,6 +134,23 @@ const Index = () => {
   };
 
   const handleUpdateTask = (updatedTask: Task) => {
+    const oldTags = tasks.find(task => task.id === updatedTask.id)?.tags || [];
+    const newTags = updatedTask.tags || [];
+    
+    // Find removed tags
+    const removedTags = oldTags.filter(tag => !newTags.includes(tag));
+    
+    // Update tag counts for removed tags
+    removedTags.forEach(tag => {
+      const currentCount = tagCounts[tag] || 0;
+      if (currentCount > 0) {
+        setTagCounts(prev => ({
+          ...prev,
+          [tag]: prev[tag] - 1
+        }));
+      }
+    });
+    
     setTasks((prev) =>
       prev.map((task) => (task.id === updatedTask.id ? updatedTask : task))
     );
@@ -316,16 +345,11 @@ const Index = () => {
                           className={cn(
                             "transition-colors",
                             isBookCompleted 
-                              ? "bg-[#09090B] hover:bg-[#09090B]/90" 
-                              : "hover:bg-gray-100"
+                              ? "text-[#09090B]" 
+                              : "text-[#71717A]"
                           )}
                         >
-                          <CheckCircle 
-                            className={cn(
-                              "h-4 w-4 transition-colors",
-                              isBookCompleted ? "text-white" : "text-gray-400"
-                            )} 
-                          />
+                          <Check className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
