@@ -11,9 +11,9 @@ export const TextSelectionTooltip = ({ onCreateNote, position }: TextSelectionTo
 
   return (
     <div
-      className="fixed z-50 bg-white rounded-lg shadow-lg border border-gray-200 py-2 px-3"
+      className="fixed z-50 bg-white rounded-lg shadow-lg border border-gray-200 py-2 px-3 animate-fade-in"
       style={{
-        top: `${position.y}px`,
+        top: `${Math.max(position.y - 10, 10)}px`,
         left: `${position.x}px`,
         transform: 'translate(-50%, -100%)',
       }}
@@ -21,7 +21,7 @@ export const TextSelectionTooltip = ({ onCreateNote, position }: TextSelectionTo
       <Button
         variant="ghost"
         size="sm"
-        className="flex items-center gap-2 text-sm"
+        className="flex items-center gap-2 text-sm hover:bg-gray-100"
         onClick={(e) => {
           e.stopPropagation();
           onCreateNote();

@@ -29,20 +29,21 @@ export const ContentViewer = ({
   const [selectedText, setSelectedText] = useState("");
 
   useEffect(() => {
-    const handleClickOutside = () => {
-      setTooltipPosition(null);
-      setSelectedText("");
+    const handleClickOutside = (e: MouseEvent) => {
+      const selection = window.getSelection();
+      if (!selection || selection.isCollapsed) {
+        setTooltipPosition(null);
+        setSelectedText("");
+      }
     };
 
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
+    document.addEventListener("mouseup", handleClickOutside);
+    return () => document.removeEventListener("mouseup", handleClickOutside);
   }, []);
 
-  const handleTextSelection = () => {
+  const handleTextSelection = (e: React.MouseEvent | React.TouchEvent) => {
     const selection = window.getSelection();
     if (!selection || selection.isCollapsed) {
-      setTooltipPosition(null);
-      setSelectedText("");
       return;
     }
 
@@ -55,10 +56,11 @@ export const ContentViewer = ({
 
     const range = selection.getRangeAt(0);
     const rect = range.getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     
     setTooltipPosition({
-      x: rect.left + rect.width / 2,
-      y: rect.top,
+      x: rect.left + (rect.width / 2),
+      y: rect.top + scrollTop,
     });
     setSelectedText(text);
   };
@@ -68,6 +70,7 @@ export const ContentViewer = ({
       onCreateNoteFromSelection(selectedText);
       setTooltipPosition(null);
       setSelectedText("");
+      window.getSelection()?.removeAllRanges();
     }
   };
 
@@ -111,7 +114,7 @@ export const ContentViewer = ({
         </div>
       </div>
       <div 
-        className="prose prose-sm max-w-none whitespace-pre-line"
+        className="prose prose-sm max-w-none whitespace-pre-line select-text"
         onMouseUp={handleTextSelection}
         onTouchEnd={handleTextSelection}
       >
