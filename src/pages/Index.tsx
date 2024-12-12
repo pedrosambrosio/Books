@@ -171,6 +171,28 @@ const Index = () => {
     return GENESIS_CONTENT[currentPage - 1] || "Conteúdo não disponível";
   };
 
+  const handleMarkAsCompleted = () => {
+    const updatedBook = { ...currentBibleBook };
+    const currentChapter = updatedBook.chapters[0];
+    
+    if (currentChapter && currentChapter.pages[currentPage - 1]) {
+      currentChapter.pages[currentPage - 1].completed = !currentChapter.pages[currentPage - 1].completed;
+      currentChapter.completedPages = currentChapter.pages.filter(page => page.completed).length;
+    }
+    
+    updatedBook.completedChapters = updatedBook.chapters.filter(
+      chapter => chapter.completedPages === chapter.pages.length
+    ).length;
+    
+    setCurrentBibleBook(updatedBook);
+    setIsBookCompleted(currentChapter.pages[currentPage - 1].completed);
+    
+    toast({
+      title: currentChapter.pages[currentPage - 1].completed ? "Página marcada como concluída" : "Página marcada como pendente",
+      description: `A página foi marcada como ${currentChapter.pages[currentPage - 1].completed ? "concluída" : "pendente"}.`,
+    });
+  };
+
   // Transform tagCounts into the format expected by AppSidebar
   const sidebarTags = Object.entries(tagCounts)
     .filter(([_, count]) => count > 0)
