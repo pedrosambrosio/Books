@@ -16,7 +16,6 @@ import { cn } from "@/lib/utils";
 import { QuizDialog } from "@/components/quiz/QuizDialog";
 import { CHAPTER_QUIZZES } from "@/data/quizQuestions";
 import { QuizResult } from "@/types/Quiz";
-import { TextSelectionTooltip } from "@/components/TextSelectionTooltip";
 
 // Create Bible book structure with Genesis and Exodus
 const BIBLE_BOOK: BookType = {
@@ -64,9 +63,6 @@ const Index = () => {
   const [tagCounts, setTagCounts] = useState<{ [key: string]: number }>({});
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [chapterLevels, setChapterLevels] = useState<{ [chapterId: string]: QuizResult }>({});
-  const [selectedText, setSelectedText] = useState("");
-  const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
-  const [activeTab, setActiveTab] = useState<"personal" | "chat">("personal");
 
   const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress" | "isPaused">) => {
     const task: Task = {
@@ -271,41 +267,6 @@ const Index = () => {
     });
   };
 
-  const handleTextSelection = () => {
-    const selection = window.getSelection();
-    if (!selection || selection.isCollapsed) {
-      setSelectedText("");
-      setTooltipPosition(null);
-      return;
-    }
-
-    const text = selection.toString().trim();
-    if (text) {
-      const range = selection.getRangeAt(0);
-      const rect = range.getBoundingClientRect();
-      
-      setSelectedText(text);
-      setTooltipPosition({
-        x: rect.left + (rect.width / 2),
-        y: rect.top - 20,
-      });
-    }
-  };
-
-  const handleAskAI = (text: string) => {
-    setActiveTab("chat");
-    // Here you would implement the logic to send the text to the AI chat
-    console.log("Asking AI about:", text);
-    setTooltipPosition(null);
-  };
-
-  const handleCreateNote = (text: string) => {
-    // Open the create task dialog with the reference field pre-filled
-    // You would need to implement this functionality in your CreateTask component
-    console.log("Creating note with reference:", text);
-    setTooltipPosition(null);
-  };
-
   // Transform tagCounts into the format expected by AppSidebar
   const sidebarTags = Object.entries(tagCounts)
     .filter(([_, count]) => count > 0)
@@ -332,20 +293,58 @@ const Index = () => {
             <ScrollArea className="h-full">
               <div className="p-4 md:p-6 flex justify-center">
                 <div className="w-full max-w-2xl">
-                  <div 
-                    className="glass-card h-full rounded-lg p-6"
-                    onMouseUp={handleTextSelection}
-                  >
-                    <div className="prose prose-sm max-w-none whitespace-pre-line">
-                      {getCurrentPageContent()}
-                    </div>
-                    <TextSelectionTooltip
-                      selectedText={selectedText}
-                      onAskAI={handleAskAI}
-                      onCreateNote={handleCreateNote}
-                      position={tooltipPosition}
-                    />
+                  <div className="text-center animate-fade-in mb-8">
+                    <h1 className="text-3xl md:text-4xl font-bold mb-4">Anote ou Pesquise..</h1>
+                    <p className="text-muted-foreground">
+                      Organize seu estudo e aprendizado
+                    </p>
                   </div>
+
+                  <Tabs defaultValue="personal" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2 h-auto mb-6">
+                      <TabsTrigger 
+                        value="personal"
+                        className="data-[state=active]:bg-white data-[state=active]:text-black px-6 py-3"
+                      >
+                        Minhas Notas
+                      </TabsTrigger>
+                      <TabsTrigger 
+                        value="chat"
+                        className="data-[state=active]:bg-white data-[state=active]:text-black px-6 py-3 flex items-center gap-2"
+                      >
+                        Chat <Sparkles className="h-4 w-4" />
+                      </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="personal">
+                      <div className="space-y-6">
+                        <CreateTask 
+                          onCreateTask={handleCreateTask} 
+                          existingTags={allTags}
+                          onTagCreate={handleTagCreate}
+                        />
+                        
+                        <div className="space-y-4">
+                          {tasks
+                            .filter(task => task.pageNumber === currentPage)
+                            .map((task) => (
+                              <div key={task.id} className="animate-fade-in">
+                                <TaskCard
+                                  task={task}
+                                  onUpdate={handleUpdateTask}
+                                  onComplete={handleCompleteTask}
+                                  onDelete={handleDeleteTask}
+                                />
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    </TabsContent>
+                    <TabsContent value="chat">
+                      <div className="p-6 text-center text-muted-foreground">
+                        Chat em breve...
+                      </div>
+                    </TabsContent>
+                  </Tabs>
                 </div>
               </div>
             </ScrollArea>
