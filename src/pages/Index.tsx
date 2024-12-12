@@ -126,25 +126,34 @@ const Index = () => {
   };
 
   const handleMarkAsCompleted = () => {
-    setIsBookCompleted(!isBookCompleted);
-    
-    // Update the current page as completed in the Bible book
     const updatedBook = { ...currentBibleBook };
-    const currentChapter = updatedBook.chapters[0]; // Genesis
+    const currentChapter = updatedBook.chapters[0];
+    
     if (currentChapter && currentChapter.pages[currentPage - 1]) {
-      currentChapter.pages[currentPage - 1].completed = !isBookCompleted;
+      currentChapter.pages[currentPage - 1].completed = !currentChapter.pages[currentPage - 1].completed;
       currentChapter.completedPages = currentChapter.pages.filter(page => page.completed).length;
     }
+    
     updatedBook.completedChapters = updatedBook.chapters.filter(
       chapter => chapter.completedPages === chapter.pages.length
     ).length;
     
     setCurrentBibleBook(updatedBook);
+    setIsBookCompleted(currentChapter.pages[currentPage - 1].completed);
     
     toast({
-      title: isBookCompleted ? "Página marcada como pendente" : "Página marcada como concluída",
-      description: `A página foi marcada como ${isBookCompleted ? "pendente" : "concluída"}.`,
+      title: currentChapter.pages[currentPage - 1].completed ? "Página marcada como concluída" : "Página marcada como pendente",
+      description: `A página foi marcada como ${currentChapter.pages[currentPage - 1].completed ? "concluída" : "pendente"}.`,
     });
+  };
+
+  const handlePageSelect = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+    // Update isBookCompleted based on the selected page's completion status
+    const currentChapter = currentBibleBook.chapters[0];
+    if (currentChapter && currentChapter.pages[pageNumber - 1]) {
+      setIsBookCompleted(currentChapter.pages[pageNumber - 1].completed);
+    }
   };
 
   // Get current page content
@@ -153,10 +162,6 @@ const Index = () => {
       return GENESIS_CONTENT.chapter1[`page${currentPage}` as keyof typeof GENESIS_CONTENT.chapter1];
     }
     return "";
-  };
-
-  const handlePageSelect = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
   };
 
   return (

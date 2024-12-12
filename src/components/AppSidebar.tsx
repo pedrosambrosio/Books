@@ -124,7 +124,7 @@ export function AppSidebar({ currentBook, onPageSelect, noteCounts }: AppSidebar
                         <Book className="h-4 w-4 mr-2" />
                         <span className="text-[#0EA5E9]">{book.title}</span>
                         <div className="ml-auto flex items-center gap-2">
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
                             {noteCounts?.bookNotes}
                           </span>
                           <span className="text-xs text-muted-foreground">
@@ -155,7 +155,7 @@ export function AppSidebar({ currentBook, onPageSelect, noteCounts }: AppSidebar
                                   {chapter.title || `Capítulo ${chapter.number}`}
                                 </span>
                                 <div className="ml-auto flex items-center gap-2">
-                                  <span className="text-xs text-muted-foreground">
+                                  <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
                                     {noteCounts?.chapterNotes}
                                   </span>
                                   <span className="text-xs text-muted-foreground">
@@ -178,7 +178,7 @@ export function AppSidebar({ currentBook, onPageSelect, noteCounts }: AppSidebar
                                     <span className="flex items-center gap-2">
                                       Página {page.number}
                                       {page.completed && <Check className="h-4 w-4" />}
-                                      <span className="text-xs text-muted-foreground ml-auto">
+                                      <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full ml-auto">
                                         {noteCounts?.pageNotes}
                                       </span>
                                     </span>

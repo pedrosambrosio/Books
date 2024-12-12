@@ -87,23 +87,8 @@ export const CreateTask = ({ onCreateTask, existingTags = [] }: CreateTaskProps)
 
           <div className="space-y-4 mb-6">
             <div className="flex items-center gap-3">
-              <Select
-                value={newTag}
-                onValueChange={(value) => setNewTag(value)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Adicionar tag..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {existingTags.map((tag) => (
-                    <SelectItem key={tag} value={tag}>
-                      {tag}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
               <Input
-                placeholder="Ou digite uma nova tag..."
+                placeholder="Adicionar tag..."
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
                 onKeyPress={(e) => {
@@ -112,7 +97,15 @@ export const CreateTask = ({ onCreateTask, existingTags = [] }: CreateTaskProps)
                     handleAddTag();
                   }
                 }}
+                list="tag-suggestions"
               />
+              {existingTags.length > 0 && (
+                <datalist id="tag-suggestions">
+                  {existingTags.map((tag) => (
+                    <option key={tag} value={tag} />
+                  ))}
+                </datalist>
+              )}
               <Button
                 type="button"
                 size="sm"
