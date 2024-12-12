@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Book, ChevronDown, ChevronRight, Plus, Tag, Tags } from "lucide-react";
+import { Book, ChevronDown, ChevronRight, Plus, Tag, Tags, Check } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
