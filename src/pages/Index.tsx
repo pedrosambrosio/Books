@@ -27,6 +27,20 @@ const Index = () => {
   const [allTags, setAllTags] = useState<string[]>([]);
   const [tagCounts, setTagCounts] = useState<{ [key: string]: number }>({});
 
+  const getCurrentPageContent = () => {
+    const currentChapter = currentBibleBook.chapters.find(c => c.id === currentChapterId);
+    if (!currentChapter) return "";
+
+    // Get content based on book, chapter and page
+    if (currentChapter.id === "genesis") {
+      return GENESIS_CONTENT[currentPage - 1] || "Conteúdo não disponível.";
+    } else if (currentChapter.id === "exodus") {
+      // Add Exodus content here when available
+      return "Conteúdo de Êxodo em breve...";
+    }
+    return "Conteúdo não disponível.";
+  };
+
   const handleTagCreate = (tag: string) => {
     if (!allTags.includes(tag)) {
       setAllTags([...allTags, tag]);
@@ -98,7 +112,6 @@ const Index = () => {
   const handleMarkAsCompleted = () => {
     setIsBookCompleted(!isBookCompleted);
     
-    // Update the current chapter's page completion status
     setCurrentBibleBook(prev => {
       const updatedChapters = prev.chapters.map(chapter => {
         if (chapter.id === currentChapterId) {
@@ -132,95 +145,6 @@ const Index = () => {
     });
   };
 
-  const getCurrentPageContent = () => {
-    const currentChapter = currentBibleBook.chapters.find(c => c.id === currentChapterId);
-    if (!currentChapter) return "";
-
-    // For now, return some sample content based on the current page
-    return GENESIS_CONTENT[currentPage - 1] || "Conteúdo não disponível.";
-  };
-
-  const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress" | "isPaused">) => {
-    const task: Task = {
-      ...newTask,
-      id: crypto.randomUUID(),
-      completed: false,
-      inProgress: false,
-      isPaused: false,
-      pageNumber: currentPage,
-      bookId: currentBibleBook.id,
-      chapterId: currentChapterId,
-    };
-
-    setTasks((prev) => [task, ...prev]);
-    
-    if (newTask.tags) {
-      const newTagCounts = { ...tagCounts };
-      newTask.tags.forEach(tag => {
-        newTagCounts[tag] = (newTagCounts[tag] || 0) + 1;
-      });
-      setTagCounts(newTagCounts);
-    }
-
-    toast({
-      title: "Anotação criada",
-      description: "Sua nova anotação foi criada com sucesso.",
-    });
-  };
-
-  const handlePageSelect = (pageNumber: number, chapterId: string) => {
-    setCurrentPage(pageNumber);
-    setCurrentChapterId(chapterId);
-    const chapter = currentBibleBook.chapters.find(c => c.id === chapterId);
-    if (chapter && chapter.pages[pageNumber - 1]) {
-      setIsBookCompleted(chapter.pages[pageNumber - 1].completed);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      const nextPage = currentPage + 1;
-      setCurrentPage(nextPage);
-      
-      const currentChapter = currentBibleBook.chapters.find(c => c.id === currentChapterId);
-      if (currentChapter && currentChapter.pages[nextPage - 1]) {
-        setIsBookCompleted(currentChapter.pages[nextPage - 1].completed);
-      }
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      const prevPage = currentPage - 1;
-      setCurrentPage(prevPage);
-      
-      const currentChapter = currentBibleBook.chapters.find(c => c.id === currentChapterId);
-      if (currentChapter && currentChapter.pages[prevPage - 1]) {
-        setIsBookCompleted(currentChapter.pages[prevPage - 1].completed);
-      }
-    }
-  };
-
-  const getNoteCounts = () => {
-    const bookNotes = tasks.filter(task => task.bookId === currentBibleBook.id).length;
-    const chapterNotes = tasks.filter(task => 
-      task.bookId === currentBibleBook.id && 
-      task.chapterId === currentChapterId
-    ).length;
-    const pageNotes = tasks.filter(task => 
-      task.bookId === currentBibleBook.id && 
-      task.chapterId === currentChapterId && 
-      task.pageNumber === currentPage
-    ).length;
-
-    return {
-      bookNotes,
-      chapterNotes,
-      pageNotes
-    };
-  };
-
-  // Transform tagCounts into the format expected by AppSidebar
   const sidebarTags = Object.entries(tagCounts)
     .filter(([_, count]) => count > 0)
     .map(([name, count]) => ({

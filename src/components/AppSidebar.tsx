@@ -176,7 +176,11 @@ export function AppSidebar({
                                   <Button
                                     key={page.id}
                                     variant="ghost"
-                                    className={`w-full justify-start text-sm pl-8 ${page.completed ? "text-[#09090B]" : "text-[#71717A]"}`}
+                                    className={`w-full justify-start text-sm pl-8 ${
+                                      page.completed || currentChapterId === chapter.id && page.number === currentPage 
+                                        ? "text-[#09090B]" 
+                                        : "text-[#71717A]"
+                                    }`}
                                     onClick={() => handlePageClick(page.number, chapter.id)}
                                   >
                                     <span className="flex items-center gap-2">
