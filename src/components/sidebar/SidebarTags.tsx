@@ -9,13 +9,14 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import { useToast } from "@/components/ui/use-toast";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 interface SidebarTagsProps {
   tags?: { name: string; count: number }[];
+  onUpdateTagCount?: (tagName: string, change: number) => void;
 }
 
-export function SidebarTags({ tags = [] }: SidebarTagsProps) {
+export function SidebarTags({ tags = [], onUpdateTagCount }: SidebarTagsProps) {
   const { toast } = useToast();
   const [lastSelectedTag, setLastSelectedTag] = useState<string | null>(null);
 
@@ -25,6 +26,10 @@ export function SidebarTags({ tags = [] }: SidebarTagsProps) {
   const handleCreateTag = (name: string) => {
     if (!name.trim()) return;
     
+    if (onUpdateTagCount) {
+      onUpdateTagCount(name, 1);
+    }
+
     toast({
       title: "Tag criada",
       description: `Tag "${name}" foi criada com sucesso.`,

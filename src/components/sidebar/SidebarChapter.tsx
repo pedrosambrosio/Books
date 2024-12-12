@@ -64,7 +64,6 @@ export function SidebarChapter({
 
   return (
     <Collapsible
-      key={chapter.id}
       open={expandedChapter === chapter.id}
       onOpenChange={() => setExpandedChapter(expandedChapter === chapter.id ? null : chapter.id)}
     >
