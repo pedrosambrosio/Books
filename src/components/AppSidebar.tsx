@@ -37,6 +37,7 @@ interface AppSidebarProps {
   };
   tags?: { name: string; count: number }[];
   currentChapterId?: string;
+  currentPage?: number;
 }
 
 export function AppSidebar({ 
@@ -44,7 +45,8 @@ export function AppSidebar({
   onPageSelect, 
   noteCounts, 
   tags = [],
-  currentChapterId 
+  currentChapterId,
+  currentPage
 }: AppSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
@@ -177,7 +179,7 @@ export function AppSidebar({
                                     key={page.id}
                                     variant="ghost"
                                     className={`w-full justify-start text-sm pl-8 ${
-                                      page.completed || currentChapterId === chapter.id && page.number === currentPage 
+                                      page.completed || (currentChapterId === chapter.id && page.number === currentPage)
                                         ? "text-[#09090B]" 
                                         : "text-[#71717A]"
                                     }`}
