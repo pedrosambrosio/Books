@@ -12,6 +12,7 @@ import { Star, ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Book as BookType } from "@/types/Book";
 import { GENESIS_CONTENT } from "@/data/bibleContent";
+import { cn } from "@/lib/utils";
 
 // Create Bible book structure with only Genesis
 const BIBLE_BOOK: BookType = {
