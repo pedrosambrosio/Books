@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Star, ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { Star, ArrowLeft, ArrowRight, Check, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Book as BookType } from "@/types/Book";
 import { GENESIS_CONTENT } from "@/data/bibleContent";
@@ -179,13 +179,29 @@ const Index = () => {
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(prev => prev + 1);
+      const nextPage = currentPage + 1;
+      setCurrentPage(nextPage);
+      
+      // Update the book data structure to reflect the current page's completion status
+      const updatedBook = { ...currentBibleBook };
+      const currentChapter = updatedBook.chapters[0];
+      if (currentChapter && currentChapter.pages[nextPage - 1]) {
+        setIsBookCompleted(currentChapter.pages[nextPage - 1].completed);
+      }
     }
   };
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(prev => prev - 1);
+      const prevPage = currentPage - 1;
+      setCurrentPage(prevPage);
+      
+      // Update the book data structure to reflect the current page's completion status
+      const updatedBook = { ...currentBibleBook };
+      const currentChapter = updatedBook.chapters[0];
+      if (currentChapter && currentChapter.pages[prevPage - 1]) {
+        setIsBookCompleted(currentChapter.pages[prevPage - 1].completed);
+      }
     }
   };
 
@@ -271,7 +287,7 @@ const Index = () => {
                         value="chat"
                         className="data-[state=active]:bg-white data-[state=active]:text-black px-6 py-3 flex items-center gap-2"
                       >
-                        Chat <Star className="h-4 w-4" />
+                        Chat <Sparkles className="h-4 w-4" />
                       </TabsTrigger>
                     </TabsList>
                     <TabsContent value="personal">
@@ -346,7 +362,7 @@ const Index = () => {
                             "transition-colors",
                             isBookCompleted 
                               ? "text-[#09090B]" 
-                              : "text-[#71717A]"
+                              : "text-[#F4F4F5]"
                           )}
                         >
                           <Check className="h-4 w-4" />

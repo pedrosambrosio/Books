@@ -57,6 +57,15 @@ export const TaskCard = ({
     const newTags = currentTags.includes(tag)
       ? currentTags.filter(t => t !== tag)
       : [...currentTags, tag];
+    
+    // If we're removing a tag, show a toast
+    if (currentTags.includes(tag)) {
+      toast({
+        title: "Tag removida",
+        description: `A tag "${tag}" foi removida desta anotação.`,
+      });
+    }
+    
     onUpdate({ ...task, tags: newTags });
   };
 
