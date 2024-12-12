@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -55,12 +55,6 @@ export function QuizDialog({ isOpen, onClose, questions, chapterId, onComplete }
   const [showResults, setShowResults] = useState(false);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
 
-  useEffect(() => {
-    if (showResults && quizResult && (quizResult.level === 'mestre' || quizResult.level === 'avancado')) {
-      triggerConfetti();
-    }
-  }, [showResults, quizResult]);
-
   const handleAnswerSelect = (answerIndex: number) => {
     const newAnswers = [...answers];
     newAnswers[currentQuestionIndex] = answerIndex;
@@ -82,12 +76,14 @@ export function QuizDialog({ isOpen, onClose, questions, chapterId, onComplete }
   };
 
   const triggerConfetti = () => {
+    // Left side confetti
     confetti({
       particleCount: 100,
       spread: 70,
       origin: { x: 0, y: 0.6 }
     });
 
+    // Right side confetti
     confetti({
       particleCount: 100,
       spread: 70,
@@ -109,6 +105,10 @@ export function QuizDialog({ isOpen, onClose, questions, chapterId, onComplete }
       level
     };
 
+    if (level === 'mestre' || level === 'avancado') {
+      triggerConfetti();
+    }
+
     setQuizResult(result);
     setShowResults(true);
     onComplete(result);
@@ -123,12 +123,6 @@ export function QuizDialog({ isOpen, onClose, questions, chapterId, onComplete }
     return 'explorador';
   };
 
-  const handleCloseQuiz = () => {
-    if (!showResults) {
-      resetQuiz();
-    }
-  };
-
   const resetQuiz = () => {
     setCurrentQuestionIndex(0);
     setAnswers(Array(questions.length).fill(-1));
@@ -140,7 +134,7 @@ export function QuizDialog({ isOpen, onClose, questions, chapterId, onComplete }
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleCloseQuiz}>
+    <Dialog open={isOpen} onOpenChange={resetQuiz}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>
