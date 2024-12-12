@@ -33,6 +33,17 @@
     @apply border-border;
   }
 
+  /* Global text selection styles */
+  ::selection {
+    background-color: #71717A;
+    color: white;
+  }
+
+  ::-moz-selection {
+    background-color: #71717A;
+    color: white;
+  }
+
   body {
     @apply bg-background text-foreground font-['Inter'] overflow-hidden;
     font-feature-settings: "rlig" 1, "calt" 1;
