@@ -173,6 +173,10 @@ const Index = () => {
     }
   };
 
+  const getCurrentPageContent = () => {
+    return GENESIS_CONTENT[currentPage - 1] || "Conteúdo não disponível";
+  };
+
   // Transform tagCounts into the format expected by AppSidebar
   const sidebarTags = Object.entries(tagCounts).map(([name, count]) => ({
     name,
