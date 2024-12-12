@@ -15,7 +15,7 @@ interface VerseDisplayProps {
   text: string;
   onCreateNote: (verseText: string) => void;
   existingTags?: string[];
-  onTagCreate?: (tag: string, verseId: string) => void;
+  onTagCreate?: (tag: string, color: string, verseId: string) => void; // Updated to include color parameter
   onTagRemove?: (verseId: string) => void;
   hasTag?: boolean;
 }
@@ -46,7 +46,8 @@ export const VerseDisplay = ({
     }
 
     if (onTagCreate) {
-      onTagCreate(tagName, `verse-${verse}`);
+      // Pass a default color if none is selected
+      onTagCreate(tagName, "#9b87f5", `verse-${verse}`);
     }
 
     toast({
