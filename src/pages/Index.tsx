@@ -168,7 +168,11 @@ const Index = () => {
   };
 
   const getCurrentPageContent = () => {
-    return GENESIS_CONTENT[currentPage - 1] || "Conteúdo não disponível";
+    const content = GENESIS_CONTENT[currentPage - 1];
+    if (!content) {
+      return "Conteúdo não disponível";
+    }
+    return content;
   };
 
   const handleMarkAsCompleted = () => {

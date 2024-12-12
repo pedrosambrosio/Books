@@ -1,21 +1,7 @@
-export const GENESIS_CONTENT = {
-  chapter1: {
-    page1: `¹No princípio, criou Deus os céus e a terra.
-
-²A terra era sem forma e vazia; e havia trevas sobre a face do abismo, mas o Espírito de Deus pairava sobre a face das águas.
-
-³Disse Deus: "Haja luz!" E houve luz.
-
-⁴Deus viu que a luz era boa; e fez separação entre a luz e as trevas.`,
-    page2: `⁵Chamou Deus à luz "dia" e às trevas, "noite". Houve tarde e manhã, o primeiro dia.
-
-⁶E disse Deus: "Haja um firmamento no meio das águas, e haja separação entre águas e águas."
-
-⁷Fez, pois, Deus o firmamento, e separou as águas que estavam debaixo do firmamento das que estavam por cima do firmamento. E assim foi.`,
-    page3: `⁸E chamou Deus ao firmamento "céus". Houve tarde e manhã, o segundo dia.
-
-⁹E disse Deus: "Ajuntem-se as águas debaixo dos céus num só lugar, e apareça a porção seca." E assim foi.
-
-¹⁰Chamou Deus à porção seca "terra" e ao ajuntamento das águas, "mares". E viu Deus que isso era bom.`
-  }
-};
+export const GENESIS_CONTENT = [
+  `No princípio, criou Deus os céus e a terra. E a terra era sem forma e vazia; e havia trevas sobre a face do abismo; e o Espírito de Deus se movia sobre a face das águas. E disse Deus: Haja luz; e houve luz. E viu Deus que era boa a luz; e fez Deus separação entre a luz e as trevas. E Deus chamou à luz Dia; e às trevas chamou Noite. E foi a tarde e a manhã, o dia primeiro.`,
+  
+  `E disse Deus: Haja uma expansão no meio das águas, e haja separação entre águas e águas. E fez Deus a expansão, e fez separação entre as águas que estavam debaixo da expansão e as águas que estavam sobre a expansão; e assim foi. E chamou Deus à expansão Céus, e foi a tarde e a manhã, o dia segundo.`,
+  
+  `E disse Deus: Ajuntem-se as águas debaixo dos céus num lugar; e apareça a porção seca; e assim foi. E chamou Deus à porção seca Terra; e ao ajuntamento das águas chamou Mares; e viu Deus que era bom. E disse Deus: Produza a terra erva verde, erva que dê semente, árvore frutífera que dê fruto segundo a sua espécie, cuja semente está nela sobre a terra; e assim foi.`
+];
