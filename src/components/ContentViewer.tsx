@@ -14,6 +14,7 @@ interface ContentViewerProps {
   isCompleted: boolean;
   onMarkAsCompleted: () => void;
   onCreateNoteFromSelection: (selectedText: string) => void;
+  onTagAdded?: (tag: string) => void;
 }
 
 export const ContentViewer = ({
@@ -25,6 +26,7 @@ export const ContentViewer = ({
   isCompleted,
   onMarkAsCompleted,
   onCreateNoteFromSelection,
+  onTagAdded,
 }: ContentViewerProps) => {
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
   const [selectedText, setSelectedText] = useState("");
@@ -127,6 +129,7 @@ export const ContentViewer = ({
             verse={verse.verse}
             text={verse.text}
             onCreateNote={onCreateNoteFromSelection}
+            onTagAdded={onTagAdded}
           />
         ))}
       </div>
