@@ -13,7 +13,7 @@ export const BIBLE_BOOK: BookType = {
         id: `genesis-page-${i+1}`,
         number: i + 1,
         title: `Página ${i + 1}`,
-        completed: false  // Ensuring completed property is always set
+        completed: false
       })),
       completedPages: 0,
     },
@@ -25,7 +25,7 @@ export const BIBLE_BOOK: BookType = {
         id: `exodus-page-${i+1}`,
         number: i + 1,
         title: `Página ${i + 1}`,
-        completed: false  // Ensuring completed property is always set
+        completed: false
       })),
       completedPages: 0,
     }

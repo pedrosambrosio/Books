@@ -2,15 +2,15 @@ export interface Page {
   id: string;
   number: number;
   title?: string;
-  completed: boolean;
+  completed?: boolean;
 }
 
 export interface Chapter {
   id: string;
   number: number;
-  title: string;
+  title?: string;
   pages: Page[];
-  completedPages: number;  // Changed from completedPages?: number to completedPages: number
+  completedPages?: number;
 }
 
 export interface Book {
