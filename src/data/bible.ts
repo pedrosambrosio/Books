@@ -1,3 +1,5 @@
+import { Book as BookType } from "@/types/Book";
+
 export const BIBLE_BOOKS = [
   // Old Testament
   "Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy",

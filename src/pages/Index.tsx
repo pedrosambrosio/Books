@@ -13,40 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Book as BookType } from "@/types/Book";
 import { GENESIS_CONTENT } from "@/data/bibleContent";
 import { cn } from "@/lib/utils";
-
-// Create Bible book structure with Genesis and Exodus
-const BIBLE_BOOK: BookType = {
-  id: "bible",
-  title: "Bíblia",
-  type: "bible",
-  chapters: [
-    {
-      id: "genesis",
-      number: 1,
-      title: "Genesis",
-      pages: Array.from({ length: 3 }, (_, i) => ({
-        id: `genesis-page-${i+1}`,
-        number: i + 1,
-        title: `Página ${i + 1}`,
-        completed: false
-      })),
-      completedPages: 0,
-    },
-    {
-      id: "exodus",
-      number: 2,
-      title: "Exodus",
-      pages: Array.from({ length: 2 }, (_, i) => ({
-        id: `exodus-page-${i+1}`,
-        number: i + 1,
-        title: `Página ${i + 1}`,
-        completed: false
-      })),
-      completedPages: 0,
-    }
-  ],
-  completedChapters: 0,
-};
+import { BIBLE_BOOK } from "@/data/bible";
 
 const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -59,6 +26,119 @@ const Index = () => {
   const [currentBibleBook, setCurrentBibleBook] = useState(BIBLE_BOOK);
   const [allTags, setAllTags] = useState<string[]>([]);
   const [tagCounts, setTagCounts] = useState<{ [key: string]: number }>({});
+
+  const handleTagCreate = (tag: string) => {
+    if (!allTags.includes(tag)) {
+      setAllTags([...allTags, tag]);
+      setTagCounts(prev => ({
+        ...prev,
+        [tag]: 1
+      }));
+    }
+  };
+
+  const handleUpdateTask = (updatedTask: Task) => {
+    setTasks(prevTasks => 
+      prevTasks.map(task => 
+        task.id === updatedTask.id ? updatedTask : task
+      )
+    );
+
+    // Update tag counts
+    const oldTask = tasks.find(t => t.id === updatedTask.id);
+    if (oldTask?.tags) {
+      const removedTags = oldTask.tags.filter(tag => !updatedTask.tags?.includes(tag));
+      const addedTags = updatedTask.tags?.filter(tag => !oldTask.tags?.includes(tag)) || [];
+
+      setTagCounts(prev => {
+        const newCounts = { ...prev };
+        removedTags.forEach(tag => {
+          newCounts[tag] = (newCounts[tag] || 1) - 1;
+          if (newCounts[tag] <= 0) delete newCounts[tag];
+        });
+        addedTags.forEach(tag => {
+          newCounts[tag] = (newCounts[tag] || 0) + 1;
+        });
+        return newCounts;
+      });
+    }
+
+    toast({
+      title: "Anotação atualizada",
+      description: "Suas alterações foram salvas com sucesso.",
+    });
+  };
+
+  const handleCompleteTask = (taskId: string) => {
+    setTasks(prevTasks =>
+      prevTasks.map(task =>
+        task.id === taskId
+          ? { ...task, completed: !task.completed }
+          : task
+      )
+    );
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    const taskToDelete = tasks.find(t => t.id === taskId);
+    if (taskToDelete?.tags) {
+      setTagCounts(prev => {
+        const newCounts = { ...prev };
+        taskToDelete.tags?.forEach(tag => {
+          newCounts[tag] = (newCounts[tag] || 1) - 1;
+          if (newCounts[tag] <= 0) delete newCounts[tag];
+        });
+        return newCounts;
+      });
+    }
+    
+    setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+  };
+
+  const handleMarkAsCompleted = () => {
+    setIsBookCompleted(!isBookCompleted);
+    
+    // Update the current chapter's page completion status
+    setCurrentBibleBook(prev => {
+      const updatedChapters = prev.chapters.map(chapter => {
+        if (chapter.id === currentChapterId) {
+          const updatedPages = chapter.pages.map(page => {
+            if (page.number === currentPage) {
+              return { ...page, completed: !isBookCompleted };
+            }
+            return page;
+          });
+          return {
+            ...chapter,
+            pages: updatedPages,
+            completedPages: updatedPages.filter(p => p.completed).length,
+          };
+        }
+        return chapter;
+      });
+
+      return {
+        ...prev,
+        chapters: updatedChapters,
+        completedChapters: updatedChapters.filter(c => 
+          c.completedPages === c.pages.length
+        ).length,
+      };
+    });
+
+    toast({
+      title: isBookCompleted ? "Página marcada como pendente" : "Página marcada como concluída",
+      description: `A página ${currentPage} foi marcada como ${isBookCompleted ? "pendente" : "concluída"}.`,
+    });
+  };
+
+  const getCurrentPageContent = () => {
+    const currentChapter = currentBibleBook.chapters.find(c => c.id === currentChapterId);
+    if (!currentChapter) return "";
+
+    // For now, return some sample content based on the current page
+    return GENESIS_CONTENT[currentPage - 1] || "Conteúdo não disponível.";
+  };
 
   const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress" | "isPaused">) => {
     const task: Task = {
