@@ -21,6 +21,8 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Book as BookType, Tag as TagType } from "@/types/Book";
+import { QuizResult } from "@/types/Quiz";
+import { LevelIcon } from "@/components/quiz/LevelIcon";
 
 const MOCK_TAGS: TagType[] = [
   { id: "1", name: "Important", color: "#ef4444" },
@@ -36,9 +38,16 @@ interface AppSidebarProps {
     pageNotes: number;
   };
   tags?: { name: string; count: number }[];
+  chapterLevels?: { [chapterId: string]: QuizResult };
 }
 
-export function AppSidebar({ currentBook, onPageSelect, noteCounts, tags = [] }: AppSidebarProps) {
+export function AppSidebar({ 
+  currentBook, 
+  onPageSelect, 
+  noteCounts, 
+  tags = [],
+  chapterLevels = {} 
+}: AppSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
   const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
@@ -154,6 +163,9 @@ export function AppSidebar({ currentBook, onPageSelect, noteCounts, tags = [] }:
                                 )}
                                 <span className={expandedChapter === chapter.id ? "text-[#09090B]" : "text-[#71717A]"}>{chapter.title || `Capítulo ${chapter.number}`}</span>
                                 <div className="ml-auto flex items-center gap-2">
+                                  {chapterLevels[chapter.id] && (
+                                    <LevelIcon level={chapterLevels[chapter.id].level} />
+                                  )}
                                   <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
                                     {noteCounts?.chapterNotes}
                                   </span>
