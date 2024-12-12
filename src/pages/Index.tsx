@@ -25,7 +25,7 @@ const BIBLE_BOOK: BookType = {
       number: 1,
       title: "Genesis",
       pages: Array.from({ length: 3 }, (_, i) => ({
-        id: `genesis-${i+1}`,
+        id: `genesis-page-${i+1}`,
         number: i + 1,
         title: `Página ${i + 1}`,
         completed: false
@@ -37,7 +37,7 @@ const BIBLE_BOOK: BookType = {
       number: 2,
       title: "Exodus",
       pages: Array.from({ length: 2 }, (_, i) => ({
-        id: `exodus-${i+1}`,
+        id: `exodus-page-${i+1}`,
         number: i + 1,
         title: `Página ${i + 1}`,
         completed: false
@@ -53,6 +53,7 @@ const Index = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const [currentPage, setCurrentPage] = useState(1);
+  const [currentChapterId, setCurrentChapterId] = useState<string>("genesis");
   const totalPages = 3;
   const [isBookCompleted, setIsBookCompleted] = useState(false);
   const [currentBibleBook, setCurrentBibleBook] = useState(BIBLE_BOOK);
@@ -67,11 +68,12 @@ const Index = () => {
       inProgress: false,
       isPaused: false,
       pageNumber: currentPage,
+      bookId: currentBibleBook.id,
+      chapterId: currentChapterId,
     };
 
     setTasks((prev) => [task, ...prev]);
     
-    // Update tag counts when creating a task
     if (newTask.tags) {
       const newTagCounts = { ...tagCounts };
       newTask.tags.forEach(tag => {
@@ -86,95 +88,13 @@ const Index = () => {
     });
   };
 
-  const handleTagCreate = (tag: string) => {
-    if (!allTags.includes(tag)) {
-      setAllTags(prev => [...prev, tag]);
+  const handlePageSelect = (pageNumber: number, chapterId: string) => {
+    setCurrentPage(pageNumber);
+    setCurrentChapterId(chapterId);
+    const chapter = currentBibleBook.chapters.find(c => c.id === chapterId);
+    if (chapter && chapter.pages[pageNumber - 1]) {
+      setIsBookCompleted(chapter.pages[pageNumber - 1].completed);
     }
-  };
-
-  const handleDeleteTask = (taskId: string) => {
-    const taskToDelete = tasks.find(task => task.id === taskId);
-    
-    if (taskToDelete?.tags) {
-      const newTagCounts = { ...tagCounts };
-      const remainingTasks = tasks.filter(task => task.id !== taskId);
-      
-      // Recalculate tag counts for all remaining tasks
-      Object.keys(newTagCounts).forEach(tag => {
-        const count = remainingTasks.filter(task => task.tags?.includes(tag)).length;
-        if (count === 0) {
-          delete newTagCounts[tag]; // Remove tag if no tasks use it
-        } else {
-          newTagCounts[tag] = count;
-        }
-      });
-      
-      setTagCounts(newTagCounts);
-    }
-    
-    setTasks((prev) => prev.filter((task) => task.id !== taskId));
-    toast({
-      title: "Anotação excluída",
-      description: "A anotação foi excluída com sucesso.",
-    });
-  };
-
-  const getNoteCounts = () => {
-    const bookNotes = tasks.length;
-    const chapterNotes = tasks.filter(task => 
-      task.pageNumber && task.pageNumber >= 1 && task.pageNumber <= 3
-    ).length;
-    const pageNotes = tasks.filter(task => task.pageNumber === currentPage).length;
-
-    return {
-      bookNotes,
-      chapterNotes,
-      pageNotes
-    };
-  };
-
-  const handleUpdateTask = (updatedTask: Task) => {
-    const oldTags = tasks.find(task => task.id === updatedTask.id)?.tags || [];
-    const newTags = updatedTask.tags || [];
-    
-    // Find removed tags
-    const removedTags = oldTags.filter(tag => !newTags.includes(tag));
-    
-    // Update tag counts for removed tags
-    removedTags.forEach(tag => {
-      const currentCount = tagCounts[tag] || 0;
-      if (currentCount > 0) {
-        setTagCounts(prev => ({
-          ...prev,
-          [tag]: prev[tag] - 1
-        }));
-      }
-    });
-    
-    setTasks((prev) =>
-      prev.map((task) => (task.id === updatedTask.id ? updatedTask : task))
-    );
-
-    // Update tag counts after task update
-    const newTagCounts: { [key: string]: number } = {};
-    tasks.forEach(task => {
-      if (task.tags) {
-        task.tags.forEach(tag => {
-          newTagCounts[tag] = (newTagCounts[tag] || 0) + 1;
-        });
-      }
-    });
-    setTagCounts(newTagCounts);
-  };
-
-  const handleCompleteTask = (taskId: string) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === taskId
-          ? { ...task, completed: !task.completed, inProgress: false, isPaused: false }
-          : task
-      )
-    );
   };
 
   const handleNextPage = () => {
@@ -182,9 +102,7 @@ const Index = () => {
       const nextPage = currentPage + 1;
       setCurrentPage(nextPage);
       
-      // Update the book data structure to reflect the current page's completion status
-      const updatedBook = { ...currentBibleBook };
-      const currentChapter = updatedBook.chapters[0];
+      const currentChapter = currentBibleBook.chapters.find(c => c.id === currentChapterId);
       if (currentChapter && currentChapter.pages[nextPage - 1]) {
         setIsBookCompleted(currentChapter.pages[nextPage - 1].completed);
       }
@@ -196,51 +114,30 @@ const Index = () => {
       const prevPage = currentPage - 1;
       setCurrentPage(prevPage);
       
-      // Update the book data structure to reflect the current page's completion status
-      const updatedBook = { ...currentBibleBook };
-      const currentChapter = updatedBook.chapters[0];
+      const currentChapter = currentBibleBook.chapters.find(c => c.id === currentChapterId);
       if (currentChapter && currentChapter.pages[prevPage - 1]) {
         setIsBookCompleted(currentChapter.pages[prevPage - 1].completed);
       }
     }
   };
 
-  const handlePageSelect = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-    const currentChapter = currentBibleBook.chapters[0];
-    if (currentChapter && currentChapter.pages[pageNumber - 1]) {
-      setIsBookCompleted(currentChapter.pages[pageNumber - 1].completed);
-    }
-  };
-
-  const getCurrentPageContent = () => {
-    const content = GENESIS_CONTENT[currentPage - 1];
-    if (!content) {
-      return "Conteúdo não disponível";
-    }
-    return content;
-  };
-
-  const handleMarkAsCompleted = () => {
-    const updatedBook = { ...currentBibleBook };
-    const currentChapter = updatedBook.chapters[0];
-    
-    if (currentChapter && currentChapter.pages[currentPage - 1]) {
-      currentChapter.pages[currentPage - 1].completed = !currentChapter.pages[currentPage - 1].completed;
-      currentChapter.completedPages = currentChapter.pages.filter(page => page.completed).length;
-    }
-    
-    updatedBook.completedChapters = updatedBook.chapters.filter(
-      chapter => chapter.completedPages === chapter.pages.length
+  const getNoteCounts = () => {
+    const bookNotes = tasks.filter(task => task.bookId === currentBibleBook.id).length;
+    const chapterNotes = tasks.filter(task => 
+      task.bookId === currentBibleBook.id && 
+      task.chapterId === currentChapterId
     ).length;
-    
-    setCurrentBibleBook(updatedBook);
-    setIsBookCompleted(currentChapter.pages[currentPage - 1].completed);
-    
-    toast({
-      title: currentChapter.pages[currentPage - 1].completed ? "Página marcada como concluída" : "Página marcada como pendente",
-      description: `A página foi marcada como ${currentChapter.pages[currentPage - 1].completed ? "concluída" : "pendente"}.`,
-    });
+    const pageNotes = tasks.filter(task => 
+      task.bookId === currentBibleBook.id && 
+      task.chapterId === currentChapterId && 
+      task.pageNumber === currentPage
+    ).length;
+
+    return {
+      bookNotes,
+      chapterNotes,
+      pageNotes
+    };
   };
 
   // Transform tagCounts into the format expected by AppSidebar
@@ -259,6 +156,7 @@ const Index = () => {
           onPageSelect={handlePageSelect}
           noteCounts={getNoteCounts()}
           tags={sidebarTags}
+          currentChapterId={currentChapterId}
         />
         <ResizablePanelGroup 
           direction={isMobile ? "vertical" : "horizontal"} 
@@ -300,7 +198,7 @@ const Index = () => {
                         
                         <div className="space-y-4">
                           {tasks
-                            .filter(task => task.pageNumber === currentPage)
+                            .filter(task => task.pageNumber === currentPage && task.chapterId === currentChapterId && task.bookId === currentBibleBook.id)
                             .map((task) => (
                               <div key={task.id} className="animate-fade-in">
                                 <TaskCard

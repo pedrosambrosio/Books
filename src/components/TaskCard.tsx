@@ -26,6 +26,8 @@ export interface Task {
   priority?: string;
   subtasks?: Subtask[];
   pageNumber?: number; // New field to track which page the note belongs to
+  bookId?: string;    // New field
+  chapterId?: string; // New field
 }
 
 interface TaskCardProps {

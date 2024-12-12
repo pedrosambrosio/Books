@@ -29,16 +29,23 @@ const MOCK_TAGS: TagType[] = [
 
 interface AppSidebarProps {
   currentBook: BookType;
-  onPageSelect?: (pageNumber: number) => void;
+  onPageSelect?: (pageNumber: number, chapterId: string) => void;
   noteCounts?: {
     bookNotes: number;
     chapterNotes: number;
     pageNotes: number;
   };
   tags?: { name: string; count: number }[];
+  currentChapterId?: string;
 }
 
-export function AppSidebar({ currentBook, onPageSelect, noteCounts, tags = [] }: AppSidebarProps) {
+export function AppSidebar({ 
+  currentBook, 
+  onPageSelect, 
+  noteCounts, 
+  tags = [],
+  currentChapterId 
+}: AppSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
   const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
@@ -58,9 +65,9 @@ export function AppSidebar({ currentBook, onPageSelect, noteCounts, tags = [] }:
     });
   };
 
-  const handlePageClick = (pageNumber: number) => {
+  const handlePageClick = (pageNumber: number, chapterId: string) => {
     if (onPageSelect) {
-      onPageSelect(pageNumber);
+      onPageSelect(pageNumber, chapterId);
       toast({
         title: "Página selecionada",
         description: `Navegando para a página ${pageNumber}`,
@@ -170,7 +177,7 @@ export function AppSidebar({ currentBook, onPageSelect, noteCounts, tags = [] }:
                                     key={page.id}
                                     variant="ghost"
                                     className={`w-full justify-start text-sm pl-8 ${page.completed ? "text-[#09090B]" : "text-[#71717A]"}`}
-                                    onClick={() => handlePageClick(page.number)}
+                                    onClick={() => handlePageClick(page.number, chapter.id)}
                                   >
                                     <span className="flex items-center gap-2">
                                       Página {page.number}
