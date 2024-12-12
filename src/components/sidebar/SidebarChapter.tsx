@@ -50,10 +50,13 @@ export function SidebarChapter({
   const handlePageClick = (pageNumber: number, chapterId: string) => {
     if (onPageSelect) {
       onPageSelect(pageNumber, chapterId);
-      toast({
-        title: "Página selecionada",
-        description: `Navegando para a página ${pageNumber}`,
-      });
+      // Only show toast if changing to a different page
+      if (pageNumber !== currentPage || chapterId !== currentChapterId) {
+        toast({
+          title: "Página selecionada",
+          description: `Navegando para a página ${pageNumber}`,
+        });
+      }
     }
   };
 
@@ -91,7 +94,7 @@ export function SidebarChapter({
       <CollapsibleContent>
         <div className="ml-6 space-y-1">
           {chapter.pages.map((page) => {
-            const isCurrentPage = isCurrentChapter && page.number === currentPage;
+            const isCurrentPage = isCurrentChapter && currentPage === page.number;
             return (
               <Button
                 key={page.id}
