@@ -32,7 +32,7 @@ export const ContentViewer = ({
 }: ContentViewerProps) => {
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
   const [selectedText, setSelectedText] = useState("");
-  const [taggedVerses, setTaggedVerses] = useState<{ [key: string]: string }>(() => {
+  const [taggedVerses, setTaggedVerses] = useState<{ [key: string]: { name: string; color: string } }>(() => {
     const saved = localStorage.getItem(`tagged-verses-page-${currentPage}`);
     return saved ? JSON.parse(saved) : {};
   });
@@ -85,10 +85,10 @@ export const ContentViewer = ({
     }
   };
 
-  const handleTagCreate = (tag: string, verseId: string) => {
+  const handleTagCreate = (tag: string, color: string, verseId: string) => {
     const newTaggedVerses = {
       ...taggedVerses,
-      [verseId]: tag
+      [verseId]: { name: tag, color }
     };
     setTaggedVerses(newTaggedVerses);
     localStorage.setItem(`tagged-verses-page-${currentPage}`, JSON.stringify(newTaggedVerses));
@@ -100,7 +100,8 @@ export const ContentViewer = ({
     const verseElement = document.getElementById(verseId);
     if (verseElement) {
       const span = document.createElement('span');
-      span.className = `bg-[${tag}]/20 px-1 rounded`;
+      span.className = 'px-1 rounded';
+      span.style.backgroundColor = `${color}20`;
       span.dataset.tag = tag;
       span.textContent = verseElement.textContent || '';
       verseElement.innerHTML = '';
@@ -121,12 +122,13 @@ export const ContentViewer = ({
 
   useEffect(() => {
     // Apply tags when component mounts or page changes
-    Object.entries(taggedVerses).forEach(([verseId, tag]) => {
+    Object.entries(taggedVerses).forEach(([verseId, tagInfo]) => {
       const verseElement = document.getElementById(verseId);
       if (verseElement) {
         const span = document.createElement('span');
-        span.className = `bg-[${tag}]/20 px-1 rounded`;
-        span.dataset.tag = tag;
+        span.className = 'px-1 rounded';
+        span.style.backgroundColor = `${tagInfo.color}20`;
+        span.dataset.tag = tagInfo.name;
         span.textContent = verseElement.textContent || '';
         verseElement.innerHTML = '';
         verseElement.appendChild(span);
