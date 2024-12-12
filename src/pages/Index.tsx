@@ -81,11 +81,21 @@ const Index = () => {
 
   const handleDeleteTask = (taskId: string) => {
     const taskToDelete = tasks.find(task => task.id === taskId);
+    
     if (taskToDelete?.tags) {
       const newTagCounts = { ...tagCounts };
-      taskToDelete.tags.forEach(tag => {
-        newTagCounts[tag] = Math.max(0, (newTagCounts[tag] || 0) - 1);
+      const remainingTasks = tasks.filter(task => task.id !== taskId);
+      
+      // Recalculate tag counts for all remaining tasks
+      Object.keys(newTagCounts).forEach(tag => {
+        const count = remainingTasks.filter(task => task.tags?.includes(tag)).length;
+        if (count === 0) {
+          delete newTagCounts[tag]; // Remove tag if no tasks use it
+        } else {
+          newTagCounts[tag] = count;
+        }
       });
+      
       setTagCounts(newTagCounts);
     }
     
@@ -96,10 +106,6 @@ const Index = () => {
     });
   };
 
-  // Filter tasks based on current page
-  const currentPageTasks = tasks.filter(task => task.pageNumber === currentPage);
-
-  // Calculate note counts for the current book
   const getNoteCounts = () => {
     const bookNotes = tasks.length;
     const chapterNotes = tasks.filter(task => 
@@ -118,6 +124,17 @@ const Index = () => {
     setTasks((prev) =>
       prev.map((task) => (task.id === updatedTask.id ? updatedTask : task))
     );
+
+    // Update tag counts after task update
+    const newTagCounts: { [key: string]: number } = {};
+    tasks.forEach(task => {
+      if (task.tags) {
+        task.tags.forEach(tag => {
+          newTagCounts[tag] = (newTagCounts[tag] || 0) + 1;
+        });
+      }
+    });
+    setTagCounts(newTagCounts);
   };
 
   const handleCompleteTask = (taskId: string) => {
@@ -142,31 +159,8 @@ const Index = () => {
     }
   };
 
-  const handleMarkAsCompleted = () => {
-    const updatedBook = { ...currentBibleBook };
-    const currentChapter = updatedBook.chapters[0];
-    
-    if (currentChapter && currentChapter.pages[currentPage - 1]) {
-      currentChapter.pages[currentPage - 1].completed = !currentChapter.pages[currentPage - 1].completed;
-      currentChapter.completedPages = currentChapter.pages.filter(page => page.completed).length;
-    }
-    
-    updatedBook.completedChapters = updatedBook.chapters.filter(
-      chapter => chapter.completedPages === chapter.pages.length
-    ).length;
-    
-    setCurrentBibleBook(updatedBook);
-    setIsBookCompleted(currentChapter.pages[currentPage - 1].completed);
-    
-    toast({
-      title: currentChapter.pages[currentPage - 1].completed ? "Página marcada como concluída" : "Página marcada como pendente",
-      description: `A página foi marcada como ${currentChapter.pages[currentPage - 1].completed ? "concluída" : "pendente"}.`,
-    });
-  };
-
   const handlePageSelect = (pageNumber: number) => {
     setCurrentPage(pageNumber);
-    // Update isBookCompleted based on the selected page's completion status
     const currentChapter = currentBibleBook.chapters[0];
     if (currentChapter && currentChapter.pages[pageNumber - 1]) {
       setIsBookCompleted(currentChapter.pages[pageNumber - 1].completed);
@@ -178,10 +172,12 @@ const Index = () => {
   };
 
   // Transform tagCounts into the format expected by AppSidebar
-  const sidebarTags = Object.entries(tagCounts).map(([name, count]) => ({
-    name,
-    count
-  }));
+  const sidebarTags = Object.entries(tagCounts)
+    .filter(([_, count]) => count > 0)
+    .map(([name, count]) => ({
+      name,
+      count
+    }));
 
   return (
     <SidebarProvider>
@@ -231,16 +227,18 @@ const Index = () => {
                         />
                         
                         <div className="space-y-4">
-                          {currentPageTasks.map((task) => (
-                            <div key={task.id} className="animate-fade-in">
-                              <TaskCard
-                                task={task}
-                                onUpdate={handleUpdateTask}
-                                onComplete={handleCompleteTask}
-                                onDelete={handleDeleteTask}
-                              />
-                            </div>
-                          ))}
+                          {tasks
+                            .filter(task => task.pageNumber === currentPage)
+                            .map((task) => (
+                              <div key={task.id} className="animate-fade-in">
+                                <TaskCard
+                                  task={task}
+                                  onUpdate={handleUpdateTask}
+                                  onComplete={handleCompleteTask}
+                                  onDelete={handleDeleteTask}
+                                />
+                              </div>
+                            ))}
                         </div>
                       </div>
                     </TabsContent>
