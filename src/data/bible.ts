@@ -1,5 +1,3 @@
-import { Book as BookType } from "@/types/Book";
-
 export const BIBLE_BOOKS = [
   // Old Testament
   "Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy",
@@ -34,38 +32,4 @@ export const BIBLE_CHAPTERS: { [key: string]: number } = {
   "1 Timothy": 6, "2 Timothy": 4, "Titus": 3, "Philemon": 1, "Hebrews": 13,
   "James": 5, "1 Peter": 5, "2 Peter": 3, "1 John": 5, "2 John": 1,
   "3 John": 1, "Jude": 1, "Revelation": 22
-};
-
-// Add unique IDs for chapters
-export const BIBLE_BOOK: BookType = {
-  id: "bible",
-  title: "Bíblia",
-  type: "bible",
-  chapters: [
-    {
-      id: "genesis",
-      number: 1,
-      title: "Genesis",
-      pages: Array.from({ length: 3 }, (_, i) => ({
-        id: `genesis-page-${i+1}`,
-        number: i + 1,
-        title: `Página ${i + 1}`,
-        completed: false
-      })),
-      completedPages: 0,
-    },
-    {
-      id: "exodus",
-      number: 2,
-      title: "Exodus",
-      pages: Array.from({ length: 2 }, (_, i) => ({
-        id: `exodus-page-${i+1}`,
-        number: i + 1,
-        title: `Página ${i + 1}`,
-        completed: false
-      })),
-      completedPages: 0,
-    }
-  ],
-  completedChapters: 0,
 };

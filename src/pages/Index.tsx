@@ -13,138 +13,237 @@ import { Button } from "@/components/ui/button";
 import { Book as BookType } from "@/types/Book";
 import { GENESIS_CONTENT } from "@/data/bibleContent";
 import { cn } from "@/lib/utils";
-import { BIBLE_BOOK } from "@/data/bible";
+
+// Create Bible book structure with Genesis and Exodus
+const BIBLE_BOOK: BookType = {
+  id: "bible",
+  title: "Bíblia",
+  type: "bible",
+  chapters: [
+    {
+      id: "genesis",
+      number: 1,
+      title: "Genesis",
+      pages: Array.from({ length: 3 }, (_, i) => ({
+        id: `genesis-${i+1}`,
+        number: i + 1,
+        title: `Página ${i + 1}`,
+        completed: false
+      })),
+      completedPages: 0,
+    },
+    {
+      id: "exodus",
+      number: 2,
+      title: "Exodus",
+      pages: Array.from({ length: 2 }, (_, i) => ({
+        id: `exodus-${i+1}`,
+        number: i + 1,
+        title: `Página ${i + 1}`,
+        completed: false
+      })),
+      completedPages: 0,
+    }
+  ],
+  completedChapters: 0,
+};
 
 const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const [currentPage, setCurrentPage] = useState(1);
-  const [currentChapterId, setCurrentChapterId] = useState<string>("genesis");
   const totalPages = 3;
   const [isBookCompleted, setIsBookCompleted] = useState(false);
   const [currentBibleBook, setCurrentBibleBook] = useState(BIBLE_BOOK);
   const [allTags, setAllTags] = useState<string[]>([]);
   const [tagCounts, setTagCounts] = useState<{ [key: string]: number }>({});
 
-  const getCurrentPageContent = () => {
-    const currentChapter = currentBibleBook.chapters.find(c => c.id === currentChapterId);
-    if (!currentChapter) return "";
+  const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress" | "isPaused">) => {
+    const task: Task = {
+      ...newTask,
+      id: crypto.randomUUID(),
+      completed: false,
+      inProgress: false,
+      isPaused: false,
+      pageNumber: currentPage,
+    };
 
-    // Get content based on book, chapter and page
-    if (currentChapter.id === "genesis") {
-      return GENESIS_CONTENT[currentPage - 1] || "Conteúdo não disponível.";
-    } else if (currentChapter.id === "exodus") {
-      // Add Exodus content here when available
-      return "Conteúdo de Êxodo em breve...";
+    setTasks((prev) => [task, ...prev]);
+    
+    // Update tag counts when creating a task
+    if (newTask.tags) {
+      const newTagCounts = { ...tagCounts };
+      newTask.tags.forEach(tag => {
+        newTagCounts[tag] = (newTagCounts[tag] || 0) + 1;
+      });
+      setTagCounts(newTagCounts);
     }
-    return "Conteúdo não disponível.";
+
+    toast({
+      title: "Anotação criada",
+      description: "Sua nova anotação foi criada com sucesso.",
+    });
   };
 
   const handleTagCreate = (tag: string) => {
     if (!allTags.includes(tag)) {
-      setAllTags([...allTags, tag]);
-      setTagCounts(prev => ({
-        ...prev,
-        [tag]: 1
-      }));
+      setAllTags(prev => [...prev, tag]);
     }
   };
 
-  const handleUpdateTask = (updatedTask: Task) => {
-    setTasks(prevTasks => 
-      prevTasks.map(task => 
-        task.id === updatedTask.id ? updatedTask : task
-      )
-    );
-
-    // Update tag counts
-    const oldTask = tasks.find(t => t.id === updatedTask.id);
-    if (oldTask?.tags) {
-      const removedTags = oldTask.tags.filter(tag => !updatedTask.tags?.includes(tag));
-      const addedTags = updatedTask.tags?.filter(tag => !oldTask.tags?.includes(tag)) || [];
-
-      setTagCounts(prev => {
-        const newCounts = { ...prev };
-        removedTags.forEach(tag => {
-          newCounts[tag] = (newCounts[tag] || 1) - 1;
-          if (newCounts[tag] <= 0) delete newCounts[tag];
-        });
-        addedTags.forEach(tag => {
-          newCounts[tag] = (newCounts[tag] || 0) + 1;
-        });
-        return newCounts;
+  const handleDeleteTask = (taskId: string) => {
+    const taskToDelete = tasks.find(task => task.id === taskId);
+    
+    if (taskToDelete?.tags) {
+      const newTagCounts = { ...tagCounts };
+      const remainingTasks = tasks.filter(task => task.id !== taskId);
+      
+      // Recalculate tag counts for all remaining tasks
+      Object.keys(newTagCounts).forEach(tag => {
+        const count = remainingTasks.filter(task => task.tags?.includes(tag)).length;
+        if (count === 0) {
+          delete newTagCounts[tag]; // Remove tag if no tasks use it
+        } else {
+          newTagCounts[tag] = count;
+        }
       });
+      
+      setTagCounts(newTagCounts);
     }
-
+    
+    setTasks((prev) => prev.filter((task) => task.id !== taskId));
     toast({
-      title: "Anotação atualizada",
-      description: "Suas alterações foram salvas com sucesso.",
+      title: "Anotação excluída",
+      description: "A anotação foi excluída com sucesso.",
     });
   };
 
+  const getNoteCounts = () => {
+    const bookNotes = tasks.length;
+    const chapterNotes = tasks.filter(task => 
+      task.pageNumber && task.pageNumber >= 1 && task.pageNumber <= 3
+    ).length;
+    const pageNotes = tasks.filter(task => task.pageNumber === currentPage).length;
+
+    return {
+      bookNotes,
+      chapterNotes,
+      pageNotes
+    };
+  };
+
+  const handleUpdateTask = (updatedTask: Task) => {
+    const oldTags = tasks.find(task => task.id === updatedTask.id)?.tags || [];
+    const newTags = updatedTask.tags || [];
+    
+    // Find removed tags
+    const removedTags = oldTags.filter(tag => !newTags.includes(tag));
+    
+    // Update tag counts for removed tags
+    removedTags.forEach(tag => {
+      const currentCount = tagCounts[tag] || 0;
+      if (currentCount > 0) {
+        setTagCounts(prev => ({
+          ...prev,
+          [tag]: prev[tag] - 1
+        }));
+      }
+    });
+    
+    setTasks((prev) =>
+      prev.map((task) => (task.id === updatedTask.id ? updatedTask : task))
+    );
+
+    // Update tag counts after task update
+    const newTagCounts: { [key: string]: number } = {};
+    tasks.forEach(task => {
+      if (task.tags) {
+        task.tags.forEach(tag => {
+          newTagCounts[tag] = (newTagCounts[tag] || 0) + 1;
+        });
+      }
+    });
+    setTagCounts(newTagCounts);
+  };
+
   const handleCompleteTask = (taskId: string) => {
-    setTasks(prevTasks =>
-      prevTasks.map(task =>
+    setTasks((prev) =>
+      prev.map((task) =>
         task.id === taskId
-          ? { ...task, completed: !task.completed }
+          ? { ...task, completed: !task.completed, inProgress: false, isPaused: false }
           : task
       )
     );
   };
 
-  const handleDeleteTask = (taskId: string) => {
-    const taskToDelete = tasks.find(t => t.id === taskId);
-    if (taskToDelete?.tags) {
-      setTagCounts(prev => {
-        const newCounts = { ...prev };
-        taskToDelete.tags?.forEach(tag => {
-          newCounts[tag] = (newCounts[tag] || 1) - 1;
-          if (newCounts[tag] <= 0) delete newCounts[tag];
-        });
-        return newCounts;
-      });
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      const nextPage = currentPage + 1;
+      setCurrentPage(nextPage);
+      
+      // Update the book data structure to reflect the current page's completion status
+      const updatedBook = { ...currentBibleBook };
+      const currentChapter = updatedBook.chapters[0];
+      if (currentChapter && currentChapter.pages[nextPage - 1]) {
+        setIsBookCompleted(currentChapter.pages[nextPage - 1].completed);
+      }
     }
-    
-    setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      const prevPage = currentPage - 1;
+      setCurrentPage(prevPage);
+      
+      // Update the book data structure to reflect the current page's completion status
+      const updatedBook = { ...currentBibleBook };
+      const currentChapter = updatedBook.chapters[0];
+      if (currentChapter && currentChapter.pages[prevPage - 1]) {
+        setIsBookCompleted(currentChapter.pages[prevPage - 1].completed);
+      }
+    }
+  };
+
+  const handlePageSelect = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+    const currentChapter = currentBibleBook.chapters[0];
+    if (currentChapter && currentChapter.pages[pageNumber - 1]) {
+      setIsBookCompleted(currentChapter.pages[pageNumber - 1].completed);
+    }
+  };
+
+  const getCurrentPageContent = () => {
+    const content = GENESIS_CONTENT[currentPage - 1];
+    if (!content) {
+      return "Conteúdo não disponível";
+    }
+    return content;
   };
 
   const handleMarkAsCompleted = () => {
-    setIsBookCompleted(!isBookCompleted);
+    const updatedBook = { ...currentBibleBook };
+    const currentChapter = updatedBook.chapters[0];
     
-    setCurrentBibleBook(prev => {
-      const updatedChapters = prev.chapters.map(chapter => {
-        if (chapter.id === currentChapterId) {
-          const updatedPages = chapter.pages.map(page => {
-            if (page.number === currentPage) {
-              return { ...page, completed: !isBookCompleted };
-            }
-            return page;
-          });
-          return {
-            ...chapter,
-            pages: updatedPages,
-            completedPages: updatedPages.filter(p => p.completed).length,
-          };
-        }
-        return chapter;
-      });
-
-      return {
-        ...prev,
-        chapters: updatedChapters,
-        completedChapters: updatedChapters.filter(c => 
-          c.completedPages === c.pages.length
-        ).length,
-      };
-    });
-
+    if (currentChapter && currentChapter.pages[currentPage - 1]) {
+      currentChapter.pages[currentPage - 1].completed = !currentChapter.pages[currentPage - 1].completed;
+      currentChapter.completedPages = currentChapter.pages.filter(page => page.completed).length;
+    }
+    
+    updatedBook.completedChapters = updatedBook.chapters.filter(
+      chapter => chapter.completedPages === chapter.pages.length
+    ).length;
+    
+    setCurrentBibleBook(updatedBook);
+    setIsBookCompleted(currentChapter.pages[currentPage - 1].completed);
+    
     toast({
-      title: isBookCompleted ? "Página marcada como pendente" : "Página marcada como concluída",
-      description: `A página ${currentPage} foi marcada como ${isBookCompleted ? "pendente" : "concluída"}.`,
+      title: currentChapter.pages[currentPage - 1].completed ? "Página marcada como concluída" : "Página marcada como pendente",
+      description: `A página foi marcada como ${currentChapter.pages[currentPage - 1].completed ? "concluída" : "pendente"}.`,
     });
   };
 
+  // Transform tagCounts into the format expected by AppSidebar
   const sidebarTags = Object.entries(tagCounts)
     .filter(([_, count]) => count > 0)
     .map(([name, count]) => ({
@@ -160,7 +259,6 @@ const Index = () => {
           onPageSelect={handlePageSelect}
           noteCounts={getNoteCounts()}
           tags={sidebarTags}
-          currentChapterId={currentChapterId}
         />
         <ResizablePanelGroup 
           direction={isMobile ? "vertical" : "horizontal"} 
@@ -202,7 +300,7 @@ const Index = () => {
                         
                         <div className="space-y-4">
                           {tasks
-                            .filter(task => task.pageNumber === currentPage && task.chapterId === currentChapterId && task.bookId === currentBibleBook.id)
+                            .filter(task => task.pageNumber === currentPage)
                             .map((task) => (
                               <div key={task.id} className="animate-fade-in">
                                 <TaskCard

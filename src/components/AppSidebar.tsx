@@ -29,23 +29,16 @@ const MOCK_TAGS: TagType[] = [
 
 interface AppSidebarProps {
   currentBook: BookType;
-  onPageSelect?: (pageNumber: number, chapterId: string) => void;
+  onPageSelect?: (pageNumber: number) => void;
   noteCounts?: {
     bookNotes: number;
     chapterNotes: number;
     pageNotes: number;
   };
   tags?: { name: string; count: number }[];
-  currentChapterId?: string;
 }
 
-export function AppSidebar({ 
-  currentBook, 
-  onPageSelect, 
-  noteCounts, 
-  tags = [],
-  currentChapterId 
-}: AppSidebarProps) {
+export function AppSidebar({ currentBook, onPageSelect, noteCounts, tags = [] }: AppSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
   const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
@@ -65,9 +58,9 @@ export function AppSidebar({
     });
   };
 
-  const handlePageClick = (pageNumber: number, chapterId: string) => {
+  const handlePageClick = (pageNumber: number) => {
     if (onPageSelect) {
-      onPageSelect(pageNumber, chapterId);
+      onPageSelect(pageNumber);
       toast({
         title: "Página selecionada",
         description: `Navegando para a página ${pageNumber}`,
@@ -176,12 +169,8 @@ export function AppSidebar({
                                   <Button
                                     key={page.id}
                                     variant="ghost"
-                                    className={`w-full justify-start text-sm pl-8 ${
-                                      page.completed || currentChapterId === chapter.id && page.number === currentPage 
-                                        ? "text-[#09090B]" 
-                                        : "text-[#71717A]"
-                                    }`}
-                                    onClick={() => handlePageClick(page.number, chapter.id)}
+                                    className={`w-full justify-start text-sm pl-8 ${page.completed ? "text-[#09090B]" : "text-[#71717A]"}`}
+                                    onClick={() => handlePageClick(page.number)}
                                   >
                                     <span className="flex items-center gap-2">
                                       Página {page.number}
