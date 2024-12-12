@@ -16,6 +16,7 @@ export const TextSelectionTooltip = ({ onCreateNote, position }: TextSelectionTo
         top: `${Math.max(position.y - 10, 10)}px`,
         left: `${position.x}px`,
         transform: 'translate(-50%, -100%)',
+        pointerEvents: 'auto',
       }}
     >
       <Button
@@ -23,6 +24,7 @@ export const TextSelectionTooltip = ({ onCreateNote, position }: TextSelectionTo
         size="sm"
         className="flex items-center gap-2 text-sm hover:bg-gray-100"
         onClick={(e) => {
+          e.preventDefault();
           e.stopPropagation();
           onCreateNote();
         }}

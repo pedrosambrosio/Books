@@ -42,12 +42,20 @@ export const ContentViewer = ({
   }, []);
 
   const handleTextSelection = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault(); // Prevent default selection behavior
+    
     const selection = window.getSelection();
+    console.log("Selection event triggered");
+    console.log("Selection object:", selection);
+    
     if (!selection || selection.isCollapsed) {
+      console.log("No text selected or selection collapsed");
       return;
     }
 
     const text = selection.toString().trim();
+    console.log("Selected text:", text);
+    
     if (!text) {
       setTooltipPosition(null);
       setSelectedText("");
@@ -58,15 +66,25 @@ export const ContentViewer = ({
     const rect = range.getBoundingClientRect();
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     
+    // Log position calculations
+    console.log("Selection rect:", rect);
+    console.log("Scroll position:", scrollTop);
+    
+    const tooltipX = rect.left + (rect.width / 2);
+    const tooltipY = rect.top + scrollTop;
+    
+    console.log("Tooltip position:", { x: tooltipX, y: tooltipY });
+    
     setTooltipPosition({
-      x: rect.left + (rect.width / 2),
-      y: rect.top + scrollTop,
+      x: tooltipX,
+      y: tooltipY,
     });
     setSelectedText(text);
   };
 
   const handleCreateNote = () => {
     if (selectedText) {
+      console.log("Creating note with text:", selectedText);
       onCreateNoteFromSelection(selectedText);
       setTooltipPosition(null);
       setSelectedText("");
@@ -115,6 +133,7 @@ export const ContentViewer = ({
       </div>
       <div 
         className="prose prose-sm max-w-none whitespace-pre-line select-text"
+        style={{ userSelect: 'text', cursor: 'text' }}
         onMouseUp={handleTextSelection}
         onTouchEnd={handleTextSelection}
       >
