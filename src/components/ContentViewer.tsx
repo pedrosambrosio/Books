@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { TextSelectionTooltip } from "./TextSelectionTooltip";
+import { VerseDisplay } from "./VerseDisplay";
 import { cn } from "@/lib/utils";
 
 interface ContentViewerProps {
-  content: string;
+  content: Array<{ verse: number; text: string }>;
   currentPage: number;
   totalPages: number;
   onNextPage: () => void;
@@ -124,7 +125,7 @@ export const ContentViewer = ({
         </div>
       </div>
       <div 
-        className="prose prose-sm max-w-none whitespace-pre-line select-text"
+        className="prose prose-sm max-w-none whitespace-pre-line select-text space-y-4"
         style={{ 
           userSelect: 'text',
           cursor: 'text',
@@ -132,10 +133,15 @@ export const ContentViewer = ({
           MozUserSelect: 'text',
           msUserSelect: 'text'
         }}
-        onMouseUp={handleTextSelection}
-        onTouchEnd={handleTextSelection}
       >
-        {content}
+        {content.map((verse) => (
+          <VerseDisplay
+            key={verse.verse}
+            verse={verse.verse}
+            text={verse.text}
+            onCreateNote={onCreateNoteFromSelection}
+          />
+        ))}
       </div>
       <TextSelectionTooltip
         position={tooltipPosition}

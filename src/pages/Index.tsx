@@ -224,7 +224,7 @@ const Index = () => {
   const getCurrentPageContent = () => {
     const content = GENESIS_CONTENT[currentPage - 1];
     if (!content) {
-      return "Conteúdo não disponível";
+      return [];
     }
     return content;
   };
