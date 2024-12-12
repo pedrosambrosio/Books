@@ -44,6 +44,14 @@
     color: white;
   }
 
+  /* Tagged text highlight styles - Apple Notes style */
+  [data-tag] {
+    @apply rounded px-1 transition-colors duration-200;
+    background-color: var(--tag-color, rgba(113, 113, 122, 0.2));
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
   body {
     @apply bg-background text-foreground font-['Inter'] overflow-hidden;
     font-feature-settings: "rlig" 1, "calt" 1;
