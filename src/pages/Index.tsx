@@ -44,6 +44,7 @@ const Index = () => {
   const [isBookCompleted, setIsBookCompleted] = useState(false);
   const [currentBibleBook, setCurrentBibleBook] = useState(BIBLE_BOOK);
   const [allTags, setAllTags] = useState<string[]>([]);
+  const [tagCounts, setTagCounts] = useState<{ [key: string]: number }>({});
 
   const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress" | "isPaused">) => {
     const task: Task = {
@@ -52,17 +53,18 @@ const Index = () => {
       completed: false,
       inProgress: false,
       isPaused: false,
-      pageNumber: currentPage, // Add current page number to the task
+      pageNumber: currentPage,
     };
 
     setTasks((prev) => [task, ...prev]);
     
-    // Update allTags with any new tags
+    // Update tag counts when creating a task
     if (newTask.tags) {
-      const newTags = newTask.tags.filter(tag => !allTags.includes(tag));
-      if (newTags.length > 0) {
-        setAllTags(prev => [...prev, ...newTags]);
-      }
+      const newTagCounts = { ...tagCounts };
+      newTask.tags.forEach(tag => {
+        newTagCounts[tag] = (newTagCounts[tag] || 0) + 1;
+      });
+      setTagCounts(newTagCounts);
     }
 
     toast({
@@ -75,6 +77,23 @@ const Index = () => {
     if (!allTags.includes(tag)) {
       setAllTags(prev => [...prev, tag]);
     }
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    const taskToDelete = tasks.find(task => task.id === taskId);
+    if (taskToDelete?.tags) {
+      const newTagCounts = { ...tagCounts };
+      taskToDelete.tags.forEach(tag => {
+        newTagCounts[tag] = Math.max(0, (newTagCounts[tag] || 0) - 1);
+      });
+      setTagCounts(newTagCounts);
+    }
+    
+    setTasks((prev) => prev.filter((task) => task.id !== taskId));
+    toast({
+      title: "Anotação excluída",
+      description: "A anotação foi excluída com sucesso.",
+    });
   };
 
   // Filter tasks based on current page
@@ -109,14 +128,6 @@ const Index = () => {
           : task
       )
     );
-  };
-
-  const handleDeleteTask = (taskId: string) => {
-    setTasks((prev) => prev.filter((task) => task.id !== taskId));
-    toast({
-      title: "Anotação excluída",
-      description: "A anotação foi excluída com sucesso.",
-    });
   };
 
   const handleNextPage = () => {
@@ -162,13 +173,11 @@ const Index = () => {
     }
   };
 
-  // Get current page content
-  const getCurrentPageContent = () => {
-    if (currentPage >= 1 && currentPage <= 3) {
-      return GENESIS_CONTENT.chapter1[`page${currentPage}` as keyof typeof GENESIS_CONTENT.chapter1];
-    }
-    return "";
-  };
+  // Transform tagCounts into the format expected by AppSidebar
+  const sidebarTags = Object.entries(tagCounts).map(([name, count]) => ({
+    name,
+    count
+  }));
 
   return (
     <SidebarProvider>
@@ -177,7 +186,7 @@ const Index = () => {
           currentBook={currentBibleBook} 
           onPageSelect={handlePageSelect}
           noteCounts={getNoteCounts()}
-          tags={allTags}
+          tags={sidebarTags}
         />
         <ResizablePanelGroup 
           direction={isMobile ? "vertical" : "horizontal"} 

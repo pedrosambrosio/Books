@@ -119,13 +119,13 @@ export const CreateTask = ({ onCreateTask, existingTags = [], onTagCreate }: Cre
                   />
                   <button
                     type="button"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800 transition-transform"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800 transition-all"
                     onClick={() => setIsTagDropdownOpen(!isTagDropdownOpen)}
                   >
                     {isTagDropdownOpen ? (
-                      <ChevronUp className="h-4 w-4" />
+                      <ChevronUp className="h-4 w-4 text-gray-700 rounded-sm transition-transform" />
                     ) : (
-                      <ChevronDown className="h-4 w-4" />
+                      <ChevronDown className="h-4 w-4 text-gray-700 rounded-sm transition-transform" />
                     )}
                   </button>
                 </div>
@@ -139,9 +139,9 @@ export const CreateTask = ({ onCreateTask, existingTags = [], onTagCreate }: Cre
                 </Button>
               </div>
               {isTagDropdownOpen && filteredTags.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg">
+                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-[160px] overflow-y-auto">
                   <div className="py-1">
-                    {filteredTags.map((tag) => (
+                    {filteredTags.slice(0, 4).map((tag) => (
                       <button
                         key={tag}
                         type="button"
