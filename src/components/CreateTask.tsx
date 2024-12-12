@@ -17,16 +17,31 @@ interface CreateTaskProps {
   onCreateTask: (task: Omit<Task, "id" | "completed" | "inProgress">) => void;
   existingTags?: string[];
   onTagCreate?: (tag: string) => void;
+  initialReference?: string;
+  onAfterSubmit?: () => void;
 }
 
-export const CreateTask = ({ onCreateTask, existingTags = [], onTagCreate }: CreateTaskProps) => {
+export const CreateTask = ({ 
+  onCreateTask, 
+  existingTags = [], 
+  onTagCreate,
+  initialReference = "",
+  onAfterSubmit
+}: CreateTaskProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [reference, setReference] = useState("");
+  const [reference, setReference] = useState(initialReference);
   const [newTag, setNewTag] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    if (initialReference) {
+      setReference(initialReference);
+      setIsExpanded(true);
+    }
+  }, [initialReference]);
 
   const handleAddTag = (tagToAdd: string = newTag.trim()) => {
     if (!tagToAdd || tags.includes(tagToAdd)) return;
@@ -59,6 +74,7 @@ export const CreateTask = ({ onCreateTask, existingTags = [], onTagCreate }: Cre
     setReference("");
     setTags([]);
     setIsExpanded(false);
+    onAfterSubmit?.();
   };
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

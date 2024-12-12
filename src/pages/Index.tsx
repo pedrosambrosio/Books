@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { QuizDialog } from "@/components/quiz/QuizDialog";
 import { CHAPTER_QUIZZES } from "@/data/quizQuestions";
 import { QuizResult } from "@/types/Quiz";
+import { ContentViewer } from "@/components/ContentViewer"; // Import the new ContentViewer component
 
 // Create Bible book structure with Genesis and Exodus
 const BIBLE_BOOK: BookType = {
@@ -63,6 +64,8 @@ const Index = () => {
   const [tagCounts, setTagCounts] = useState<{ [key: string]: number }>({});
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [chapterLevels, setChapterLevels] = useState<{ [chapterId: string]: QuizResult }>({});
+  const [isCreatingNoteFromSelection, setIsCreatingNoteFromSelection] = useState(false);
+  const [selectedTextReference, setSelectedTextReference] = useState("");
 
   const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress" | "isPaused">) => {
     const task: Task = {
@@ -267,6 +270,13 @@ const Index = () => {
     });
   };
 
+  const handleCreateNoteFromSelection = (selectedText: string) => {
+    setSelectedTextReference(selectedText);
+    setIsCreatingNoteFromSelection(true);
+    // Scroll to the create note form
+    document.querySelector('.create-task-form')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   // Transform tagCounts into the format expected by AppSidebar
   const sidebarTags = Object.entries(tagCounts)
     .filter(([_, count]) => count > 0)
@@ -317,11 +327,18 @@ const Index = () => {
                     </TabsList>
                     <TabsContent value="personal">
                       <div className="space-y-6">
-                        <CreateTask 
-                          onCreateTask={handleCreateTask} 
-                          existingTags={allTags}
-                          onTagCreate={handleTagCreate}
-                        />
+                        <div className="create-task-form">
+                          <CreateTask 
+                            onCreateTask={handleCreateTask} 
+                            existingTags={allTags}
+                            onTagCreate={handleTagCreate}
+                            initialReference={isCreatingNoteFromSelection ? selectedTextReference : ""}
+                            onAfterSubmit={() => {
+                              setIsCreatingNoteFromSelection(false);
+                              setSelectedTextReference("");
+                            }}
+                          />
+                        </div>
                         
                         <div className="space-y-4">
                           {tasks
@@ -356,48 +373,16 @@ const Index = () => {
             <ScrollArea className="h-full">
               <div className="p-4 md:p-6 flex justify-center">
                 <div className="w-full max-w-2xl">
-                  <div className="glass-card h-full rounded-lg p-6">
-                    <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-2xl font-semibold">Gênesis</h2>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={handlePreviousPage}
-                          disabled={currentPage === 1}
-                        >
-                          <ArrowLeft className="h-4 w-4" />
-                        </Button>
-                        <span className="text-sm text-muted-foreground">
-                          {currentPage} / {totalPages}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={handleNextPage}
-                          disabled={currentPage === totalPages}
-                        >
-                          <ArrowRight className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={handleMarkAsCompleted}
-                          className={cn(
-                            "transition-colors",
-                            isBookCompleted 
-                              ? "text-[#09090B]" 
-                              : "text-[#F4F4F5]"
-                          )}
-                        >
-                          <Check className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="prose prose-sm max-w-none whitespace-pre-line">
-                      {getCurrentPageContent()}
-                    </div>
-                  </div>
+                  <ContentViewer
+                    content={getCurrentPageContent()}
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onNextPage={handleNextPage}
+                    onPreviousPage={handlePreviousPage}
+                    isCompleted={isBookCompleted}
+                    onMarkAsCompleted={handleMarkAsCompleted}
+                    onCreateNoteFromSelection={handleCreateNoteFromSelection}
+                  />
                 </div>
               </div>
             </ScrollArea>
