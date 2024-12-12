@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Edit, Tag, MessageSquare, X } from "lucide-react";
+import { Edit, Tag, MessageSquare, X, Check } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
