@@ -76,14 +76,12 @@ export function QuizDialog({ isOpen, onClose, questions, chapterId, onComplete }
   };
 
   const triggerConfetti = () => {
-    // Left side confetti
     confetti({
       particleCount: 100,
       spread: 70,
       origin: { x: 0, y: 0.6 }
     });
 
-    // Right side confetti
     confetti({
       particleCount: 100,
       spread: 70,
@@ -123,6 +121,12 @@ export function QuizDialog({ isOpen, onClose, questions, chapterId, onComplete }
     return 'explorador';
   };
 
+  const handleCloseQuiz = () => {
+    if (!showResults) {
+      resetQuiz();
+    }
+  };
+
   const resetQuiz = () => {
     setCurrentQuestionIndex(0);
     setAnswers(Array(questions.length).fill(-1));
@@ -134,7 +138,7 @@ export function QuizDialog({ isOpen, onClose, questions, chapterId, onComplete }
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
-    <Dialog open={isOpen} onOpenChange={resetQuiz}>
+    <Dialog open={isOpen} onOpenChange={handleCloseQuiz}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>
