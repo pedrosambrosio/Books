@@ -8,7 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Edit, Tag, MessageSquare } from "lucide-react";
+import { Edit, Tag, MessageSquare, X } from "lucide-react";
 
 interface VerseDisplayProps {
   verse: number;
@@ -20,6 +20,7 @@ export const VerseDisplay = ({ verse, text, onCreateNote }: VerseDisplayProps) =
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [tagName, setTagName] = useState("");
+  const [hasTag, setHasTag] = useState(false);
   const { toast } = useToast();
 
   const handleCreateNote = () => {
@@ -50,6 +51,24 @@ export const VerseDisplay = ({ verse, text, onCreateNote }: VerseDisplayProps) =
 
     setTagName("");
     setIsAddingTag(false);
+    setHasTag(true);
+  };
+
+  const handleRemoveTag = () => {
+    const verseElement = document.getElementById(`verse-${verse}`);
+    if (verseElement) {
+      const taggedSpan = verseElement.querySelector('[data-tag]');
+      if (taggedSpan) {
+        const textContent = taggedSpan.textContent || '';
+        verseElement.innerHTML = textContent;
+      }
+    }
+
+    setHasTag(false);
+    toast({
+      title: "Tag removida",
+      description: "A tag foi removida do versículo.",
+    });
     setIsTooltipOpen(false);
   };
 
@@ -75,65 +94,72 @@ export const VerseDisplay = ({ verse, text, onCreateNote }: VerseDisplayProps) =
             </Button>
           </TooltipTrigger>
           <TooltipContent side="right" className="w-48 p-2">
-            <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
                 size="sm"
-                className="flex items-center gap-2 text-sm hover:bg-gray-100 w-full justify-start"
+                className="p-2 hover:bg-gray-100"
                 onClick={handleCreateNote}
               >
                 <Edit className="h-4 w-4" />
-                Criar Anotação
               </Button>
 
-              {isAddingTag ? (
-                <div className="flex items-center gap-2">
-                  <Input
-                    value={tagName}
-                    onChange={(e) => setTagName(e.target.value)}
-                    placeholder="Nome da tag..."
-                    className="h-8 text-sm"
-                    autoFocus
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        handleAddTag();
-                      } else if (e.key === 'Escape') {
-                        setIsAddingTag(false);
-                        setTagName("");
-                      }
-                    }}
-                  />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleAddTag}
-                    className="h-8"
-                  >
-                    OK
-                  </Button>
-                </div>
+              {hasTag ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="p-2 hover:bg-gray-100"
+                  onClick={handleRemoveTag}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
               ) : (
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="flex items-center gap-2 text-sm hover:bg-gray-100 w-full justify-start"
+                  className="p-2 hover:bg-gray-100"
                   onClick={() => setIsAddingTag(true)}
                 >
                   <Tag className="h-4 w-4" />
-                  Adicionar Tag
                 </Button>
               )}
 
               <Button
                 variant="ghost"
                 size="sm"
-                className="flex items-center gap-2 text-sm hover:bg-gray-100 w-full justify-start"
+                className="p-2 hover:bg-gray-100"
                 onClick={handleAskChat}
               >
                 <MessageSquare className="h-4 w-4" />
-                Perguntar pro Chat
               </Button>
             </div>
+            {isAddingTag && (
+              <div className="flex items-center gap-2">
+                <Input
+                  value={tagName}
+                  onChange={(e) => setTagName(e.target.value)}
+                  placeholder="Nome da tag..."
+                  className="h-8 text-sm"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleAddTag();
+                    } else if (e.key === 'Escape') {
+                      setIsAddingTag(false);
+                      setTagName("");
+                    }
+                  }}
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleAddTag}
+                  className="h-8"
+                >
+                  OK
+                </Button>
+              </div>
+            )}
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
