@@ -2,28 +2,41 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Book, Tag, Plus, X } from "lucide-react";
+import { Bookmark, Tag, Plus, X, ChevronDown, ChevronUp } from "lucide-react";
 import { Task } from "./TaskCard";
 import { RichTextEditor } from "./RichTextEditor";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface CreateTaskProps {
   onCreateTask: (task: Omit<Task, "id" | "completed" | "inProgress">) => void;
-  existingTags?: string[]; // Add this prop
+  existingTags?: string[];
+  onTagCreate?: (tag: string) => void;
 }
 
-export const CreateTask = ({ onCreateTask, existingTags = [] }: CreateTaskProps) => {
+export const CreateTask = ({ onCreateTask, existingTags = [], onTagCreate }: CreateTaskProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [reference, setReference] = useState("");
   const [newTag, setNewTag] = useState("");
   const [tags, setTags] = useState<string[]>([]);
+  const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
 
-  const handleAddTag = () => {
-    if (!newTag.trim() || tags.includes(newTag.trim())) return;
-    setTags([...tags, newTag.trim()]);
+  const handleAddTag = (tagToAdd: string = newTag.trim()) => {
+    if (!tagToAdd || tags.includes(tagToAdd)) return;
+    
+    setTags([...tags, tagToAdd]);
+    if (onTagCreate && !existingTags.includes(tagToAdd)) {
+      onTagCreate(tagToAdd);
+    }
     setNewTag("");
+    setIsTagDropdownOpen(false);
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
@@ -61,10 +74,15 @@ export const CreateTask = ({ onCreateTask, existingTags = [] }: CreateTaskProps)
     }
   };
 
+  const filteredTags = existingTags.filter(tag => 
+    tag.toLowerCase().includes(newTag.toLowerCase()) &&
+    !tags.includes(tag)
+  );
+
   return (
     <form onSubmit={handleSubmit} className="rounded-lg p-6">
       <div className="flex items-center gap-3 mb-4">
-        <Book className="h-5 w-5 text-primary" />
+        <Bookmark className="h-5 w-5 text-primary" />
         <Input
           placeholder="Adicionar novo estudo ou anotação..."
           value={title}
@@ -86,34 +104,56 @@ export const CreateTask = ({ onCreateTask, existingTags = [] }: CreateTaskProps)
           </div>
 
           <div className="space-y-4 mb-6">
-            <div className="flex items-center gap-3">
-              <Input
-                placeholder="Adicionar tag..."
-                value={newTag}
-                onChange={(e) => setNewTag(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleAddTag();
-                  }
-                }}
-                list="tag-suggestions"
-              />
-              {existingTags.length > 0 && (
-                <datalist id="tag-suggestions">
-                  {existingTags.map((tag) => (
-                    <option key={tag} value={tag} />
-                  ))}
-                </datalist>
+            <div className="relative">
+              <div className="flex items-center gap-3">
+                <div className="relative flex-1">
+                  <Input
+                    placeholder="Adicionar tag..."
+                    value={newTag}
+                    onChange={(e) => {
+                      setNewTag(e.target.value);
+                      setIsTagDropdownOpen(true);
+                    }}
+                    onFocus={() => setIsTagDropdownOpen(true)}
+                    className="pr-8"
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800 transition-transform"
+                    onClick={() => setIsTagDropdownOpen(!isTagDropdownOpen)}
+                  >
+                    {isTagDropdownOpen ? (
+                      <ChevronUp className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => handleAddTag()}
+                  disabled={!newTag.trim() || tags.includes(newTag.trim())}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              {isTagDropdownOpen && filteredTags.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg">
+                  <div className="py-1">
+                    {filteredTags.map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                        onClick={() => handleAddTag(tag)}
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               )}
-              <Button
-                type="button"
-                size="sm"
-                onClick={handleAddTag}
-                disabled={!newTag.trim() || tags.includes(newTag.trim())}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
             </div>
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-2">

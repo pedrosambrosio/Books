@@ -71,6 +71,12 @@ const Index = () => {
     });
   };
 
+  const handleTagCreate = (tag: string) => {
+    if (!allTags.includes(tag)) {
+      setAllTags(prev => [...prev, tag]);
+    }
+  };
+
   // Filter tasks based on current page
   const currentPageTasks = tasks.filter(task => task.pageNumber === currentPage);
 
@@ -170,7 +176,8 @@ const Index = () => {
         <AppSidebar 
           currentBook={currentBibleBook} 
           onPageSelect={handlePageSelect}
-          noteCounts={getNoteCounts()} // Pass note counts to sidebar
+          noteCounts={getNoteCounts()}
+          tags={allTags}
         />
         <ResizablePanelGroup 
           direction={isMobile ? "vertical" : "horizontal"} 
@@ -204,7 +211,11 @@ const Index = () => {
                     </TabsList>
                     <TabsContent value="personal">
                       <div className="space-y-6">
-                        <CreateTask onCreateTask={handleCreateTask} existingTags={allTags} />
+                        <CreateTask 
+                          onCreateTask={handleCreateTask} 
+                          existingTags={allTags}
+                          onTagCreate={handleTagCreate}
+                        />
                         
                         <div className="space-y-4">
                           {currentPageTasks.map((task) => (

@@ -35,9 +35,10 @@ interface AppSidebarProps {
     chapterNotes: number;
     pageNotes: number;
   };
+  tags?: string[];
 }
 
-export function AppSidebar({ currentBook, onPageSelect, noteCounts }: AppSidebarProps) {
+export function AppSidebar({ currentBook, onPageSelect, noteCounts, tags = [] }: AppSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
   const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
@@ -210,19 +211,19 @@ export function AppSidebar({ currentBook, onPageSelect, noteCounts }: AppSidebar
             </div>
             <SidebarGroupContent>
               <SidebarMenu>
-                {MOCK_TAGS.map((tag) => (
-                  <SidebarMenuItem key={tag.id}>
+                {tags.map((tag) => (
+                  <SidebarMenuItem key={tag}>
                     <SidebarMenuButton
                       className="w-full px-4 py-2 hover:bg-accent rounded-lg transition-colors"
                       onClick={() => {
                         toast({
                           title: "Tag selecionada",
-                          description: `Mostrando itens com a tag "${tag.name}"`,
+                          description: `Mostrando itens com a tag "${tag}"`,
                         });
                       }}
                     >
-                      <Tags className="h-4 w-4 mr-2" style={{ color: tag.color }} />
-                      <span>{tag.name}</span>
+                      <Tags className="h-4 w-4 mr-2" />
+                      <span>{tag}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
