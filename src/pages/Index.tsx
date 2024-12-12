@@ -13,6 +13,9 @@ import { Button } from "@/components/ui/button";
 import { Book as BookType } from "@/types/Book";
 import { GENESIS_CONTENT } from "@/data/bibleContent";
 import { cn } from "@/lib/utils";
+import { QuizDialog } from "@/components/quiz/QuizDialog";
+import { CHAPTER_QUIZZES } from "@/data/quizQuestions";
+import { QuizResult } from "@/types/Quiz";
 
 // Create Bible book structure with Genesis and Exodus
 const BIBLE_BOOK: BookType = {
@@ -58,6 +61,8 @@ const Index = () => {
   const [currentBibleBook, setCurrentBibleBook] = useState(BIBLE_BOOK);
   const [allTags, setAllTags] = useState<string[]>([]);
   const [tagCounts, setTagCounts] = useState<{ [key: string]: number }>({});
+  const [isQuizOpen, setIsQuizOpen] = useState(false);
+  const [chapterLevels, setChapterLevels] = useState<{ [chapterId: string]: QuizResult }>({});
 
   const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress" | "isPaused">) => {
     const task: Task = {
@@ -226,8 +231,14 @@ const Index = () => {
     const currentChapter = updatedBook.chapters[0];
     
     if (currentChapter && currentChapter.pages[currentPage - 1]) {
+      const wasCompletedBefore = currentChapter.pages[currentPage - 1].completed;
       currentChapter.pages[currentPage - 1].completed = !currentChapter.pages[currentPage - 1].completed;
       currentChapter.completedPages = currentChapter.pages.filter(page => page.completed).length;
+      
+      // If this is the last page and it wasn't completed before, open the quiz
+      if (currentPage === totalPages && !wasCompletedBefore && currentChapter.pages[currentPage - 1].completed) {
+        setIsQuizOpen(true);
+      }
     }
     
     updatedBook.completedChapters = updatedBook.chapters.filter(
@@ -240,6 +251,19 @@ const Index = () => {
     toast({
       title: currentChapter.pages[currentPage - 1].completed ? "Página marcada como concluída" : "Página marcada como pendente",
       description: `A página foi marcada como ${currentChapter.pages[currentPage - 1].completed ? "concluída" : "pendente"}.`,
+    });
+  };
+
+  const handleQuizComplete = (result: QuizResult) => {
+    setChapterLevels(prev => ({
+      ...prev,
+      [result.chapterId]: result
+    }));
+    setIsQuizOpen(false);
+    
+    toast({
+      title: "Quiz completado!",
+      description: `Você acertou ${result.score} de ${result.totalQuestions} questões.`,
     });
   };
 
@@ -259,6 +283,7 @@ const Index = () => {
           onPageSelect={handlePageSelect}
           noteCounts={getNoteCounts()}
           tags={sidebarTags}
+          chapterLevels={chapterLevels}
         />
         <ResizablePanelGroup 
           direction={isMobile ? "vertical" : "horizontal"} 
@@ -378,6 +403,13 @@ const Index = () => {
             </ScrollArea>
           </ResizablePanel>
         </ResizablePanelGroup>
+        <QuizDialog
+          isOpen={isQuizOpen}
+          onClose={() => setIsQuizOpen(false)}
+          questions={CHAPTER_QUIZZES[0].questions}
+          chapterId="genesis"
+          onComplete={handleQuizComplete}
+        />
       </div>
     </SidebarProvider>
   );
