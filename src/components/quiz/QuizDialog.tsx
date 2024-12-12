@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -55,6 +55,12 @@ export function QuizDialog({ isOpen, onClose, questions, chapterId, onComplete }
   const [showResults, setShowResults] = useState(false);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
 
+  useEffect(() => {
+    if (showResults && quizResult && (quizResult.level === 'mestre' || quizResult.level === 'avancado')) {
+      triggerConfetti();
+    }
+  }, [showResults, quizResult]);
+
   const handleAnswerSelect = (answerIndex: number) => {
     const newAnswers = [...answers];
     newAnswers[currentQuestionIndex] = answerIndex;
@@ -102,10 +108,6 @@ export function QuizDialog({ isOpen, onClose, questions, chapterId, onComplete }
       totalQuestions: questions.length,
       level
     };
-
-    if (level === 'mestre' || level === 'avancado') {
-      triggerConfetti();
-    }
 
     setQuizResult(result);
     setShowResults(true);
