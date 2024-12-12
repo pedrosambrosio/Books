@@ -8,7 +8,7 @@ export const BIBLE_BOOK: BookType = {
     {
       id: "genesis",
       number: 1,
-      title: "Genesis",
+      title: "Genesis",  // Title is now required
       pages: Array.from({ length: 3 }, (_, i) => ({
         id: `genesis-page-${i+1}`,
         number: i + 1,
@@ -20,7 +20,7 @@ export const BIBLE_BOOK: BookType = {
     {
       id: "exodus",
       number: 2,
-      title: "Exodus",
+      title: "Exodus",  // Title is now required
       pages: Array.from({ length: 2 }, (_, i) => ({
         id: `exodus-page-${i+1}`,
         number: i + 1,

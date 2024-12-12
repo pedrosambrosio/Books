@@ -8,7 +8,7 @@ export interface Page {
 export interface Chapter {
   id: string;
   number: number;
-  title?: string;
+  title: string;  // Changed from title?: string to title: string
   pages: Page[];
   completedPages?: number;
 }
