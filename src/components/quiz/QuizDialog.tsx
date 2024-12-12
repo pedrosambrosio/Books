@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Brain, Star, BookOpen, Lightbulb, Compass } from "lucide-react";
 import { QuizQuestion, QuizResult } from "@/types/Quiz";
 import { cn } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import confetti from 'canvas-confetti';
 
 interface QuizDialogProps {
   isOpen: boolean;
@@ -50,14 +50,68 @@ const LEVEL_CONFIG = {
 };
 
 export function QuizDialog({ isOpen, onClose, questions, chapterId, onComplete }: QuizDialogProps) {
-  const [currentAnswers, setCurrentAnswers] = useState<number[]>(Array(questions.length).fill(-1));
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState<number[]>(Array(questions.length).fill(-1));
   const [showResults, setShowResults] = useState(false);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
 
-  const handleAnswerSelect = (questionIndex: number, answerIndex: number) => {
-    const newAnswers = [...currentAnswers];
-    newAnswers[questionIndex] = answerIndex;
-    setCurrentAnswers(newAnswers);
+  const handleAnswerSelect = (answerIndex: number) => {
+    const newAnswers = [...answers];
+    newAnswers[currentQuestionIndex] = answerIndex;
+    setAnswers(newAnswers);
+  };
+
+  const handleNext = () => {
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+    } else {
+      calculateResults();
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(prev => prev - 1);
+    }
+  };
+
+  const triggerConfetti = () => {
+    // Left side confetti
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { x: 0, y: 0.6 }
+    });
+
+    // Right side confetti
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { x: 1, y: 0.6 }
+    });
+  };
+
+  const calculateResults = () => {
+    const score = answers.reduce((acc, answer, index) => {
+      return acc + (answer === questions[index].correctAnswer ? 1 : 0);
+    }, 0);
+
+    const level = calculateLevel(score, questions.length);
+    
+    const result: QuizResult = {
+      chapterId,
+      score,
+      totalQuestions: questions.length,
+      level
+    };
+
+    if (level === 'mestre' || level === 'avancado') {
+      triggerConfetti();
+    }
+
+    setQuizResult(result);
+    setShowResults(true);
+    onComplete(result);
   };
 
   const calculateLevel = (score: number, total: number): QuizResult['level'] => {
@@ -69,29 +123,15 @@ export function QuizDialog({ isOpen, onClose, questions, chapterId, onComplete }
     return 'explorador';
   };
 
-  const handleSubmit = () => {
-    const score = currentAnswers.reduce((acc, answer, index) => {
-      return acc + (answer === questions[index].correctAnswer ? 1 : 0);
-    }, 0);
-
-    const result: QuizResult = {
-      chapterId,
-      score,
-      totalQuestions: questions.length,
-      level: calculateLevel(score, questions.length)
-    };
-
-    setQuizResult(result);
-    setShowResults(true);
-    onComplete(result);
-  };
-
   const resetQuiz = () => {
-    setCurrentAnswers(Array(questions.length).fill(-1));
+    setCurrentQuestionIndex(0);
+    setAnswers(Array(questions.length).fill(-1));
     setShowResults(false);
     setQuizResult(null);
     onClose();
   };
+
+  const currentQuestion = questions[currentQuestionIndex];
 
   return (
     <Dialog open={isOpen} onOpenChange={resetQuiz}>
@@ -104,31 +144,40 @@ export function QuizDialog({ isOpen, onClose, questions, chapterId, onComplete }
 
         {!showResults ? (
           <div className="space-y-6">
-            {questions.map((question, index) => (
-              <div key={question.id} className="space-y-4">
-                <p className="font-medium">
-                  {index + 1}. {question.question}
-                </p>
-                <RadioGroup
-                  value={currentAnswers[index].toString()}
-                  onValueChange={(value) => handleAnswerSelect(index, parseInt(value))}
-                >
-                  {question.options.map((option, optionIndex) => (
-                    <div key={optionIndex} className="flex items-center space-x-2">
-                      <RadioGroupItem value={optionIndex.toString()} id={`q${index}-a${optionIndex}`} />
-                      <Label htmlFor={`q${index}-a${optionIndex}`}>{option}</Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-              </div>
-            ))}
-            <Button
-              onClick={handleSubmit}
-              disabled={currentAnswers.some((answer) => answer === -1)}
-              className="w-full"
-            >
-              Enviar Respostas
-            </Button>
+            <div className="text-sm text-muted-foreground mb-4">
+              Questão {currentQuestionIndex + 1} de {questions.length}
+            </div>
+            
+            <div className="space-y-4">
+              <p className="font-medium">{currentQuestion.question}</p>
+              <RadioGroup
+                value={answers[currentQuestionIndex].toString()}
+                onValueChange={(value) => handleAnswerSelect(parseInt(value))}
+              >
+                {currentQuestion.options.map((option, optionIndex) => (
+                  <div key={optionIndex} className="flex items-center space-x-2">
+                    <RadioGroupItem value={optionIndex.toString()} id={`q${currentQuestionIndex}-a${optionIndex}`} />
+                    <Label htmlFor={`q${currentQuestionIndex}-a${optionIndex}`}>{option}</Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </div>
+
+            <div className="flex justify-between mt-6">
+              <Button
+                variant="outline"
+                onClick={handlePrevious}
+                disabled={currentQuestionIndex === 0}
+              >
+                Anterior
+              </Button>
+              <Button
+                onClick={handleNext}
+                disabled={answers[currentQuestionIndex] === -1}
+              >
+                {currentQuestionIndex === questions.length - 1 ? "Finalizar" : "Próxima"}
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="space-y-6">
