@@ -24,6 +24,13 @@ export function SidebarTags({ tags = [] }: SidebarTagsProps) {
     });
   };
 
+  // Filter out tags with zero count
+  const activeTags = tags.filter(tag => tag.count > 0);
+
+  if (activeTags.length === 0) {
+    return null;
+  }
+
   return (
     <SidebarGroup>
       <div className="flex items-center justify-between px-4 py-2">
@@ -39,29 +46,27 @@ export function SidebarTags({ tags = [] }: SidebarTagsProps) {
       </div>
       <SidebarGroupContent>
         <SidebarMenu>
-          {tags
-            .filter(tag => tag.count > 0)
-            .map((tag) => (
-              <SidebarMenuItem key={tag.name}>
-                <SidebarMenuButton
-                  className="w-full px-4 py-2 hover:bg-accent rounded-lg transition-colors flex items-center justify-between"
-                  onClick={() => {
-                    toast({
-                      title: "Tag selecionada",
-                      description: `Mostrando itens com a tag "${tag.name}"`,
-                    });
-                  }}
-                >
-                  <div className="flex items-center">
-                    <Tags className="h-4 w-4 mr-2" />
-                    <span>{tag.name}</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                    {tag.count}
-                  </span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
+          {activeTags.map((tag) => (
+            <SidebarMenuItem key={tag.name}>
+              <SidebarMenuButton
+                className="w-full px-4 py-2 hover:bg-accent rounded-lg transition-colors flex items-center justify-between"
+                onClick={() => {
+                  toast({
+                    title: "Tag selecionada",
+                    description: `Mostrando itens com a tag "${tag.name}"`,
+                  });
+                }}
+              >
+                <div className="flex items-center">
+                  <Tags className="h-4 w-4 mr-2" />
+                  <span>{tag.name}</span>
+                </div>
+                <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                  {tag.count}
+                </span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
