@@ -4,12 +4,15 @@ import { TaskCard, Task } from "@/components/TaskCard";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { ContentViewer } from "@/components/content/ContentViewer";
+import { Star, ArrowLeft, ArrowRight, Check, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Book as BookType } from "@/types/Book";
 import { GENESIS_CONTENT } from "@/data/bibleContent";
+import { cn } from "@/lib/utils";
 import { QuizDialog } from "@/components/quiz/QuizDialog";
 import { CHAPTER_QUIZZES } from "@/data/quizQuestions";
 import { QuizResult } from "@/types/Quiz";
@@ -272,39 +275,6 @@ const Index = () => {
       count
     }));
 
-  const handleAskAI = (selectedText: string) => {
-    setTasks((prev) => [
-      {
-        id: crypto.randomUUID(),
-        title: "Pergunta para IA",
-        content: `Me explique sobre esse trecho: "${selectedText}"`,
-        completed: false,
-        inProgress: false,
-        isPaused: false,
-        category: "chat",
-        pageNumber: currentPage,
-      },
-      ...prev,
-    ]);
-  };
-
-  const handleCreateNote = (selectedText: string) => {
-    setTasks((prev) => [
-      {
-        id: crypto.randomUUID(),
-        title: "",
-        content: "",
-        reference: selectedText,
-        completed: false,
-        inProgress: false,
-        isPaused: false,
-        category: "note",
-        pageNumber: currentPage,
-      },
-      ...prev,
-    ]);
-  };
-
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full bg-gradient-to-b from-background to-muted/20">
@@ -320,71 +290,117 @@ const Index = () => {
           className="h-screen flex-1"
         >
           <ResizablePanel defaultSize={50} minSize={30} className="h-full">
-            <Tabs defaultValue="personal" className="w-full h-full">
-              <TabsList className="grid w-full grid-cols-2 h-auto mb-6">
-                <TabsTrigger value="personal">
-                  Minhas Notas
-                </TabsTrigger>
-                <TabsTrigger value="chat">
-                  Chat
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="personal" className="h-full">
-                <div className="p-4 md:p-6 space-y-6">
-                  <CreateTask 
-                    onCreateTask={handleCreateTask} 
-                    existingTags={allTags}
-                    onTagCreate={handleTagCreate}
-                  />
-                  
-                  <div className="space-y-4">
-                    {tasks
-                      .filter(task => task.pageNumber === currentPage && task.category !== "chat")
-                      .map((task) => (
-                        <TaskCard
-                          key={task.id}
-                          task={task}
-                          onUpdate={handleUpdateTask}
-                          onComplete={handleCompleteTask}
-                          onDelete={handleDeleteTask}
-                        />
-                      ))}
+            <ScrollArea className="h-full">
+              <div className="p-4 md:p-6 flex justify-center">
+                <div className="w-full max-w-2xl">
+                  <div className="text-center animate-fade-in mb-8">
+                    <h1 className="text-3xl md:text-4xl font-bold mb-4">Anote ou Pesquise..</h1>
+                    <p className="text-muted-foreground">
+                      Organize seu estudo e aprendizado
+                    </p>
                   </div>
-                </div>
-              </TabsContent>
 
-              <TabsContent value="chat" className="h-full">
-                <div className="p-4 space-y-4">
-                  {tasks
-                    .filter(task => task.category === "chat")
-                    .map((task) => (
-                      <TaskCard
-                        key={task.id}
-                        task={task}
-                        onUpdate={handleUpdateTask}
-                        onComplete={handleCompleteTask}
-                        onDelete={handleDeleteTask}
-                      />
-                    ))}
+                  <Tabs defaultValue="personal" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2 h-auto mb-6">
+                      <TabsTrigger 
+                        value="personal"
+                        className="data-[state=active]:bg-white data-[state=active]:text-black px-6 py-3"
+                      >
+                        Minhas Notas
+                      </TabsTrigger>
+                      <TabsTrigger 
+                        value="chat"
+                        className="data-[state=active]:bg-white data-[state=active]:text-black px-6 py-3 flex items-center gap-2"
+                      >
+                        Chat <Sparkles className="h-4 w-4" />
+                      </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="personal">
+                      <div className="space-y-6">
+                        <CreateTask 
+                          onCreateTask={handleCreateTask} 
+                          existingTags={allTags}
+                          onTagCreate={handleTagCreate}
+                        />
+                        
+                        <div className="space-y-4">
+                          {tasks
+                            .filter(task => task.pageNumber === currentPage)
+                            .map((task) => (
+                              <div key={task.id} className="animate-fade-in">
+                                <TaskCard
+                                  task={task}
+                                  onUpdate={handleUpdateTask}
+                                  onComplete={handleCompleteTask}
+                                  onDelete={handleDeleteTask}
+                                />
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    </TabsContent>
+                    <TabsContent value="chat">
+                      <div className="p-6 text-center text-muted-foreground">
+                        Chat em breve...
+                      </div>
+                    </TabsContent>
+                  </Tabs>
                 </div>
-              </TabsContent>
-            </Tabs>
+              </div>
+            </ScrollArea>
           </ResizablePanel>
           
           <ResizableHandle withHandle />
           
           <ResizablePanel defaultSize={50} minSize={30} className="h-full">
-            <ContentViewer
-              content={getCurrentPageContent()}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              isBookCompleted={isBookCompleted}
-              onPageChange={(page) => page > currentPage ? handleNextPage() : handlePreviousPage()}
-              onMarkAsCompleted={handleMarkAsCompleted}
-              onAskAI={handleAskAI}
-              onCreateNote={handleCreateNote}
-            />
+            <ScrollArea className="h-full">
+              <div className="p-4 md:p-6 flex justify-center">
+                <div className="w-full max-w-2xl">
+                  <div className="glass-card h-full rounded-lg p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-2xl font-semibold">Gênesis</h2>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={handlePreviousPage}
+                          disabled={currentPage === 1}
+                        >
+                          <ArrowLeft className="h-4 w-4" />
+                        </Button>
+                        <span className="text-sm text-muted-foreground">
+                          {currentPage} / {totalPages}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={handleNextPage}
+                          disabled={currentPage === totalPages}
+                        >
+                          <ArrowRight className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={handleMarkAsCompleted}
+                          className={cn(
+                            "transition-colors",
+                            isBookCompleted 
+                              ? "text-[#09090B]" 
+                              : "text-[#F4F4F5]"
+                          )}
+                        >
+                          <Check className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="prose prose-sm max-w-none whitespace-pre-line">
+                      {getCurrentPageContent()}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ScrollArea>
           </ResizablePanel>
         </ResizablePanelGroup>
         <QuizDialog
