@@ -52,6 +52,7 @@ export const VerseDisplay = ({ verse, text, onCreateNote }: VerseDisplayProps) =
     setTagName("");
     setIsAddingTag(false);
     setHasTag(true);
+    setIsTooltipOpen(false);
   };
 
   const handleRemoveTag = () => {
@@ -80,60 +81,30 @@ export const VerseDisplay = ({ verse, text, onCreateNote }: VerseDisplayProps) =
     setIsTooltipOpen(false);
   };
 
+  const handleTooltipOpenChange = (open: boolean) => {
+    if (!open) {
+      setIsAddingTag(false);
+      setTagName("");
+    }
+    setIsTooltipOpen(open);
+  };
+
   return (
     <div className="flex gap-2 mb-2">
       <TooltipProvider>
-        <Tooltip open={isTooltipOpen} onOpenChange={setIsTooltipOpen}>
+        <Tooltip open={isTooltipOpen} onOpenChange={handleTooltipOpenChange}>
           <TooltipTrigger asChild>
             <Button
               variant="ghost"
               size="sm"
               className="text-sm font-semibold text-zinc-500 hover:text-zinc-800 min-w-[2rem] h-6 px-1"
+              onClick={() => setIsTooltipOpen(!isTooltipOpen)}
             >
               {verse}
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="right" className="w-48 p-2">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="p-2 hover:bg-gray-100"
-                onClick={handleCreateNote}
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
-
-              {hasTag ? (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="p-2 hover:bg-gray-100"
-                  onClick={handleRemoveTag}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              ) : (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="p-2 hover:bg-gray-100"
-                  onClick={() => setIsAddingTag(true)}
-                >
-                  <Tag className="h-4 w-4" />
-                </Button>
-              )}
-
-              <Button
-                variant="ghost"
-                size="sm"
-                className="p-2 hover:bg-gray-100"
-                onClick={handleAskChat}
-              >
-                <MessageSquare className="h-4 w-4" />
-              </Button>
-            </div>
-            {isAddingTag && (
+          <TooltipContent side="right" className="p-3 flex flex-col gap-2">
+            {isAddingTag ? (
               <div className="flex items-center gap-2">
                 <Input
                   value={tagName}
@@ -157,6 +128,46 @@ export const VerseDisplay = ({ verse, text, onCreateNote }: VerseDisplayProps) =
                   className="h-8"
                 >
                   OK
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                {hasTag ? (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="p-2 hover:bg-gray-100"
+                    onClick={handleRemoveTag}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="p-2 hover:bg-gray-100"
+                    onClick={() => setIsAddingTag(true)}
+                  >
+                    <Tag className="h-4 w-4" />
+                  </Button>
+                )}
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="p-2 hover:bg-gray-100"
+                  onClick={handleCreateNote}
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="p-2 hover:bg-gray-100"
+                  onClick={handleAskChat}
+                >
+                  <MessageSquare className="h-4 w-4" />
                 </Button>
               </div>
             )}
