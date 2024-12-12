@@ -52,7 +52,6 @@ export const VerseDisplay = ({ verse, text, onCreateNote }: VerseDisplayProps) =
     setTagName("");
     setIsAddingTag(false);
     setHasTag(true);
-    setIsTooltipOpen(false);
   };
 
   const handleRemoveTag = () => {
@@ -103,35 +102,25 @@ export const VerseDisplay = ({ verse, text, onCreateNote }: VerseDisplayProps) =
               {verse}
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="right" className="p-3 flex flex-col gap-2">
+          <TooltipContent side="right" className="p-2">
             {isAddingTag ? (
-              <div className="flex items-center gap-2">
-                <Input
-                  value={tagName}
-                  onChange={(e) => setTagName(e.target.value)}
-                  placeholder="Nome da tag..."
-                  className="h-8 text-sm"
-                  autoFocus
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleAddTag();
-                    } else if (e.key === 'Escape') {
-                      setIsAddingTag(false);
-                      setTagName("");
-                    }
-                  }}
-                />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleAddTag}
-                  className="h-8"
-                >
-                  OK
-                </Button>
-              </div>
+              <Input
+                value={tagName}
+                onChange={(e) => setTagName(e.target.value)}
+                placeholder="Nome da tag..."
+                className="h-8 text-sm min-w-[150px]"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleAddTag();
+                  } else if (e.key === 'Escape') {
+                    setIsAddingTag(false);
+                    setTagName("");
+                  }
+                }}
+              />
             ) : (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 {hasTag ? (
                   <Button
                     variant="ghost"
