@@ -14,8 +14,8 @@ export function ProfileMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Avatar className="h-9 w-9 cursor-pointer">
-          <AvatarImage src="/placeholder.svg" alt="Profile" />
-          <AvatarFallback>U</AvatarFallback>
+          <AvatarImage src="https://github.com/shadcn.png" alt="Profile" />
+          <AvatarFallback>CN</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end">

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Book, ChevronDown, ChevronRight, Tag, Check, Search } from "lucide-react";
+import { Book, ChevronDown, Tag, Search } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -24,6 +24,7 @@ import { QuizResult } from "@/types/Quiz";
 import { LevelIcon } from "@/components/quiz/LevelIcon";
 import { SearchInput } from "@/components/search/SearchInput";
 import { ProfileMenu } from "@/components/profile/ProfileMenu";
+import { Badge } from "@/components/ui/badge";
 
 interface AppSidebarProps {
   currentBook: BookType;
@@ -35,7 +36,7 @@ interface AppSidebarProps {
   };
   tags?: { name: string; count: number }[];
   chapterLevels?: { [chapterId: string]: QuizResult };
-  onViewChange?: (view: 'books' | 'tags') => void;
+  onViewChange?: (view: 'books' | 'tags' | 'library') => void;
 }
 
 export function AppSidebar({ 
@@ -54,6 +55,7 @@ export function AppSidebar({
   const handlePageClick = (pageNumber: number) => {
     if (onPageSelect) {
       onPageSelect(pageNumber);
+      onViewChange?.('books');
       toast({
         title: "Página selecionada",
         description: `Navegando para a página ${pageNumber}`,
@@ -61,7 +63,6 @@ export function AppSidebar({
     }
   };
 
-  // Filter books based on search query
   const filteredBooks = [currentBook].filter(book => 
     book.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -79,13 +80,29 @@ export function AppSidebar({
               <Button
                 variant="ghost"
                 className="p-0 h-auto hover:bg-transparent"
-                onClick={() => onViewChange?.('books')}
+                onClick={() => onViewChange?.('library')}
               >
                 <SidebarGroupLabel className="cursor-pointer hover:text-primary transition-colors">
-                  Livros
+                  Biblioteca
                 </SidebarGroupLabel>
               </Button>
-              <SearchInput onSearch={setSearchQuery} />
+            </div>
+          </SidebarGroup>
+
+          <SidebarGroup>
+            <div className="flex items-center justify-between px-4 py-2">
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  className="p-0 h-auto hover:bg-transparent"
+                  onClick={() => onViewChange?.('books')}
+                >
+                  <SidebarGroupLabel className="cursor-pointer hover:text-primary transition-colors">
+                    Livros
+                  </SidebarGroupLabel>
+                </Button>
+                <SearchInput onSearch={setSearchQuery} />
+              </div>
             </div>
             <SidebarGroupContent>
               <SidebarMenu>
@@ -103,12 +120,9 @@ export function AppSidebar({
                           <Book className="h-4 w-4 mr-2" />
                         )}
                         <span className={expandedBook === book.id ? "text-[#09090B]" : "text-[#71717A]"}>{book.title}</span>
-                        <div className="ml-auto flex items-center gap-2">
-                          <span className="text-xs text-muted-foreground">
+                        <div className="ml-auto">
+                          <span className="text-xs bg-muted px-2 py-0.5 rounded-full">
                             notas {noteCounts?.bookNotes || 0}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {book.completedChapters}/{book.chapters.length}
                           </span>
                         </div>
                       </SidebarMenuButton>
@@ -125,6 +139,7 @@ export function AppSidebar({
                               <Button
                                 variant="ghost"
                                 className="w-full justify-start text-sm"
+                                onClick={() => onViewChange?.('books')}
                               >
                                 {expandedChapter === chapter.id ? (
                                   <ChevronDown className="h-4 w-4 mr-2" />
@@ -138,9 +153,6 @@ export function AppSidebar({
                                   )}
                                   <span className="text-xs bg-muted px-2 py-0.5 rounded-full">
                                     {noteCounts?.chapterNotes || 0}
-                                  </span>
-                                  <span className="text-xs text-muted-foreground">
-                                    {chapter.completedPages}/{chapter.pages.length}
                                   </span>
                                 </div>
                               </Button>
@@ -156,7 +168,6 @@ export function AppSidebar({
                                   >
                                     <span className="flex items-center gap-2">
                                       Página {page.number}
-                                      {page.completed && <Check className="h-4 w-4" />}
                                       <span className="text-xs bg-muted px-2 py-0.5 rounded-full ml-auto">
                                         {noteCounts?.pageNotes || 0}
                                       </span>
@@ -185,9 +196,9 @@ export function AppSidebar({
                 <SidebarGroupLabel className="cursor-pointer hover:text-primary transition-colors flex items-center gap-2">
                   Tags
                   {tags.length > 0 && (
-                    <span className="text-xs bg-muted px-2 py-0.5 rounded-full">
+                    <Badge variant="secondary" className="ml-2">
                       {tags.length}
-                    </span>
+                    </Badge>
                   )}
                 </SidebarGroupLabel>
               </Button>

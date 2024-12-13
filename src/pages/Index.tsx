@@ -18,6 +18,7 @@ import { CHAPTER_QUIZZES } from "@/data/quizQuestions";
 import { QuizResult } from "@/types/Quiz";
 import { ContentViewer } from "@/components/ContentViewer";
 import { TagPanel } from "@/components/TagPanel";
+import { LibraryPanel } from "@/components/LibraryPanel";
 
 const BIBLE_BOOK: BookType = {
   id: "bible",
@@ -66,7 +67,7 @@ const Index = () => {
   const [chapterLevels, setChapterLevels] = useState<{ [chapterId: string]: QuizResult }>({});
   const [isCreatingNoteFromSelection, setIsCreatingNoteFromSelection] = useState(false);
   const [selectedTextReference, setSelectedTextReference] = useState("");
-  const [currentView, setCurrentView] = useState<'books' | 'tags'>('books');
+  const [currentView, setCurrentView] = useState<'books' | 'tags' | 'library'>('books');
 
   const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress" | "isPaused">) => {
     const task: Task = {
@@ -392,9 +393,13 @@ const Index = () => {
               </ScrollArea>
             </ResizablePanel>
           </ResizablePanelGroup>
-        ) : (
+        ) : currentView === 'tags' ? (
           <div className="flex-1">
             <TagPanel tags={sidebarTags} tasks={tasks} />
+          </div>
+        ) : (
+          <div className="flex-1">
+            <LibraryPanel books={[currentBibleBook]} />
           </div>
         )}
 
