@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Book, ChevronDown, ChevronRight, Plus, Tag, Tags, Check } from "lucide-react";
+import { Book, ChevronDown, ChevronRight, Tag, Tags, Check, Search } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -10,7 +10,6 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarInput,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -20,7 +19,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Book as BookType, Tag as TagType } from "@/types/Book";
+import { Book as BookType } from "@/types/Book";
 import { QuizResult } from "@/types/Quiz";
 import { LevelIcon } from "@/components/quiz/LevelIcon";
 
@@ -50,20 +49,6 @@ export function AppSidebar({
   const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const handleCreateBook = (title: string, type: 'bible' | 'regular' = 'regular') => {
-    toast({
-      title: "Livro adicionado",
-      description: `"${title}" foi adicionado à sua biblioteca`,
-    });
-  };
-
-  const handleCreateTag = (name: string) => {
-    toast({
-      title: "Tag criada",
-      description: `Tag "${name}" foi criada com sucesso`,
-    });
-  };
-
   const handlePageClick = (pageNumber: number) => {
     if (onPageSelect) {
       onPageSelect(pageNumber);
@@ -81,19 +66,8 @@ export function AppSidebar({
 
   return (
     <Sidebar className="w-[var(--sidebar-width)] min-w-[200px] border-r border-border">
-      <SidebarHeader>
-        <div className="flex items-center gap-2 p-4">
-          <SidebarInput
-            type="text"
-            placeholder="Pesquisar livros..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1"
-          />
-        </div>
-      </SidebarHeader>
       <SidebarContent>
-        <ScrollArea className="h-[calc(100vh-5rem)]">
+        <ScrollArea className="h-[calc(100vh-2rem)]">
           <SidebarGroup>
             <div className="flex items-center justify-between px-4 py-2">
               <Button
@@ -105,21 +79,19 @@ export function AppSidebar({
                   Livros
                 </SidebarGroupLabel>
               </Button>
-              <div className="flex items-center gap-2">
-                {noteCounts && (
-                  <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                    {noteCounts.bookNotes} notas
-                  </span>
-                )}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-5 w-5"
-                  onClick={() => handleCreateBook("Novo Livro")}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-5 w-5"
+                onClick={() => {
+                  toast({
+                    title: "Buscar livros",
+                    description: "Funcionalidade de busca em desenvolvimento.",
+                  });
+                }}
+              >
+                <Search className="h-4 w-4" />
+              </Button>
             </div>
             <SidebarGroupContent>
               <SidebarMenu>
@@ -136,11 +108,10 @@ export function AppSidebar({
                         ) : (
                           <ChevronRight className="h-4 w-4 mr-2" />
                         )}
-                        <Book className="h-4 w-4 mr-2" />
                         <span className={expandedBook === book.id ? "text-[#09090B]" : "text-[#71717A]"}>{book.title}</span>
                         <div className="ml-auto flex items-center gap-2">
-                          <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                            {noteCounts?.bookNotes}
+                          <span className="text-xs text-muted-foreground">
+                            notas {noteCounts?.bookNotes || 0}
                           </span>
                           <span className="text-xs text-muted-foreground">
                             {book.completedChapters}/{book.chapters.length}
@@ -171,8 +142,8 @@ export function AppSidebar({
                                   {chapterLevels[chapter.id] && (
                                     <LevelIcon level={chapterLevels[chapter.id].level} />
                                   )}
-                                  <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                                    {noteCounts?.chapterNotes}
+                                  <span className="text-xs text-muted-foreground">
+                                    notas {noteCounts?.chapterNotes || 0}
                                   </span>
                                   <span className="text-xs text-muted-foreground">
                                     {chapter.completedPages}/{chapter.pages.length}
@@ -192,8 +163,8 @@ export function AppSidebar({
                                     <span className="flex items-center gap-2">
                                       Página {page.number}
                                       {page.completed && <Check className="h-4 w-4" />}
-                                      <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full ml-auto">
-                                        {noteCounts?.pageNotes}
+                                      <span className="text-xs text-muted-foreground ml-auto">
+                                        notas {noteCounts?.pageNotes || 0}
                                       </span>
                                     </span>
                                   </Button>
@@ -220,14 +191,6 @@ export function AppSidebar({
                 <SidebarGroupLabel className="cursor-pointer hover:text-primary transition-colors">
                   Tags
                 </SidebarGroupLabel>
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-5 w-5"
-                onClick={() => handleCreateTag("Nova Tag")}
-              >
-                <Plus className="h-4 w-4" />
               </Button>
             </div>
             <SidebarGroupContent>

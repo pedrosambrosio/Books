@@ -19,10 +19,10 @@ export const TagPanel = ({ tags, tasks }: TagPanelProps) => {
     : tasks;
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="space-y-4">
-        <h1 className="text-3xl font-bold">Tags</h1>
-        <p className="text-muted-foreground">
+    <div className="container mx-auto px-12 py-6 space-y-6">
+      <div className="space-y-4 max-w-3xl mx-auto">
+        <h1 className="text-3xl font-bold text-center">Tags</h1>
+        <p className="text-muted-foreground text-center">
           Descubra e organize suas anotações por tags
         </p>
         
@@ -38,8 +38,16 @@ export const TagPanel = ({ tags, tasks }: TagPanelProps) => {
       </div>
 
       <ScrollArea className="h-[calc(100vh-15rem)]">
-        <div className="space-y-6">
-          <div className="flex flex-wrap gap-2">
+        <div className="space-y-6 max-w-6xl mx-auto">
+          <div className="flex flex-wrap gap-2 justify-center">
+            <Badge
+              variant={selectedTag === null ? "default" : "secondary"}
+              className="cursor-pointer px-3 py-1 hover:bg-accent"
+              onClick={() => setSelectedTag(null)}
+            >
+              <TagIcon className="h-3 w-3 mr-1" />
+              Tudo
+            </Badge>
             {tags
               .filter(tag => 
                 tag.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -58,7 +66,7 @@ export const TagPanel = ({ tags, tasks }: TagPanelProps) => {
               ))}
           </div>
 
-          <div className="grid gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {filteredTasks.map((task) => (
               <TaskCard
                 key={task.id}
