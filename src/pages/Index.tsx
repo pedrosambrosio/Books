@@ -304,75 +304,73 @@ const Index = () => {
         >
           <ResizablePanel defaultSize={50} minSize={30} className="h-full">
             <ScrollArea className="h-full">
-              <div className="p-4 md:p-6 flex justify-center">
-                <div className="w-full max-w-2xl">
-                  {currentView === 'books' ? (
-                    <>
-                      <div className="text-center animate-fade-in mb-8">
-                        <h1 className="text-3xl md:text-4xl font-bold mb-4">Anote ou Pesquise..</h1>
-                        <p className="text-muted-foreground">
-                          Organize seu estudo e aprendizado
-                        </p>
-                      </div>
+              {currentView === 'books' ? (
+                <div className="p-4 md:p-6 flex justify-center">
+                  <div className="w-full max-w-2xl">
+                    <div className="text-center animate-fade-in mb-8">
+                      <h1 className="text-3xl md:text-4xl font-bold mb-4">Anote ou Pesquise..</h1>
+                      <p className="text-muted-foreground">
+                        Organize seu estudo e aprendizado
+                      </p>
+                    </div>
 
-                      <Tabs defaultValue="personal" className="w-full">
-                        <TabsList className="grid w-full grid-cols-2 h-auto mb-6">
-                          <TabsTrigger 
-                            value="personal"
-                            className="data-[state=active]:bg-white data-[state=active]:text-black px-6 py-3"
-                          >
-                            Minhas Notas
-                          </TabsTrigger>
-                          <TabsTrigger 
-                            value="chat"
-                            className="data-[state=active]:bg-white data-[state=active]:text-black px-6 py-3 flex items-center gap-2"
-                          >
-                            Chat <Sparkles className="h-4 w-4" />
-                          </TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="personal">
-                          <div className="space-y-6">
-                            <div className="create-task-form">
-                              <CreateTask 
-                                onCreateTask={handleCreateTask} 
-                                existingTags={allTags}
-                                onTagCreate={handleTagCreate}
-                                initialReference={isCreatingNoteFromSelection ? selectedTextReference : ""}
-                                onAfterSubmit={() => {
-                                  setIsCreatingNoteFromSelection(false);
-                                  setSelectedTextReference("");
-                                }}
-                              />
-                            </div>
-                            
-                            <div className="space-y-4">
-                              {tasks
-                                .filter(task => task.pageNumber === currentPage)
-                                .map((task) => (
-                                  <div key={task.id} className="animate-fade-in">
-                                    <TaskCard
-                                      task={task}
-                                      onUpdate={handleUpdateTask}
-                                      onComplete={handleCompleteTask}
-                                      onDelete={handleDeleteTask}
-                                    />
-                                  </div>
-                                ))}
-                            </div>
+                    <Tabs defaultValue="personal" className="w-full">
+                      <TabsList className="grid w-full grid-cols-2 h-auto mb-6">
+                        <TabsTrigger 
+                          value="personal"
+                          className="data-[state=active]:bg-white data-[state=active]:text-black px-6 py-3"
+                        >
+                          Minhas Notas
+                        </TabsTrigger>
+                        <TabsTrigger 
+                          value="chat"
+                          className="data-[state=active]:bg-white data-[state=active]:text-black px-6 py-3 flex items-center gap-2"
+                        >
+                          Chat <Sparkles className="h-4 w-4" />
+                        </TabsTrigger>
+                      </TabsList>
+                      <TabsContent value="personal">
+                        <div className="space-y-6">
+                          <div className="create-task-form">
+                            <CreateTask 
+                              onCreateTask={handleCreateTask} 
+                              existingTags={allTags}
+                              onTagCreate={handleTagCreate}
+                              initialReference={isCreatingNoteFromSelection ? selectedTextReference : ""}
+                              onAfterSubmit={() => {
+                                setIsCreatingNoteFromSelection(false);
+                                setSelectedTextReference("");
+                              }}
+                            />
                           </div>
-                        </TabsContent>
-                        <TabsContent value="chat">
-                          <div className="p-6 text-center text-muted-foreground">
-                            Chat em breve...
+                          
+                          <div className="space-y-4">
+                            {tasks
+                              .filter(task => task.pageNumber === currentPage)
+                              .map((task) => (
+                                <div key={task.id} className="animate-fade-in">
+                                  <TaskCard
+                                    task={task}
+                                    onUpdate={handleUpdateTask}
+                                    onComplete={handleCompleteTask}
+                                    onDelete={handleDeleteTask}
+                                  />
+                                </div>
+                              ))}
                           </div>
-                        </TabsContent>
-                      </Tabs>
-                    </>
-                  ) : (
-                    <TagPanel tags={sidebarTags} tasks={tasks} />
-                  )}
+                        </div>
+                      </TabsContent>
+                      <TabsContent value="chat">
+                        <div className="p-6 text-center text-muted-foreground">
+                          Chat em breve...
+                        </div>
+                      </TabsContent>
+                    </Tabs>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <TagPanel tags={sidebarTags} tasks={tasks} />
+              )}
             </ScrollArea>
           </ResizablePanel>
           
