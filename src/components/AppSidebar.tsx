@@ -215,17 +215,14 @@ export function AppSidebar({
           </SidebarGroup>
 
           <div className="absolute bottom-4 left-0 right-0 px-4">
-            <div className="flex items-center justify-between p-2 rounded-lg border border-border">
-              <span className="text-sm font-medium">
-                {isDarkMode ? "Tema escuro" : "Tema claro"}
-              </span>
+            <div className="flex items-center justify-center p-2 rounded-lg border border-border">
               <div className="flex items-center gap-2">
-                <Sun className="h-4 w-4" />
+                <Sun className="h-4 w-4 dark:text-white transition-colors" />
                 <Switch
                   checked={isDarkMode}
                   onCheckedChange={toggleTheme}
                 />
-                <Moon className="h-4 w-4" />
+                <Moon className="h-4 w-4 dark:text-white transition-colors" />
               </div>
             </div>
           </div>
