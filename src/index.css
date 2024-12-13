@@ -28,6 +28,28 @@
     --ring: 240 10% 3.9%;
     --radius: 0.75rem;
   }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+  }
  
   * {
     @apply border-border;
@@ -67,11 +89,11 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-zinc-300 rounded-full hover:bg-zinc-400 transition-colors;
+    @apply bg-zinc-300 rounded-full hover:bg-zinc-400 transition-colors dark:bg-zinc-700 dark:hover:bg-zinc-600;
   }
 
   .glass-card {
-    @apply border border-zinc-200 shadow-sm;
+    @apply border border-zinc-200 shadow-sm dark:border-zinc-800;
   }
 
   .hover-scale {
@@ -89,19 +111,19 @@
   /* Responsive text sizes with reduced sizes */
   @screen sm {
     h1 {
-      @apply text-xl; /* Reduced size by 15% */
+      @apply text-xl;
     }
     h2 {
-      @apply text-lg; /* Reduced size by 15% */
+      @apply text-lg;
     }
   }
 
   @screen md {
     h1 {
-      @apply text-2xl; /* Reduced size by 15% */
+      @apply text-2xl;
     }
     h2 {
-      @apply text-xl; /* Reduced size by 15% */
+      @apply text-xl;
     }
   }
 }
@@ -129,7 +151,7 @@
 
 /* Tab slider animation */
 .tabs-slider {
-  @apply absolute bottom-0 h-full bg-white transition-all duration-300 ease-in-out rounded;
+  @apply absolute bottom-0 h-full bg-white dark:bg-zinc-800 transition-all duration-300 ease-in-out rounded;
 }
 
 .rich-text-editor {

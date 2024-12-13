@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Book, ChevronDown, Tag, Search } from "lucide-react";
+import { Book, ChevronDown, Tag, Search, Sun, Moon } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -24,7 +24,7 @@ import { QuizResult } from "@/types/Quiz";
 import { LevelIcon } from "@/components/quiz/LevelIcon";
 import { SearchInput } from "@/components/search/SearchInput";
 import { ProfileMenu } from "@/components/profile/ProfileMenu";
-import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 
 interface AppSidebarProps {
   currentBook: BookType;
@@ -50,7 +50,17 @@ export function AppSidebar({
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
   const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const { toast } = useToast();
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    document.documentElement.classList.toggle('dark');
+    toast({
+      title: isDarkMode ? "Tema claro ativado" : "Tema escuro ativado",
+      description: `O tema foi alterado para ${isDarkMode ? "claro" : "escuro"}.`,
+    });
+  };
 
   const handlePageClick = (pageNumber: number) => {
     if (onPageSelect) {
@@ -203,6 +213,22 @@ export function AppSidebar({
               </Button>
             </div>
           </SidebarGroup>
+
+          <div className="absolute bottom-4 left-0 right-0 px-4">
+            <div className="flex items-center justify-between p-2 rounded-lg border border-border">
+              <span className="text-sm font-medium">
+                {isDarkMode ? "Tema escuro" : "Tema claro"}
+              </span>
+              <div className="flex items-center gap-2">
+                <Sun className="h-4 w-4" />
+                <Switch
+                  checked={isDarkMode}
+                  onCheckedChange={toggleTheme}
+                />
+                <Moon className="h-4 w-4" />
+              </div>
+            </div>
+          </div>
         </ScrollArea>
       </SidebarContent>
     </Sidebar>

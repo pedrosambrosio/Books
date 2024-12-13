@@ -313,7 +313,7 @@ const Index = () => {
               <ScrollArea className="h-full">
                 <div className="p-4 md:p-6 flex justify-center">
                   <div className="w-full max-w-2xl">
-                    <div className="text-center animate-fade-in mb-6 header-container">
+                    <div className="text-center animate-fade-in mb-4">
                       <h1 className="text-2xl md:text-3xl font-bold mb-2">Anote ou Pesquise..</h1>
                       <p className="text-muted-foreground">
                         Organize seu estudo e aprendizado
@@ -326,8 +326,8 @@ const Index = () => {
                       value={currentTab}
                       onValueChange={(value) => setCurrentTab(value as TabType)}
                     >
-                      <div className="relative">
-                        <TabsList className="grid w-full grid-cols-2 h-auto mb-6">
+                      <div className="relative mb-2">
+                        <TabsList className="grid w-full grid-cols-2 h-auto">
                           <TabsTrigger value="personal">
                             Minhas Notas
                           </TabsTrigger>
@@ -337,7 +337,7 @@ const Index = () => {
                         </TabsList>
                       </div>
                       <TabsContent value="personal" className="tab-content-enter">
-                        <div className="space-y-6">
+                        <div className="space-y-4">
                           <div className="create-task-form">
                             <CreateTask 
                               onCreateTask={handleCreateTask} 
