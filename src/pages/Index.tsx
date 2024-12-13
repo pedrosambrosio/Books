@@ -16,10 +16,9 @@ import { cn } from "@/lib/utils";
 import { QuizDialog } from "@/components/quiz/QuizDialog";
 import { CHAPTER_QUIZZES } from "@/data/quizQuestions";
 import { QuizResult } from "@/types/Quiz";
-import { ContentViewer } from "@/components/ContentViewer"; // Import the new ContentViewer component
-import { TagPanel } from "@/components/TagPanel"; // Import the new TagPanel component
+import { ContentViewer } from "@/components/ContentViewer";
+import { TagPanel } from "@/components/TagPanel";
 
-// Create Bible book structure with Genesis and Exodus
 const BIBLE_BOOK: BookType = {
   id: "bible",
   title: "Bíblia",
@@ -298,13 +297,14 @@ const Index = () => {
           chapterLevels={chapterLevels}
           onViewChange={setCurrentView}
         />
-        <ResizablePanelGroup 
-          direction={isMobile ? "vertical" : "horizontal"} 
-          className="h-screen flex-1"
-        >
-          <ResizablePanel defaultSize={50} minSize={30} className="h-full">
-            <ScrollArea className="h-full">
-              {currentView === 'books' ? (
+        
+        {currentView === 'books' ? (
+          <ResizablePanelGroup 
+            direction={isMobile ? "vertical" : "horizontal"} 
+            className="h-screen flex-1"
+          >
+            <ResizablePanel defaultSize={50} minSize={30} className="h-full">
+              <ScrollArea className="h-full">
                 <div className="p-4 md:p-6 flex justify-center">
                   <div className="w-full max-w-2xl">
                     <div className="text-center animate-fade-in mb-8">
@@ -368,33 +368,36 @@ const Index = () => {
                     </Tabs>
                   </div>
                 </div>
-              ) : (
-                <TagPanel tags={sidebarTags} tasks={tasks} />
-              )}
-            </ScrollArea>
-          </ResizablePanel>
-          
-          <ResizableHandle withHandle />
-          
-          <ResizablePanel defaultSize={50} minSize={30} className="h-full">
-            <ScrollArea className="h-full">
-              <div className="p-4 md:p-6 flex justify-center">
-                <div className="w-full max-w-2xl">
-                  <ContentViewer
-                    content={getCurrentPageContent()}
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onNextPage={handleNextPage}
-                    onPreviousPage={handlePreviousPage}
-                    isCompleted={isBookCompleted}
-                    onMarkAsCompleted={handleMarkAsCompleted}
-                    onCreateNoteFromSelection={handleCreateNoteFromSelection}
-                  />
+              </ScrollArea>
+            </ResizablePanel>
+            
+            <ResizableHandle withHandle />
+            
+            <ResizablePanel defaultSize={50} minSize={30} className="h-full">
+              <ScrollArea className="h-full">
+                <div className="p-4 md:p-6 flex justify-center">
+                  <div className="w-full max-w-2xl">
+                    <ContentViewer
+                      content={getCurrentPageContent()}
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onNextPage={handleNextPage}
+                      onPreviousPage={handlePreviousPage}
+                      isCompleted={isBookCompleted}
+                      onMarkAsCompleted={handleMarkAsCompleted}
+                      onCreateNoteFromSelection={handleCreateNoteFromSelection}
+                    />
+                  </div>
                 </div>
-              </div>
-            </ScrollArea>
-          </ResizablePanel>
-        </ResizablePanelGroup>
+              </ScrollArea>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        ) : (
+          <div className="flex-1">
+            <TagPanel tags={sidebarTags} tasks={tasks} />
+          </div>
+        )}
+
         <QuizDialog
           isOpen={isQuizOpen}
           onClose={() => setIsQuizOpen(false)}
