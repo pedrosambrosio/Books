@@ -71,7 +71,7 @@
   }
 
   .glass-card {
-    @apply bg-white/80 backdrop-blur-sm border border-white/20 shadow-lg;
+    @apply border border-zinc-200 shadow-sm;
   }
 
   .hover-scale {
@@ -86,22 +86,22 @@
     }
   }
 
-  /* Responsive text sizes */
+  /* Responsive text sizes with reduced sizes */
   @screen sm {
     h1 {
-      @apply text-2xl; /* Reduced size */
+      @apply text-xl; /* Reduced size by 15% */
     }
     h2 {
-      @apply text-xl; /* Reduced size */
+      @apply text-lg; /* Reduced size by 15% */
     }
   }
 
   @screen md {
     h1 {
-      @apply text-3xl; /* Reduced size */
+      @apply text-2xl; /* Reduced size by 15% */
     }
     h2 {
-      @apply text-2xl; /* Reduced size */
+      @apply text-xl; /* Reduced size by 15% */
     }
   }
 }
@@ -122,9 +122,14 @@
   animation: slide-in 0.2s ease-out forwards;
 }
 
-/* Reduce header container height */
+/* Reduce header container height by 30% */
 .header-container {
-  @apply h-32 md:h-40;
+  @apply h-24 md:h-28;
+}
+
+/* Tab slider animation */
+.tabs-slider {
+  @apply absolute bottom-0 h-full bg-white transition-all duration-300 ease-in-out rounded;
 }
 
 .rich-text-editor {

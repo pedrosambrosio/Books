@@ -23,35 +23,37 @@ export function SearchInput({ onSearch }: SearchInputProps) {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 relative">
       <div
         className={cn(
-          "overflow-hidden transition-all duration-300 flex items-center",
+          "overflow-hidden transition-all duration-300 flex items-center absolute right-0",
           isExpanded ? "w-40" : "w-0"
         )}
       >
-        <Input
-          type="text"
-          placeholder="Buscar livro..."
-          className="h-8"
-          value={searchValue}
-          onChange={handleInputChange}
-        />
-        {searchValue && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 -ml-8"
-            onClick={handleClear}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        )}
+        <div className="relative w-full">
+          <Input
+            type="text"
+            placeholder="Buscar livro..."
+            className="h-8 pr-8"
+            value={searchValue}
+            onChange={handleInputChange}
+          />
+          {searchValue && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 absolute right-0 top-0"
+              onClick={handleClear}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </div>
       <Button
         variant="ghost"
         size="icon"
-        className="h-8 w-8"
+        className="h-8 w-8 relative z-10"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <Search className="h-4 w-4" />

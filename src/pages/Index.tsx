@@ -309,27 +309,36 @@ const Index = () => {
                 <div className="p-4 md:p-6 flex justify-center">
                   <div className="w-full max-w-2xl">
                     <div className="text-center animate-fade-in mb-6 header-container">
-                      <h1 className="text-3xl md:text-4xl font-bold mb-4">Anote ou Pesquise..</h1>
+                      <h1 className="text-2xl md:text-3xl font-bold mb-2">Anote ou Pesquise..</h1>
                       <p className="text-muted-foreground">
                         Organize seu estudo e aprendizado
                       </p>
                     </div>
 
                     <Tabs defaultValue="personal" className="w-full">
-                      <TabsList className="grid w-full grid-cols-2 h-auto mb-6">
-                        <TabsTrigger 
-                          value="personal"
-                          className="data-[state=active]:bg-white data-[state=active]:text-black px-6 py-3"
-                        >
-                          Minhas Notas
-                        </TabsTrigger>
-                        <TabsTrigger 
-                          value="chat"
-                          className="data-[state=active]:bg-white data-[state=active]:text-black px-6 py-3 flex items-center gap-2"
-                        >
-                          Chat <Sparkles className="h-4 w-4" />
-                        </TabsTrigger>
-                      </TabsList>
+                      <div className="relative">
+                        <TabsList className="grid w-full grid-cols-2 h-auto mb-6">
+                          <TabsTrigger 
+                            value="personal"
+                            className="data-[state=active]:text-black px-6 py-3 relative z-10"
+                          >
+                            Minhas Notas
+                          </TabsTrigger>
+                          <TabsTrigger 
+                            value="chat"
+                            className="data-[state=active]:text-black px-6 py-3 relative z-10 flex items-center gap-2"
+                          >
+                            Chat <Sparkles className="h-4 w-4" />
+                          </TabsTrigger>
+                          <div 
+                            className="tabs-slider" 
+                            style={{ 
+                              width: '50%',
+                              transform: `translateX(${currentView === 'chat' ? '100%' : '0%'})`
+                            }} 
+                          />
+                        </TabsList>
+                      </div>
                       <TabsContent value="personal" className="tab-content-enter">
                         <div className="space-y-6">
                           <div className="create-task-form">
