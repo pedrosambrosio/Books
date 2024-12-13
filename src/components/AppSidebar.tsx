@@ -82,7 +82,7 @@ export function AppSidebar({
                 className="p-0 h-auto hover:bg-transparent"
                 onClick={() => onViewChange?.('books')}
               >
-                <SidebarGroupLabel className="text-base font-semibold cursor-pointer hover:text-primary transition-colors">
+                <SidebarGroupLabel className="text-sm font-semibold cursor-pointer hover:text-primary transition-colors">
                   Livros
                 </SidebarGroupLabel>
               </Button>
@@ -177,13 +177,13 @@ export function AppSidebar({
           </SidebarGroup>
 
           <SidebarGroup>
-            <div className="flex items-center justify-between px-4 py-1">
+            <div className="flex items-center justify-between px-4 py-0.5">
               <Button
                 variant="ghost"
                 className="p-0 h-auto hover:bg-transparent"
                 onClick={() => onViewChange?.('library')}
               >
-                <SidebarGroupLabel className="text-base font-semibold cursor-pointer hover:text-primary transition-colors">
+                <SidebarGroupLabel className="text-sm font-semibold cursor-pointer hover:text-primary transition-colors">
                   Biblioteca
                 </SidebarGroupLabel>
               </Button>
@@ -191,19 +191,14 @@ export function AppSidebar({
           </SidebarGroup>
 
           <SidebarGroup>
-            <div className="flex items-center justify-between px-4 py-1">
+            <div className="flex items-center justify-between px-4 py-0.5">
               <Button
                 variant="ghost"
                 className="p-0 h-auto hover:bg-transparent"
                 onClick={() => onViewChange?.('tags')}
               >
-                <SidebarGroupLabel className="text-base font-semibold cursor-pointer hover:text-primary transition-colors flex items-center gap-2">
+                <SidebarGroupLabel className="text-sm font-semibold cursor-pointer hover:text-primary transition-colors">
                   Notas
-                  {tags.length > 0 && (
-                    <Badge variant="secondary" className="ml-2">
-                      {tags.length}
-                    </Badge>
-                  )}
                 </SidebarGroupLabel>
               </Button>
             </div>

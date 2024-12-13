@@ -1,28 +1,23 @@
-export interface Page {
-  id: string;
-  number: number;
-  title?: string;
-  completed?: boolean;
-}
-
-export interface Chapter {
-  id: string;
-  number: number;
-  title?: string;
-  pages: Page[];
-  completedPages?: number;
-}
-
 export interface Book {
   id: string;
   title: string;
-  type: 'bible' | 'regular';
-  chapters: Chapter[];
-  completedChapters?: number;
-}
-
-export interface Tag {
-  id: string;
-  name: string;
-  color?: string;
+  type?: string;
+  chapters: {
+    id: string;
+    number: number;
+    title?: string;
+    pages: {
+      id: string;
+      number: number;
+      title?: string;
+      completed: boolean;
+    }[];
+    completedPages: number;
+    notes?: number;
+  }[];
+  completedChapters: number;
+  level?: {
+    name: string;
+    icon: string;
+  };
 }
