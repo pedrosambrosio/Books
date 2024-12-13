@@ -90,8 +90,11 @@ export default {
         "fade-in": "fade-in 0.3s ease-out",
         "fade-out": "fade-out 0.3s ease-out",
         "slide-in": "slide-in 0.3s ease-out",
-        "scale-in": "scale-in 0.1s ease-out"
+        "scale-in": "scale-in 15ms ease-out"
       },
+      transitionDuration: {
+        '15': '15ms',
+      }
     },
   },
   plugins: [require("tailwindcss-animate")],

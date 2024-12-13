@@ -39,6 +39,7 @@ interface AppSidebarProps {
   };
   tags?: { name: string; count: number }[];
   chapterLevels?: { [chapterId: string]: QuizResult };
+  onTagClick?: () => void;
 }
 
 export function AppSidebar({ 
@@ -46,7 +47,8 @@ export function AppSidebar({
   onPageSelect, 
   noteCounts, 
   tags = [],
-  chapterLevels = {} 
+  chapterLevels = {},
+  onTagClick
 }: AppSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
@@ -219,6 +221,17 @@ export function AppSidebar({
             </div>
             <SidebarGroupContent>
               <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    className="w-full px-4 py-2 hover:bg-accent rounded-lg transition-colors"
+                    onClick={onTagClick}
+                  >
+                    <div className="flex items-center">
+                      <Tags className="h-4 w-4 mr-2" />
+                      <span>Visualizar Tags</span>
+                    </div>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
                 {tags
                   .filter(tag => tag.count > 0)
                   .map((tag) => (

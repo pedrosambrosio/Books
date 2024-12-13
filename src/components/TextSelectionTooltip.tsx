@@ -9,13 +9,15 @@ interface TextSelectionTooltipProps {
   position: { x: number; y: number } | null;
   hasTag?: boolean;
   onRemoveTag?: () => void;
+  onTagAdded?: (tagName: string) => void;
 }
 
 export const TextSelectionTooltip = ({ 
   onCreateNote, 
   position, 
   hasTag,
-  onRemoveTag 
+  onRemoveTag,
+  onTagAdded 
 }: TextSelectionTooltipProps) => {
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [tagName, setTagName] = useState("");
@@ -27,14 +29,8 @@ export const TextSelectionTooltip = ({
       return;
     }
 
-    // Apply highlight style to selected text
-    const selection = window.getSelection();
-    if (selection && !selection.isCollapsed) {
-      const range = selection.getRangeAt(0);
-      const span = document.createElement('span');
-      span.className = `bg-[${tagName}]/20 px-1 rounded`;
-      span.dataset.tag = tagName;
-      range.surroundContents(span);
+    if (onTagAdded) {
+      onTagAdded(tagName);
     }
 
     toast({
@@ -57,7 +53,7 @@ export const TextSelectionTooltip = ({
 
   return (
     <div
-      className="fixed z-50 bg-white rounded-lg shadow-lg border border-gray-200 py-2 px-3 animate-scale-in flex gap-2 items-center transition-transform duration-100"
+      className="fixed z-50 bg-white rounded-lg shadow-lg border border-gray-200 py-2 px-3 animate-scale-in flex gap-2 items-center transition-transform duration-15"
       style={{
         top: `${Math.max(position.y - 10, 10)}px`,
         left: `${position.x}px`,
