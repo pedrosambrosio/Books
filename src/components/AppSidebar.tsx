@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Book, ChevronDown, ChevronRight, Tag, Tags, Check, Search } from "lucide-react";
+import { Book, ChevronDown, ChevronRight, Tag, Check, Search } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -22,6 +22,8 @@ import {
 import { Book as BookType } from "@/types/Book";
 import { QuizResult } from "@/types/Quiz";
 import { LevelIcon } from "@/components/quiz/LevelIcon";
+import { SearchInput } from "@/components/search/SearchInput";
+import { ProfileMenu } from "@/components/profile/ProfileMenu";
 
 interface AppSidebarProps {
   currentBook: BookType;
@@ -68,6 +70,10 @@ export function AppSidebar({
     <Sidebar className="w-[var(--sidebar-width)] min-w-[200px] border-r border-border">
       <SidebarContent>
         <ScrollArea className="h-[calc(100vh-2rem)]">
+          <div className="p-4">
+            <ProfileMenu />
+          </div>
+          
           <SidebarGroup>
             <div className="flex items-center justify-between px-4 py-2">
               <Button
@@ -79,19 +85,7 @@ export function AppSidebar({
                   Livros
                 </SidebarGroupLabel>
               </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-5 w-5"
-                onClick={() => {
-                  toast({
-                    title: "Buscar livros",
-                    description: "Funcionalidade de busca em desenvolvimento.",
-                  });
-                }}
-              >
-                <Search className="h-4 w-4" />
-              </Button>
+              <SearchInput onSearch={setSearchQuery} />
             </div>
             <SidebarGroupContent>
               <SidebarMenu>
@@ -106,7 +100,7 @@ export function AppSidebar({
                         {expandedBook === book.id ? (
                           <ChevronDown className="h-4 w-4 mr-2" />
                         ) : (
-                          <ChevronRight className="h-4 w-4 mr-2" />
+                          <Book className="h-4 w-4 mr-2" />
                         )}
                         <span className={expandedBook === book.id ? "text-[#09090B]" : "text-[#71717A]"}>{book.title}</span>
                         <div className="ml-auto flex items-center gap-2">
@@ -135,15 +129,15 @@ export function AppSidebar({
                                 {expandedChapter === chapter.id ? (
                                   <ChevronDown className="h-4 w-4 mr-2" />
                                 ) : (
-                                  <ChevronRight className="h-4 w-4 mr-2" />
+                                  <Book className="h-4 w-4 mr-2" />
                                 )}
                                 <span className={expandedChapter === chapter.id ? "text-[#09090B]" : "text-[#71717A]"}>{chapter.title || `Capítulo ${chapter.number}`}</span>
                                 <div className="ml-auto flex items-center gap-2">
                                   {chapterLevels[chapter.id] && (
                                     <LevelIcon level={chapterLevels[chapter.id].level} />
                                   )}
-                                  <span className="text-xs text-muted-foreground">
-                                    notas {noteCounts?.chapterNotes || 0}
+                                  <span className="text-xs bg-muted px-2 py-0.5 rounded-full">
+                                    {noteCounts?.chapterNotes || 0}
                                   </span>
                                   <span className="text-xs text-muted-foreground">
                                     {chapter.completedPages}/{chapter.pages.length}
@@ -163,8 +157,8 @@ export function AppSidebar({
                                     <span className="flex items-center gap-2">
                                       Página {page.number}
                                       {page.completed && <Check className="h-4 w-4" />}
-                                      <span className="text-xs text-muted-foreground ml-auto">
-                                        notas {noteCounts?.pageNotes || 0}
+                                      <span className="text-xs bg-muted px-2 py-0.5 rounded-full ml-auto">
+                                        {noteCounts?.pageNotes || 0}
                                       </span>
                                     </span>
                                   </Button>
@@ -188,38 +182,16 @@ export function AppSidebar({
                 className="p-0 h-auto hover:bg-transparent"
                 onClick={() => onViewChange?.('tags')}
               >
-                <SidebarGroupLabel className="cursor-pointer hover:text-primary transition-colors">
+                <SidebarGroupLabel className="cursor-pointer hover:text-primary transition-colors flex items-center gap-2">
                   Tags
+                  {tags.length > 0 && (
+                    <span className="text-xs bg-muted px-2 py-0.5 rounded-full">
+                      {tags.length}
+                    </span>
+                  )}
                 </SidebarGroupLabel>
               </Button>
             </div>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {tags
-                  .filter(tag => tag.count > 0)
-                  .map((tag) => (
-                    <SidebarMenuItem key={tag.name}>
-                      <SidebarMenuButton
-                        className="w-full px-4 py-2 hover:bg-accent rounded-lg transition-colors flex items-center justify-between"
-                        onClick={() => {
-                          toast({
-                            title: "Tag selecionada",
-                            description: `Mostrando itens com a tag "${tag.name}"`,
-                          });
-                        }}
-                      >
-                        <div className="flex items-center">
-                          <Tags className="h-4 w-4 mr-2" />
-                          <span>{tag.name}</span>
-                        </div>
-                        <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                          {tag.count}
-                        </span>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
           </SidebarGroup>
         </ScrollArea>
       </SidebarContent>
