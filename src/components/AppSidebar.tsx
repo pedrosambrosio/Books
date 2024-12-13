@@ -24,11 +24,6 @@ import { Book as BookType, Tag as TagType } from "@/types/Book";
 import { QuizResult } from "@/types/Quiz";
 import { LevelIcon } from "@/components/quiz/LevelIcon";
 
-const MOCK_TAGS: TagType[] = [
-  { id: "1", name: "Important", color: "#ef4444" },
-  { id: "2", name: "Review", color: "#3b82f6" },
-];
-
 interface AppSidebarProps {
   currentBook: BookType;
   onPageSelect?: (pageNumber: number) => void;
@@ -39,7 +34,7 @@ interface AppSidebarProps {
   };
   tags?: { name: string; count: number }[];
   chapterLevels?: { [chapterId: string]: QuizResult };
-  onTagClick?: () => void;
+  onViewChange?: (view: 'books' | 'tags') => void;
 }
 
 export function AppSidebar({ 
@@ -48,7 +43,7 @@ export function AppSidebar({
   noteCounts, 
   tags = [],
   chapterLevels = {},
-  onTagClick
+  onViewChange
 }: AppSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
@@ -101,7 +96,15 @@ export function AppSidebar({
         <ScrollArea className="h-[calc(100vh-5rem)]">
           <SidebarGroup>
             <div className="flex items-center justify-between px-4 py-2">
-              <SidebarGroupLabel>Livros</SidebarGroupLabel>
+              <Button
+                variant="ghost"
+                className="p-0 h-auto hover:bg-transparent"
+                onClick={() => onViewChange?.('books')}
+              >
+                <SidebarGroupLabel className="cursor-pointer hover:text-primary transition-colors">
+                  Livros
+                </SidebarGroupLabel>
+              </Button>
               <div className="flex items-center gap-2">
                 {noteCounts && (
                   <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
@@ -209,7 +212,15 @@ export function AppSidebar({
 
           <SidebarGroup>
             <div className="flex items-center justify-between px-4 py-2">
-              <SidebarGroupLabel>Tags</SidebarGroupLabel>
+              <Button
+                variant="ghost"
+                className="p-0 h-auto hover:bg-transparent"
+                onClick={() => onViewChange?.('tags')}
+              >
+                <SidebarGroupLabel className="cursor-pointer hover:text-primary transition-colors">
+                  Tags
+                </SidebarGroupLabel>
+              </Button>
               <Button
                 variant="ghost"
                 size="icon"
@@ -221,17 +232,6 @@ export function AppSidebar({
             </div>
             <SidebarGroupContent>
               <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    className="w-full px-4 py-2 hover:bg-accent rounded-lg transition-colors"
-                    onClick={onTagClick}
-                  >
-                    <div className="flex items-center">
-                      <Tags className="h-4 w-4 mr-2" />
-                      <span>Visualizar Tags</span>
-                    </div>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
                 {tags
                   .filter(tag => tag.count > 0)
                   .map((tag) => (
