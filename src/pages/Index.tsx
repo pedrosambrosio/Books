@@ -308,7 +308,7 @@ const Index = () => {
               <ScrollArea className="h-full">
                 <div className="p-4 md:p-6 flex justify-center">
                   <div className="w-full max-w-2xl">
-                    <div className="text-center animate-fade-in mb-8">
+                    <div className="text-center animate-fade-in mb-6 header-container">
                       <h1 className="text-3xl md:text-4xl font-bold mb-4">Anote ou Pesquise..</h1>
                       <p className="text-muted-foreground">
                         Organize seu estudo e aprendizado
@@ -330,7 +330,7 @@ const Index = () => {
                           Chat <Sparkles className="h-4 w-4" />
                         </TabsTrigger>
                       </TabsList>
-                      <TabsContent value="personal">
+                      <TabsContent value="personal" className="tab-content-enter">
                         <div className="space-y-6">
                           <div className="create-task-form">
                             <CreateTask 
@@ -361,7 +361,7 @@ const Index = () => {
                           </div>
                         </div>
                       </TabsContent>
-                      <TabsContent value="chat">
+                      <TabsContent value="chat" className="tab-content-enter">
                         <div className="p-6 text-center text-muted-foreground">
                           Chat em breve...
                         </div>

@@ -76,13 +76,13 @@ export function AppSidebar({
           </div>
           
           <SidebarGroup>
-            <div className="flex items-center justify-between px-4 py-2">
+            <div className="flex items-center justify-between px-4 py-1">
               <Button
                 variant="ghost"
                 className="p-0 h-auto hover:bg-transparent"
                 onClick={() => onViewChange?.('books')}
               >
-                <SidebarGroupLabel className="text-lg font-semibold cursor-pointer hover:text-primary transition-colors">
+                <SidebarGroupLabel className="text-base font-semibold cursor-pointer hover:text-primary transition-colors">
                   Livros
                 </SidebarGroupLabel>
               </Button>
@@ -104,9 +104,12 @@ export function AppSidebar({
                           <Book className="h-4 w-4 mr-2" />
                         )}
                         <span className={expandedBook === book.id ? "text-[#09090B]" : "text-[#71717A]"}>{book.title}</span>
-                        <div className="ml-auto">
+                        <div className="ml-auto flex items-center gap-2">
                           <span className="text-xs bg-muted px-2 py-0.5 rounded-full">
                             notas {noteCounts?.bookNotes || 0}
+                          </span>
+                          <span className="text-xs bg-muted px-2 py-0.5 rounded-full">
+                            {book.completedChapters}/{book.chapters.length}
                           </span>
                         </div>
                       </SidebarMenuButton>
@@ -137,6 +140,9 @@ export function AppSidebar({
                                   )}
                                   <span className="text-xs bg-muted px-2 py-0.5 rounded-full">
                                     {noteCounts?.chapterNotes || 0}
+                                  </span>
+                                  <span className="text-xs bg-muted px-2 py-0.5 rounded-full">
+                                    {chapter.completedPages}/{chapter.pages.length}
                                   </span>
                                 </div>
                               </Button>
@@ -171,13 +177,13 @@ export function AppSidebar({
           </SidebarGroup>
 
           <SidebarGroup>
-            <div className="flex items-center justify-between px-4 py-2">
+            <div className="flex items-center justify-between px-4 py-1">
               <Button
                 variant="ghost"
                 className="p-0 h-auto hover:bg-transparent"
                 onClick={() => onViewChange?.('library')}
               >
-                <SidebarGroupLabel className="text-lg font-semibold cursor-pointer hover:text-primary transition-colors">
+                <SidebarGroupLabel className="text-base font-semibold cursor-pointer hover:text-primary transition-colors">
                   Biblioteca
                 </SidebarGroupLabel>
               </Button>
@@ -185,13 +191,13 @@ export function AppSidebar({
           </SidebarGroup>
 
           <SidebarGroup>
-            <div className="flex items-center justify-between px-4 py-2">
+            <div className="flex items-center justify-between px-4 py-1">
               <Button
                 variant="ghost"
                 className="p-0 h-auto hover:bg-transparent"
                 onClick={() => onViewChange?.('tags')}
               >
-                <SidebarGroupLabel className="text-lg font-semibold cursor-pointer hover:text-primary transition-colors flex items-center gap-2">
+                <SidebarGroupLabel className="text-base font-semibold cursor-pointer hover:text-primary transition-colors flex items-center gap-2">
                   Notas
                   {tags.length > 0 && (
                     <Badge variant="secondary" className="ml-2">
