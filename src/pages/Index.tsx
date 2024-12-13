@@ -20,6 +20,10 @@ import { ContentViewer } from "@/components/ContentViewer";
 import { TagPanel } from "@/components/TagPanel";
 import { LibraryPanel } from "@/components/LibraryPanel";
 
+// Define the view type
+type ViewType = 'books' | 'tags' | 'library';
+type TabType = 'personal' | 'chat';
+
 const BIBLE_BOOK: BookType = {
   id: "bible",
   title: "Bíblia",
@@ -67,7 +71,8 @@ const Index = () => {
   const [chapterLevels, setChapterLevels] = useState<{ [chapterId: string]: QuizResult }>({});
   const [isCreatingNoteFromSelection, setIsCreatingNoteFromSelection] = useState(false);
   const [selectedTextReference, setSelectedTextReference] = useState("");
-  const [currentView, setCurrentView] = useState<'books' | 'tags' | 'library'>('books');
+  const [currentView, setCurrentView] = useState<ViewType>('books');
+  const [currentTab, setCurrentTab] = useState<TabType>('personal');
 
   const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress" | "isPaused">) => {
     const task: Task = {
@@ -315,28 +320,20 @@ const Index = () => {
                       </p>
                     </div>
 
-                    <Tabs defaultValue="personal" className="w-full">
+                    <Tabs 
+                      defaultValue="personal" 
+                      className="w-full"
+                      value={currentTab}
+                      onValueChange={(value) => setCurrentTab(value as TabType)}
+                    >
                       <div className="relative">
                         <TabsList className="grid w-full grid-cols-2 h-auto mb-6">
-                          <TabsTrigger 
-                            value="personal"
-                            className="data-[state=active]:text-black px-6 py-3 relative z-10"
-                          >
+                          <TabsTrigger value="personal">
                             Minhas Notas
                           </TabsTrigger>
-                          <TabsTrigger 
-                            value="chat"
-                            className="data-[state=active]:text-black px-6 py-3 relative z-10 flex items-center gap-2"
-                          >
+                          <TabsTrigger value="chat" className="flex items-center gap-2">
                             Chat <Sparkles className="h-4 w-4" />
                           </TabsTrigger>
-                          <div 
-                            className="tabs-slider" 
-                            style={{ 
-                              width: '50%',
-                              transform: `translateX(${currentView === 'chat' ? '100%' : '0%'})`
-                            }} 
-                          />
                         </TabsList>
                       </div>
                       <TabsContent value="personal" className="tab-content-enter">
