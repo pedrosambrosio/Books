@@ -3,7 +3,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -13,14 +12,15 @@ export function ProfileMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Avatar className="h-9 w-9 cursor-pointer">
-          <AvatarImage src="https://github.com/shadcn.png" alt="Profile" />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
+        <div className="flex items-center gap-3 bg-muted p-2 rounded-lg cursor-pointer">
+          <Avatar className="h-9 w-9">
+            <AvatarImage src="https://github.com/shadcn.png" alt="Profile" />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
+          <span className="font-medium">John Doe</span>
+        </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end">
-        <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
-        <DropdownMenuSeparator />
         <DropdownMenuItem>
           <User className="mr-2 h-4 w-4" />
           <span>Perfil</span>

@@ -13,7 +13,7 @@ export function TagPanel({ tags, tasks }: TagPanelProps) {
     <div className="p-8 max-w-7xl mx-auto">
       <div className="space-y-8">
         <div className="space-y-4 text-center">
-          <h2 className="text-3xl font-bold">Tags</h2>
+          <h2 className="text-3xl font-bold">Notas</h2>
           <p className="text-muted-foreground">
             Organize e gerencie suas anotações por tags
           </p>

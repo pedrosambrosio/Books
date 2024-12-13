@@ -80,29 +80,13 @@ export function AppSidebar({
               <Button
                 variant="ghost"
                 className="p-0 h-auto hover:bg-transparent"
-                onClick={() => onViewChange?.('library')}
+                onClick={() => onViewChange?.('books')}
               >
-                <SidebarGroupLabel className="cursor-pointer hover:text-primary transition-colors">
-                  Biblioteca
+                <SidebarGroupLabel className="text-lg font-semibold cursor-pointer hover:text-primary transition-colors">
+                  Livros
                 </SidebarGroupLabel>
               </Button>
-            </div>
-          </SidebarGroup>
-
-          <SidebarGroup>
-            <div className="flex items-center justify-between px-4 py-2">
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  className="p-0 h-auto hover:bg-transparent"
-                  onClick={() => onViewChange?.('books')}
-                >
-                  <SidebarGroupLabel className="cursor-pointer hover:text-primary transition-colors">
-                    Livros
-                  </SidebarGroupLabel>
-                </Button>
-                <SearchInput onSearch={setSearchQuery} />
-              </div>
+              <SearchInput onSearch={setSearchQuery} />
             </div>
             <SidebarGroupContent>
               <SidebarMenu>
@@ -191,10 +175,24 @@ export function AppSidebar({
               <Button
                 variant="ghost"
                 className="p-0 h-auto hover:bg-transparent"
+                onClick={() => onViewChange?.('library')}
+              >
+                <SidebarGroupLabel className="text-lg font-semibold cursor-pointer hover:text-primary transition-colors">
+                  Biblioteca
+                </SidebarGroupLabel>
+              </Button>
+            </div>
+          </SidebarGroup>
+
+          <SidebarGroup>
+            <div className="flex items-center justify-between px-4 py-2">
+              <Button
+                variant="ghost"
+                className="p-0 h-auto hover:bg-transparent"
                 onClick={() => onViewChange?.('tags')}
               >
-                <SidebarGroupLabel className="cursor-pointer hover:text-primary transition-colors flex items-center gap-2">
-                  Tags
+                <SidebarGroupLabel className="text-lg font-semibold cursor-pointer hover:text-primary transition-colors flex items-center gap-2">
+                  Notas
                   {tags.length > 0 && (
                     <Badge variant="secondary" className="ml-2">
                       {tags.length}
