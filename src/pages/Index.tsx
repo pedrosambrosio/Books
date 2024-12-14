@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Star, ArrowLeft, ArrowRight, Check, Sparkles } from "lucide-react";
+import { Star, ArrowLeft, ArrowRight, Check, Sparkles, Book, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Book as BookType } from "@/types/Book";
 import { GENESIS_CONTENT } from "@/data/bibleContent";
