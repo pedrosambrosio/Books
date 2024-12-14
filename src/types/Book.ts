@@ -22,4 +22,5 @@ export interface Book {
   chapters: Chapter[];
   completedChapters: number;
   tags?: string[];
+  coverImage?: string;
 }
