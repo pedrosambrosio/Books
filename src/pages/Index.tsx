@@ -299,58 +299,24 @@ const Index = () => {
     if (currentView === 'books') {
       return (
         <div className="flex flex-col h-screen">
-          <div className="fixed top-4 left-0 right-0 px-4 z-10">
-            <div className="bg-muted/20 backdrop-blur-sm rounded-lg p-2 flex justify-center gap-2 max-w-md mx-auto">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setMobileView('bible')}
-                className={cn(
-                  "flex-1 bg-background",
-                  mobileView === 'bible' && "bg-white dark:bg-zinc-800"
-                )}
-              >
-                <Book className="h-4 w-4 mr-2" />
-                Bíblia
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setMobileView('chat')}
-                className={cn(
-                  "flex-1 bg-background",
-                  mobileView === 'chat' && "bg-white dark:bg-zinc-800"
-                )}
-              >
-                <MessageSquare className="h-4 w-4 mr-2" />
-                Chat
-              </Button>
-            </div>
-          </div>
-          
-          <div className="flex-1 overflow-hidden mt-20 mb-16">
-            {mobileView === 'bible' ? (
-              <ScrollArea className="h-full">
-                <div className="p-4 md:p-6 flex justify-center">
-                  <div className="w-full max-w-2xl">
-                    <ContentViewer
-                      content={getCurrentPageContent()}
-                      currentPage={currentPage}
-                      totalPages={totalPages}
-                      onNextPage={handleNextPage}
-                      onPreviousPage={handlePreviousPage}
-                      isCompleted={isBookCompleted}
-                      onMarkAsCompleted={handleMarkAsCompleted}
-                      onCreateNoteFromSelection={handleCreateNoteFromSelection}
-                    />
-                  </div>
+          <div className="flex-1 overflow-hidden mb-16">
+            <ScrollArea className="h-full">
+              <div className="p-4 md:p-6 flex justify-center">
+                <div className="w-full max-w-2xl">
+                  <ContentViewer
+                    content={getCurrentPageContent()}
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onNextPage={handleNextPage}
+                    onPreviousPage={handlePreviousPage}
+                    isCompleted={isBookCompleted}
+                    onMarkAsCompleted={handleMarkAsCompleted}
+                    onCreateNoteFromSelection={handleCreateNoteFromSelection}
+                  />
                 </div>
-              </ScrollArea>
-            ) : (
-              <MobileChatView />
-            )}
+              </div>
+            </ScrollArea>
           </div>
-          
           <div className="fixed bottom-0 left-0 right-0">
             <AppSidebar 
               currentBook={currentBibleBook} 

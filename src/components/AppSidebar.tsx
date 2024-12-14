@@ -53,7 +53,7 @@ export function AppSidebar({
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
   const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [currentTab, setCurrentTab] = useState<'books' | 'tags' | 'library'>('books');
+  const [currentView, setCurrentView] = useState<'books' | 'tags' | 'library'>('books');
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -66,45 +66,59 @@ export function AppSidebar({
     });
   };
 
-  const handlePageClick = (pageNumber: number) => {
-    if (onPageSelect) {
-      onPageSelect(pageNumber);
-      onViewChange?.('books');
-      toast({
-        title: "Página selecionada",
-        description: `Navegando para a página ${pageNumber}`,
-      });
-    }
+  const handleTabChange = (value: string) => {
+    setCurrentView(value as 'books' | 'tags' | 'library');
+    onViewChange?.(value as 'books' | 'tags' | 'library');
   };
 
   const filteredBooks = [currentBook].filter(book => 
     book.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleTabChange = (value: string) => {
-    setCurrentTab(value as 'books' | 'tags' | 'library');
-    onViewChange?.(value as 'books' | 'tags' | 'library');
-  };
-
-  const renderSidebarContent = () => (
-    <ScrollArea className="h-[calc(100vh-2rem)]">
-      <div className="p-4">
-        <ProfileMenu />
-      </div>
-      
-      <SidebarGroup>
-        <div className="flex items-center justify-between px-4 py-1">
-          <Button
-            variant="ghost"
-            className="p-0 h-auto hover:bg-transparent"
-            onClick={() => onViewChange?.('books')}
-          >
-            <SidebarGroupLabel className="text-sm font-semibold cursor-pointer hover:text-primary transition-colors">
+  if (isMobile) {
+    return (
+      <div className="w-full border-t border-border bg-background">
+        <Tabs value={currentView} onValueChange={handleTabChange} className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="books" className="flex items-center gap-2">
+              <Book className="h-4 w-4" />
               Livros
-            </SidebarGroupLabel>
-          </Button>
-          <SearchInput onSearch={setSearchQuery} />
-        </div>
+            </TabsTrigger>
+            <TabsTrigger value="library" className="flex items-center gap-2">
+              <Book className="h-4 w-4" />
+              Biblioteca
+            </TabsTrigger>
+            <TabsTrigger value="tags" className="flex items-center gap-2">
+              <Tag className="h-4 w-4" />
+              Notas
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+    );
+  }
+
+  return (
+    <Sidebar className="w-[var(--sidebar-width)] min-w-[200px] border-r border-border">
+      <SidebarContent>
+        <ScrollArea className="h-[calc(100vh-2rem)]">
+          <div className="p-4">
+            <ProfileMenu />
+          </div>
+          
+          <SidebarGroup>
+            <div className="flex items-center justify-between px-4 py-1">
+              <Button
+                variant="ghost"
+                className="p-0 h-auto hover:bg-transparent"
+                onClick={() => onViewChange?.('books')}
+              >
+                <SidebarGroupLabel className="text-sm font-semibold cursor-pointer hover:text-primary transition-colors">
+                  Livros
+                </SidebarGroupLabel>
+              </Button>
+              <SearchInput onSearch={setSearchQuery} />
+            </div>
             <SidebarGroupContent>
               <SidebarMenu>
                 {filteredBooks.map((book) => (
@@ -171,7 +185,7 @@ export function AppSidebar({
                                     key={page.id}
                                     variant="ghost"
                                     className={`w-full justify-start text-sm pl-8 ${page.completed ? "text-[#09090B]" : "text-[#71717A]"}`}
-                                    onClick={() => handlePageClick(page.number)}
+                                    onClick={() => onPageSelect?.(page.number)}
                                   >
                                     <span className="flex items-center gap-2">
                                       Página {page.number}
@@ -191,78 +205,49 @@ export function AppSidebar({
                 ))}
               </SidebarMenu>
             </SidebarGroupContent>
-      </SidebarGroup>
+          </SidebarGroup>
 
-      <SidebarGroup>
-        <div className="flex items-center justify-between px-4 py-0.5">
-          <Button
-            variant="ghost"
-            className="p-0 h-auto hover:bg-transparent"
-            onClick={() => onViewChange?.('library')}
-          >
-            <SidebarGroupLabel className="text-sm font-semibold cursor-pointer hover:text-primary transition-colors">
-              Biblioteca
-            </SidebarGroupLabel>
-          </Button>
-        </div>
-      </SidebarGroup>
+          <SidebarGroup>
+            <div className="flex items-center justify-between px-4 py-0.5">
+              <Button
+                variant="ghost"
+                className="p-0 h-auto hover:bg-transparent"
+                onClick={() => onViewChange?.('library')}
+              >
+                <SidebarGroupLabel className="text-sm font-semibold cursor-pointer hover:text-primary transition-colors">
+                  Biblioteca
+                </SidebarGroupLabel>
+              </Button>
+            </div>
+          </SidebarGroup>
 
-      <SidebarGroup>
-        <div className="flex items-center justify-between px-4 py-0.5">
-          <Button
-            variant="ghost"
-            className="p-0 h-auto hover:bg-transparent"
-            onClick={() => onViewChange?.('tags')}
-          >
-            <SidebarGroupLabel className="text-sm font-semibold cursor-pointer hover:text-primary transition-colors">
-              Notas
-            </SidebarGroupLabel>
-          </Button>
-        </div>
-      </SidebarGroup>
+          <SidebarGroup>
+            <div className="flex items-center justify-between px-4 py-0.5">
+              <Button
+                variant="ghost"
+                className="p-0 h-auto hover:bg-transparent"
+                onClick={() => onViewChange?.('tags')}
+              >
+                <SidebarGroupLabel className="text-sm font-semibold cursor-pointer hover:text-primary transition-colors">
+                  Notas
+                </SidebarGroupLabel>
+              </Button>
+            </div>
+          </SidebarGroup>
 
-      <div className="absolute bottom-4 left-0 right-0 px-4">
-        <div className="flex items-center justify-between p-2 rounded-lg border border-border">
-          <div className="flex items-center gap-2">
-            <Sun className="h-4 w-4" />
-            <Switch
-              checked={isDarkMode}
-              onCheckedChange={toggleTheme}
-            />
-            <Moon className="h-4 w-4" />
+          <div className="absolute bottom-4 left-0 right-0 px-4">
+            <div className="flex items-center justify-between p-2 rounded-lg border border-border">
+              <div className="flex items-center gap-2">
+                <Sun className="h-4 w-4" />
+                <Switch
+                  checked={isDarkMode}
+                  onCheckedChange={toggleTheme}
+                />
+                <Moon className="h-4 w-4" />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </ScrollArea>
-  );
-
-  if (isMobile) {
-    return (
-      <div className="w-full border-t border-border bg-background">
-        <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="books" className="flex items-center gap-2">
-              <Book className="h-4 w-4" />
-              Livros
-            </TabsTrigger>
-            <TabsTrigger value="library" className="flex items-center gap-2">
-              <Book className="h-4 w-4" />
-              Biblioteca
-            </TabsTrigger>
-            <TabsTrigger value="tags" className="flex items-center gap-2">
-              <Tag className="h-4 w-4" />
-              Notas
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-    );
-  }
-
-  return (
-    <Sidebar className="w-[var(--sidebar-width)] min-w-[200px] border-r border-border">
-      <SidebarContent>
-        {renderSidebarContent()}
+        </ScrollArea>
       </SidebarContent>
     </Sidebar>
   );
