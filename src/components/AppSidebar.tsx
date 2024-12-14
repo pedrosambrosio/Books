@@ -114,7 +114,7 @@ export function AppSidebar({
                 onClick={() => onViewChange?.('books')}
               >
                 <SidebarGroupLabel className="text-sm font-semibold cursor-pointer hover:text-primary transition-colors">
-                  Livros
+                  Docs
                 </SidebarGroupLabel>
               </Button>
               <SearchInput onSearch={setSearchQuery} />
