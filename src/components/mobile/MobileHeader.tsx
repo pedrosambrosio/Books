@@ -18,11 +18,11 @@ export function MobileHeader({ currentTab, onViewChange }: MobileHeaderProps) {
   return (
     <div className="mobile-book-header">
       <Tabs value={currentTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-2 h-9 bg-muted p-1">
           <TabsTrigger 
             value="books" 
             onClick={handleBooksClick}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:text-foreground rounded-md"
           >
             <Book className="h-4 w-4" />
             Bíblia
@@ -30,7 +30,7 @@ export function MobileHeader({ currentTab, onViewChange }: MobileHeaderProps) {
           <TabsTrigger 
             value="chat" 
             onClick={handleChatClick}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:text-foreground rounded-md"
           >
             <MessageSquare className="h-4 w-4" />
             Chat

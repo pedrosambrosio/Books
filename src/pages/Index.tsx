@@ -20,6 +20,7 @@ import { ContentViewer } from "@/components/ContentViewer";
 import { TagPanel } from "@/components/TagPanel";
 import { LibraryPanel } from "@/components/LibraryPanel";
 import { MobileHeader } from "@/components/mobile/MobileHeader";
+import { ChatPanel } from "@/components/chat/ChatPanel";
 
 // Update the ViewType definition to include 'chat'
 type ViewType = 'books' | 'tags' | 'library' | 'chat';
@@ -294,27 +295,31 @@ const Index = () => {
     }));
 
   const renderMobileBookPanel = () => {
-    if (!isMobile || currentView !== 'books') return null;
+    if (!isMobile) return null;
 
     return (
       <div className="mobile-book-panel">
         <MobileHeader 
-          currentTab={currentTab}
+          currentTab={currentView}
           onViewChange={setCurrentView}
         />
         <ScrollArea className="flex-1">
-          <div className="p-2">
-            <ContentViewer
-              content={getCurrentPageContent()}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onNextPage={handleNextPage}
-              onPreviousPage={handlePreviousPage}
-              isCompleted={isBookCompleted}
-              onMarkAsCompleted={handleMarkAsCompleted}
-              onCreateNoteFromSelection={handleCreateNoteFromSelection}
-            />
-          </div>
+          {currentView === 'chat' ? (
+            <ChatPanel />
+          ) : (
+            <div className="p-2">
+              <ContentViewer
+                content={getCurrentPageContent()}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onNextPage={handleNextPage}
+                onPreviousPage={handlePreviousPage}
+                isCompleted={isBookCompleted}
+                onMarkAsCompleted={handleMarkAsCompleted}
+                onCreateNoteFromSelection={handleCreateNoteFromSelection}
+              />
+            </div>
+          )}
         </ScrollArea>
       </div>
     );
@@ -334,13 +339,7 @@ const Index = () => {
         
         {isMobile ? (
           <div className="mobile-content w-full">
-            {currentView === 'books' ? (
-              renderMobileBookPanel()
-            ) : currentView === 'tags' ? (
-              <TagPanel tags={sidebarTags} tasks={tasks} />
-            ) : (
-              <LibraryPanel books={[currentBibleBook]} />
-            )}
+            {renderMobileBookPanel()}
           </div>
         ) : (
           <ResizablePanelGroup 
