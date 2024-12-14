@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Star, ArrowLeft, ArrowRight, Check, Sparkles, Book, MessageSquare, Menu } from "lucide-react";
+import { Star, ArrowLeft, ArrowRight, Check, Sparkles, Book, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Book as BookType } from "@/types/Book";
 import { GENESIS_CONTENT } from "@/data/bibleContent";
@@ -308,34 +308,13 @@ const Index = () => {
     }
 
     return (
-      <div className="flex flex-col h-screen">
-        <div className="flex items-center gap-4 p-4 border-b">
-          <SidebarProvider>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setCurrentView('books')}
-            >
-              <Menu className="h-6 w-6" />
-            </Button>
-            {currentView === 'books' && (
-              <AppSidebar 
-                currentBook={currentBibleBook}
-                onPageSelect={handlePageSelect}
-                noteCounts={getNoteCounts()}
-                tags={sidebarTags}
-                chapterLevels={chapterLevels}
-                onViewChange={setCurrentView}
-              />
-            )}
-          </SidebarProvider>
-          <h2 className="text-lg font-semibold">Gênesis</h2>
-        </div>
+      <div className="flex flex-col h-screen pb-16">
+        <MobileMenu currentView={currentView} onViewChange={setCurrentView} />
         
-        <div className="flex-1 overflow-hidden relative">
+        <div className="flex-1 overflow-hidden">
           {currentView === 'books' ? (
             <ScrollArea className="h-full">
-              <div className="p-4 md:p-6 flex justify-center mb-20">
+              <div className="p-4 md:p-6 flex justify-center">
                 <div className="w-full max-w-2xl">
                   <ContentViewer
                     content={getCurrentPageContent()}
@@ -355,37 +334,33 @@ const Index = () => {
           ) : (
             <LibraryPanel books={[currentBibleBook]} />
           )}
+        </div>
 
-          {currentView === 'books' && (
-            <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2">
-              <div className="bg-zinc-100 rounded-full shadow-lg px-2 py-1">
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setCurrentTab('personal')}
-                    className={cn(
-                      "rounded-full hover:bg-transparent",
-                      currentTab === 'personal' && "bg-white"
-                    )}
-                  >
-                    Minhas Notas
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setCurrentTab('chat')}
-                    className={cn(
-                      "rounded-full hover:bg-transparent",
-                      currentTab === 'chat' && "bg-white"
-                    )}
-                  >
-                    Chat
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
+        <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4">
+          <div className="max-w-md mx-auto flex justify-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentTab('personal')}
+              className={cn(
+                "flex-1 bg-background",
+                currentTab === 'personal' && "bg-white dark:bg-zinc-800"
+              )}
+            >
+              Minhas Notas
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentTab('chat')}
+              className={cn(
+                "flex-1 bg-background",
+                currentTab === 'chat' && "bg-white dark:bg-zinc-800"
+              )}
+            >
+              Chat
+            </Button>
+          </div>
         </div>
       </div>
     );
