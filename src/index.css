@@ -133,6 +133,13 @@
       @apply text-xl;
     }
   }
+
+  /* Mobile layout adjustments */
+  @media (max-width: 768px) {
+    .content-area {
+      padding-bottom: 4rem;
+    }
+  }
 }
 
 /* Tab animations */

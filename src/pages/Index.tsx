@@ -304,83 +304,9 @@ const Index = () => {
           onViewChange={setCurrentView}
         />
         
-        {currentView === 'books' ? (
-          <ResizablePanelGroup 
-            direction={isMobile ? "vertical" : "horizontal"} 
-            className="h-screen flex-1"
-          >
-            <ResizablePanel defaultSize={50} minSize={30} className="h-full">
-              <ScrollArea className="h-full">
-                <div className="p-4 md:p-6 flex justify-center">
-                  <div className="w-full max-w-2xl">
-                    <div className="text-center animate-fade-in mb-4">
-                      <h1 className="text-2xl md:text-3xl font-bold mb-2">Anote ou Pesquise..</h1>
-                      <p className="text-muted-foreground">
-                        Organize seu estudo e aprendizado
-                      </p>
-                    </div>
-
-                    <Tabs 
-                      defaultValue="personal" 
-                      className="w-full"
-                      value={currentTab}
-                      onValueChange={(value) => setCurrentTab(value as TabType)}
-                    >
-                      <div className="relative mb-2">
-                        <TabsList className="grid w-full grid-cols-2 h-auto">
-                          <TabsTrigger value="personal">
-                            Minhas Notas
-                          </TabsTrigger>
-                          <TabsTrigger value="chat" className="flex items-center gap-2">
-                            Chat <Sparkles className="h-4 w-4" />
-                          </TabsTrigger>
-                        </TabsList>
-                      </div>
-                      <TabsContent value="personal" className="tab-content-enter">
-                        <div className="space-y-4">
-                          <div className="create-task-form">
-                            <CreateTask 
-                              onCreateTask={handleCreateTask} 
-                              existingTags={allTags}
-                              onTagCreate={handleTagCreate}
-                              initialReference={isCreatingNoteFromSelection ? selectedTextReference : ""}
-                              onAfterSubmit={() => {
-                                setIsCreatingNoteFromSelection(false);
-                                setSelectedTextReference("");
-                              }}
-                            />
-                          </div>
-                          
-                          <div className="space-y-4">
-                            {tasks
-                              .filter(task => task.pageNumber === currentPage)
-                              .map((task) => (
-                                <div key={task.id} className="animate-fade-in">
-                                  <TaskCard
-                                    task={task}
-                                    onUpdate={handleUpdateTask}
-                                    onComplete={handleCompleteTask}
-                                    onDelete={handleDeleteTask}
-                                  />
-                                </div>
-                              ))}
-                          </div>
-                        </div>
-                      </TabsContent>
-                      <TabsContent value="chat" className="tab-content-enter">
-                        <div className="p-6 text-center text-muted-foreground">
-                          Chat em breve...
-                        </div>
-                      </TabsContent>
-                    </Tabs>
-                  </div>
-                </div>
-              </ScrollArea>
-            </ResizablePanel>
-            
-            <ResizableHandle withHandle />
-            
-            <ResizablePanel defaultSize={50} minSize={30} className="h-full">
+        <div className={`flex-1 ${isMobile ? 'pb-16' : ''}`}>
+          {currentView === 'books' ? (
+            <div className="h-full">
               <ScrollArea className="h-full">
                 <div className="p-4 md:p-6 flex justify-center">
                   <div className="w-full max-w-2xl">
@@ -397,17 +323,17 @@ const Index = () => {
                   </div>
                 </div>
               </ScrollArea>
-            </ResizablePanel>
-          </ResizablePanelGroup>
-        ) : currentView === 'tags' ? (
-          <div className="flex-1">
-            <TagPanel tags={sidebarTags} tasks={tasks} />
-          </div>
-        ) : (
-          <div className="flex-1">
-            <LibraryPanel books={[currentBibleBook]} />
-          </div>
-        )}
+            </div>
+          ) : currentView === 'tags' ? (
+            <div className="h-full overflow-auto pb-16">
+              <TagPanel tags={sidebarTags} tasks={tasks} />
+            </div>
+          ) : (
+            <div className="h-full overflow-auto pb-16">
+              <LibraryPanel books={[currentBibleBook]} />
+            </div>
+          )}
+        </div>
 
         <QuizDialog
           isOpen={isQuizOpen}
