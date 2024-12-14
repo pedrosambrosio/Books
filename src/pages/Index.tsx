@@ -296,10 +296,10 @@ const Index = () => {
     }));
 
   const renderMobileContent = () => {
-    if (currentView === 'books') {
-      return (
-        <div className="flex flex-col h-screen">
-          <div className="flex-1 overflow-hidden mb-16">
+    return (
+      <div className="flex flex-col h-screen pb-16">
+        <div className="flex-1 overflow-hidden">
+          {currentView === 'books' ? (
             <ScrollArea className="h-full">
               <div className="p-4 md:p-6 flex justify-center">
                 <div className="w-full max-w-2xl">
@@ -316,56 +316,22 @@ const Index = () => {
                 </div>
               </div>
             </ScrollArea>
-          </div>
-          <div className="fixed bottom-0 left-0 right-0">
-            <AppSidebar 
-              currentBook={currentBibleBook} 
-              onPageSelect={handlePageSelect}
-              noteCounts={getNoteCounts()}
-              tags={sidebarTags}
-              chapterLevels={chapterLevels}
-              onViewChange={setCurrentView}
-            />
-          </div>
-        </div>
-      );
-    } else if (currentView === 'tags') {
-      return (
-        <div className="flex flex-col h-screen">
-          <div className="flex-1 overflow-hidden mb-16">
+          ) : currentView === 'tags' ? (
             <TagPanel tags={sidebarTags} tasks={tasks} />
-          </div>
-          <div className="fixed bottom-0 left-0 right-0">
-            <AppSidebar 
-              currentBook={currentBibleBook} 
-              onPageSelect={handlePageSelect}
-              noteCounts={getNoteCounts()}
-              tags={sidebarTags}
-              chapterLevels={chapterLevels}
-              onViewChange={setCurrentView}
-            />
-          </div>
-        </div>
-      );
-    } else {
-      return (
-        <div className="flex flex-col h-screen">
-          <div className="flex-1 overflow-hidden mb-16">
+          ) : (
             <LibraryPanel books={[currentBibleBook]} />
-          </div>
-          <div className="fixed bottom-0 left-0 right-0">
-            <AppSidebar 
-              currentBook={currentBibleBook} 
-              onPageSelect={handlePageSelect}
-              noteCounts={getNoteCounts()}
-              tags={sidebarTags}
-              chapterLevels={chapterLevels}
-              onViewChange={setCurrentView}
-            />
-          </div>
+          )}
         </div>
-      );
-    }
+        <AppSidebar 
+          currentBook={currentBibleBook} 
+          onPageSelect={handlePageSelect}
+          noteCounts={getNoteCounts()}
+          tags={sidebarTags}
+          chapterLevels={chapterLevels}
+          onViewChange={setCurrentView}
+        />
+      </div>
+    );
   };
 
   return (

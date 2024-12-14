@@ -77,7 +77,7 @@ export function AppSidebar({
 
   if (isMobile) {
     return (
-      <div className="w-full border-t border-border bg-background">
+      <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border">
         <Tabs value={currentView} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="books" className="flex items-center gap-2">
