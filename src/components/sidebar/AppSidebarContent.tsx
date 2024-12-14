@@ -2,12 +2,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { ProfileMenu } from "@/components/profile/ProfileMenu";
 import { Switch } from "@/components/ui/switch";
-import { Book, ChevronDown, Sun, Moon, Library, Tag } from "lucide-react";
+import { Book, ChevronDown, Sun, Moon, Library, Tag, Check } from "lucide-react";
 import { SearchInput } from "@/components/search/SearchInput";
 import { useState } from "react";
 import { Book as BookType } from "@/types/Book";
 import { QuizResult } from "@/types/Quiz";
 import { Badge } from "@/components/ui/badge";
+import { LevelIcon } from "@/components/quiz/LevelIcon";
 import {
   Collapsible,
   CollapsibleContent,
@@ -78,8 +79,11 @@ export function AppSidebarContent({
                   variant="ghost"
                   className="w-full justify-between text-sm group"
                 >
-                  <div className="flex items-center">
+                  <div className="flex items-center gap-2">
                     {book.title}
+                    <span className="text-xs text-muted-foreground">
+                      ({book.completedChapters}/{book.chapters.length})
+                    </span>
                     <Badge variant="secondary" className="ml-2">
                       Notas {noteCounts.bookNotes}
                     </Badge>
@@ -100,11 +104,16 @@ export function AppSidebarContent({
                           variant="ghost"
                           className="w-full justify-between text-sm group"
                         >
-                          <div className="flex items-center">
+                          <div className="flex items-center gap-2">
                             {chapter.title || `Capítulo ${chapter.number}`}
-                            <span className="ml-2 text-muted-foreground">
-                              ({chapter.completedPages}/{chapter.pages.length})
-                            </span>
+                            {chapterLevels[chapter.id] && (
+                              <LevelIcon level={chapterLevels[chapter.id].level} className="ml-1" />
+                            )}
+                            {chapter.notes > 0 && (
+                              <Badge variant="secondary" className="ml-1">
+                                {chapter.notes}
+                              </Badge>
+                            )}
                           </div>
                           <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                         </Button>
@@ -118,10 +127,15 @@ export function AppSidebarContent({
                               className="w-full justify-between text-sm"
                               onClick={() => onPageSelect?.(page.number)}
                             >
-                              <span>Página {page.number}</span>
-                              <span className="text-muted-foreground">
-                                ({page.completed ? '1' : '0'}/1)
-                              </span>
+                              <div className="flex items-center gap-2">
+                                <span>Página {page.number}</span>
+                                {page.completed && <Check className="h-4 w-4" />}
+                                {page.notes > 0 && (
+                                  <Badge variant="secondary" className="ml-1">
+                                    {page.notes}
+                                  </Badge>
+                                )}
+                              </div>
                             </Button>
                           ))}
                         </div>
