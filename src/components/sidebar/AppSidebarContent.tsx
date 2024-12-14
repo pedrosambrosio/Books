@@ -25,7 +25,7 @@ interface AppSidebarContentProps {
   };
   tags?: { name: string; count: number }[];
   chapterLevels?: { [chapterId: string]: QuizResult };
-  onViewChange?: (view: 'books' | 'tags' | 'library') => void;
+  onViewChange?: (view: 'books' | 'tags' | 'library' | 'chat') => void;
   isDarkMode: boolean;
   toggleTheme: () => void;
 }
