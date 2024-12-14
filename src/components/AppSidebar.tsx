@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Collapsible,
   CollapsibleContent,
@@ -25,6 +26,7 @@ import { LevelIcon } from "@/components/quiz/LevelIcon";
 import { SearchInput } from "@/components/search/SearchInput";
 import { ProfileMenu } from "@/components/profile/ProfileMenu";
 import { Switch } from "@/components/ui/switch";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface AppSidebarProps {
   currentBook: BookType;
@@ -51,7 +53,9 @@ export function AppSidebar({
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
   const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [currentTab, setCurrentTab] = useState<'books' | 'tags' | 'library'>('books');
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
@@ -77,27 +81,30 @@ export function AppSidebar({
     book.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  return (
-    <Sidebar className="w-[var(--sidebar-width)] min-w-[200px] border-r border-border">
-      <SidebarContent>
-        <ScrollArea className="h-[calc(100vh-2rem)]">
-          <div className="p-4">
-            <ProfileMenu />
-          </div>
-          
-          <SidebarGroup>
-            <div className="flex items-center justify-between px-4 py-1">
-              <Button
-                variant="ghost"
-                className="p-0 h-auto hover:bg-transparent"
-                onClick={() => onViewChange?.('books')}
-              >
-                <SidebarGroupLabel className="text-sm font-semibold cursor-pointer hover:text-primary transition-colors">
-                  Livros
-                </SidebarGroupLabel>
-              </Button>
-              <SearchInput onSearch={setSearchQuery} />
-            </div>
+  const handleTabChange = (value: string) => {
+    setCurrentTab(value as 'books' | 'tags' | 'library');
+    onViewChange?.(value as 'books' | 'tags' | 'library');
+  };
+
+  const renderSidebarContent = () => (
+    <ScrollArea className="h-[calc(100vh-2rem)]">
+      <div className="p-4">
+        <ProfileMenu />
+      </div>
+      
+      <SidebarGroup>
+        <div className="flex items-center justify-between px-4 py-1">
+          <Button
+            variant="ghost"
+            className="p-0 h-auto hover:bg-transparent"
+            onClick={() => onViewChange?.('books')}
+          >
+            <SidebarGroupLabel className="text-sm font-semibold cursor-pointer hover:text-primary transition-colors">
+              Livros
+            </SidebarGroupLabel>
+          </Button>
+          <SearchInput onSearch={setSearchQuery} />
+        </div>
             <SidebarGroupContent>
               <SidebarMenu>
                 {filteredBooks.map((book) => (
@@ -184,52 +191,78 @@ export function AppSidebar({
                 ))}
               </SidebarMenu>
             </SidebarGroupContent>
-          </SidebarGroup>
+      </SidebarGroup>
 
-          <SidebarGroup>
-            <div className="flex items-center justify-between px-4 py-0.5">
-              <Button
-                variant="ghost"
-                className="p-0 h-auto hover:bg-transparent"
-                onClick={() => onViewChange?.('library')}
-              >
-                <SidebarGroupLabel className="text-sm font-semibold cursor-pointer hover:text-primary transition-colors">
-                  Biblioteca
-                </SidebarGroupLabel>
-              </Button>
-            </div>
-          </SidebarGroup>
+      <SidebarGroup>
+        <div className="flex items-center justify-between px-4 py-0.5">
+          <Button
+            variant="ghost"
+            className="p-0 h-auto hover:bg-transparent"
+            onClick={() => onViewChange?.('library')}
+          >
+            <SidebarGroupLabel className="text-sm font-semibold cursor-pointer hover:text-primary transition-colors">
+              Biblioteca
+            </SidebarGroupLabel>
+          </Button>
+        </div>
+      </SidebarGroup>
 
-          <SidebarGroup>
-            <div className="flex items-center justify-between px-4 py-0.5">
-              <Button
-                variant="ghost"
-                className="p-0 h-auto hover:bg-transparent"
-                onClick={() => onViewChange?.('tags')}
-              >
-                <SidebarGroupLabel className="text-sm font-semibold cursor-pointer hover:text-primary transition-colors">
-                  Notas
-                </SidebarGroupLabel>
-              </Button>
-            </div>
-          </SidebarGroup>
+      <SidebarGroup>
+        <div className="flex items-center justify-between px-4 py-0.5">
+          <Button
+            variant="ghost"
+            className="p-0 h-auto hover:bg-transparent"
+            onClick={() => onViewChange?.('tags')}
+          >
+            <SidebarGroupLabel className="text-sm font-semibold cursor-pointer hover:text-primary transition-colors">
+              Notas
+            </SidebarGroupLabel>
+          </Button>
+        </div>
+      </SidebarGroup>
 
-          <div className="absolute bottom-4 left-0 right-0 px-4">
-            <div className="flex items-center justify-between p-2 rounded-lg border border-border">
-              <span className="text-sm font-medium">
-                {isDarkMode ? "Tema escuro" : "Tema claro"}
-              </span>
-              <div className="flex items-center gap-2">
-                <Sun className="h-4 w-4" />
-                <Switch
-                  checked={isDarkMode}
-                  onCheckedChange={toggleTheme}
-                />
-                <Moon className="h-4 w-4" />
-              </div>
-            </div>
+      <div className="absolute bottom-4 left-0 right-0 px-4">
+        <div className="flex items-center justify-between p-2 rounded-lg border border-border">
+          <div className="flex items-center gap-2">
+            <Sun className="h-4 w-4" />
+            <Switch
+              checked={isDarkMode}
+              onCheckedChange={toggleTheme}
+            />
+            <Moon className="h-4 w-4" />
           </div>
-        </ScrollArea>
+        </div>
+      </div>
+    </ScrollArea>
+  );
+
+  if (isMobile) {
+    return (
+      <div className="w-full border-b border-border">
+        <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="books" className="flex items-center gap-2">
+              <Book className="h-4 w-4" />
+              Livros
+            </TabsTrigger>
+            <TabsTrigger value="library" className="flex items-center gap-2">
+              <Book className="h-4 w-4" />
+              Biblioteca
+            </TabsTrigger>
+            <TabsTrigger value="tags" className="flex items-center gap-2">
+              <Tag className="h-4 w-4" />
+              Notas
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+    );
+  }
+
+  return (
+    <Sidebar className="w-[var(--sidebar-width)] min-w-[200px] border-r border-border">
+      <SidebarContent>
+        {renderSidebarContent()}
       </SidebarContent>
     </Sidebar>
   );

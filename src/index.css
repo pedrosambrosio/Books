@@ -100,6 +100,13 @@
     @apply transition-transform duration-200 hover:scale-[1.02];
   }
 
+  /* Mobile sidebar tabs */
+  @media (max-width: 768px) {
+    [data-tab="sidebar"] {
+      @apply w-full border-b border-border;
+    }
+  }
+
   /* Touch-friendly styles */
   @media (hover: none) {
     .touch-manipulation {
