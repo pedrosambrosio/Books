@@ -298,7 +298,7 @@ const Index = () => {
     }));
 
   const renderMobileContent = () => {
-    if (currentTab === 'chat') {
+    if (mobileView === 'chat') {
       return (
         <MobileChatView 
           currentView={currentView}
