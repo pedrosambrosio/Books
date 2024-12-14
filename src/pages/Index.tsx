@@ -38,9 +38,11 @@ const BIBLE_BOOK: BookType = {
         id: `genesis-${i+1}`,
         number: i + 1,
         title: `Página ${i + 1}`,
-        completed: false
+        completed: false,
+        notes: 0
       })),
       completedPages: 0,
+      notes: 0
     },
     {
       id: "exodus",
@@ -50,9 +52,11 @@ const BIBLE_BOOK: BookType = {
         id: `exodus-${i+1}`,
         number: i + 1,
         title: `Página ${i + 1}`,
-        completed: false
+        completed: false,
+        notes: 0
       })),
       completedPages: 0,
+      notes: 0
     }
   ],
   completedChapters: 0,
