@@ -1,25 +1,21 @@
-export interface Page {
-  id: string;
-  number: number;
-  title: string;
-  completed: boolean;
-}
-
-export interface Chapter {
-  id: string;
-  number: number;
-  title?: string;
-  pages: Page[];
-  completedPages: number;
-  notes?: number;
-  quizScore?: number;
-}
-
 export interface Book {
   id: string;
   title: string;
   type?: string;
-  chapters: Chapter[];
+  chapters: {
+    id: string;
+    number: number;
+    title?: string;
+    pages: {
+      id: string;
+      number: number;
+      title: string;
+      completed: boolean;
+    }[];
+    completedPages: number;
+    notes?: number;
+    quizScore?: number;
+  }[];
   completedChapters: number;
   tags?: string[];
 }
