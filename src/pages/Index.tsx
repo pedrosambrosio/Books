@@ -19,6 +19,7 @@ import { QuizResult } from "@/types/Quiz";
 import { ContentViewer } from "@/components/ContentViewer";
 import { TagPanel } from "@/components/TagPanel";
 import { LibraryPanel } from "@/components/LibraryPanel";
+import { MobileHeader } from "@/components/mobile/MobileHeader";
 
 // Update the ViewType definition to include 'chat'
 type ViewType = 'books' | 'tags' | 'library' | 'chat';
@@ -297,17 +298,12 @@ const Index = () => {
 
     return (
       <div className="mobile-book-panel">
-        <div className="mobile-book-header">
-          <Button
-            variant="ghost"
-            className="text-lg font-semibold"
-            onClick={() => setCurrentView('library')}
-          >
-            {currentBibleBook.title}
-          </Button>
-        </div>
+        <MobileHeader 
+          currentTab={currentTab}
+          onViewChange={setCurrentView}
+        />
         <ScrollArea className="flex-1">
-          <div className="p-4">
+          <div className="p-2">
             <ContentViewer
               content={getCurrentPageContent()}
               currentPage={currentPage}
@@ -456,4 +452,3 @@ const Index = () => {
 };
 
 export default Index;
-

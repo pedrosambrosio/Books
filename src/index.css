@@ -107,7 +107,7 @@
     }
 
     .mobile-content {
-      @apply pb-12 h-[calc(100vh-3rem)];
+      @apply pb-8 h-[calc(100vh-3rem)];
     }
 
     .mobile-book-panel {
@@ -115,7 +115,7 @@
     }
 
     .mobile-book-header {
-      @apply flex items-center justify-center gap-2 p-2;
+      @apply flex items-center justify-center p-1 border-b border-border;
     }
 
     .mobile-header-button {
