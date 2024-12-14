@@ -2,14 +2,14 @@ import { Book, MessageSquare } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface MobileHeaderProps {
-  currentTab: string;
-  onTabChange: (tab: string) => void;
+  currentTab: 'personal' | 'chat';  // Updated to match TabType
+  onTabChange: (tab: 'personal' | 'chat') => void;  // Updated to be more specific
   onViewChange: (view: 'books' | 'tags' | 'library' | 'chat') => void;
 }
 
 export function MobileHeader({ currentTab, onTabChange, onViewChange }: MobileHeaderProps) {
   const handleBooksClick = () => {
-    onTabChange('books');
+    onTabChange('personal');
   };
 
   const handleChatClick = () => {
@@ -22,7 +22,7 @@ export function MobileHeader({ currentTab, onTabChange, onViewChange }: MobileHe
       <Tabs value={currentTab} className="w-full max-w-[280px] mx-auto">
         <TabsList className="grid w-full grid-cols-2 h-9 bg-muted p-1 relative">
           <TabsTrigger 
-            value="books" 
+            value="personal" 
             onClick={handleBooksClick}
             className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:text-foreground rounded"
           >

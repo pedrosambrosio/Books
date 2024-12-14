@@ -22,7 +22,6 @@ import { LibraryPanel } from "@/components/LibraryPanel";
 import { MobileHeader } from "@/components/mobile/MobileHeader";
 import { ChatPanel } from "@/components/chat/ChatPanel";
 
-// Update the ViewType definition to include 'chat'
 type ViewType = 'books' | 'tags' | 'library' | 'chat';
 type TabType = 'personal' | 'chat';
 
@@ -294,6 +293,10 @@ const Index = () => {
       count
     }));
 
+  const handleTabChange = (tab: TabType) => {
+    setCurrentTab(tab);
+  };
+
   const renderContent = () => {
     switch (currentView) {
       case 'books':
@@ -301,7 +304,7 @@ const Index = () => {
           <div className="mobile-book-panel">
             <MobileHeader 
               currentTab={currentTab}
-              onTabChange={setCurrentTab}
+              onTabChange={handleTabChange}
               onViewChange={setCurrentView}
             />
             <ScrollArea className="flex-1">
