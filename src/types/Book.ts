@@ -1,8 +1,9 @@
 export interface Page {
   id: string;
   number: number;
-  title?: string;
+  title: string;
   completed: boolean;
+  notes: number;
 }
 
 export interface Chapter {
@@ -11,17 +12,13 @@ export interface Chapter {
   title?: string;
   pages: Page[];
   completedPages: number;
-  notes?: number;
+  notes: number;
 }
 
 export interface Book {
   id: string;
   title: string;
-  type?: string;
+  type: string;
   chapters: Chapter[];
   completedChapters: number;
-  level?: {
-    name: string;
-    icon: string;
-  };
 }

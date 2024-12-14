@@ -109,11 +109,9 @@ export function AppSidebarContent({
                             {chapterLevels[chapter.id] && (
                               <LevelIcon level={chapterLevels[chapter.id].level} className="ml-1" />
                             )}
-                            {chapter.notes > 0 && (
-                              <Badge variant="secondary" className="ml-1">
-                                {chapter.notes}
-                              </Badge>
-                            )}
+                            <Badge variant="secondary" className="ml-1">
+                              {chapter.notes}
+                            </Badge>
                           </div>
                           <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                         </Button>
@@ -130,11 +128,9 @@ export function AppSidebarContent({
                               <div className="flex items-center gap-2">
                                 <span>Página {page.number}</span>
                                 {page.completed && <Check className="h-4 w-4" />}
-                                {page.notes > 0 && (
-                                  <Badge variant="secondary" className="ml-1">
-                                    {page.notes}
-                                  </Badge>
-                                )}
+                                <Badge variant="secondary" className="ml-1">
+                                  {page.notes}
+                                </Badge>
                               </div>
                             </Button>
                           ))}
