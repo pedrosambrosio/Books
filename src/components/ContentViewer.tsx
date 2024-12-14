@@ -136,6 +136,7 @@ export const ContentViewer = ({
       <TextSelectionTooltip
         position={tooltipPosition}
         onCreateNote={handleCreateNote}
+        selectedText={selectedText}
       />
     </div>
   );
