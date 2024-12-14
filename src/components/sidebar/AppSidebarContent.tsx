@@ -2,12 +2,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { ProfileMenu } from "@/components/profile/ProfileMenu";
 import { Switch } from "@/components/ui/switch";
-import { Book, ChevronDown, Sun, Moon, MessageSquare, Library, Tag } from "lucide-react";
+import { Book, ChevronDown, Sun, Moon, Library, Tag } from "lucide-react";
 import { SearchInput } from "@/components/search/SearchInput";
 import { useState } from "react";
 import { Book as BookType } from "@/types/Book";
 import { QuizResult } from "@/types/Quiz";
-import { LevelIcon } from "@/components/quiz/LevelIcon";
+import { Badge } from "@/components/ui/badge";
 import {
   Collapsible,
   CollapsibleContent,
@@ -32,7 +32,7 @@ interface AppSidebarContentProps {
 export function AppSidebarContent({
   currentBook,
   onPageSelect,
-  noteCounts,
+  noteCounts = { bookNotes: 0, chapterNotes: 0, pageNotes: 0 },
   tags = [],
   chapterLevels = {},
   onViewChange,
@@ -76,10 +76,15 @@ export function AppSidebarContent({
               <CollapsibleTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="w-full justify-start text-sm"
+                  className="w-full justify-between text-sm group"
                 >
-                  {book.title}
-                  <ChevronDown className="h-4 w-4 ml-auto" />
+                  <div className="flex items-center">
+                    {book.title}
+                    <Badge variant="secondary" className="ml-2">
+                      Notas {noteCounts.bookNotes}
+                    </Badge>
+                  </div>
+                  <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                 </Button>
               </CollapsibleTrigger>
               <CollapsibleContent>
@@ -93,13 +98,15 @@ export function AppSidebarContent({
                       <CollapsibleTrigger asChild>
                         <Button
                           variant="ghost"
-                          className="w-full justify-start text-sm"
+                          className="w-full justify-between text-sm group"
                         >
-                          {chapter.title || `Capítulo ${chapter.number}`}
-                          {chapterLevels[chapter.id] && (
-                            <LevelIcon level={chapterLevels[chapter.id].level} />
-                          )}
-                          <ChevronDown className="h-4 w-4 ml-auto" />
+                          <div className="flex items-center">
+                            {chapter.title || `Capítulo ${chapter.number}`}
+                            <span className="ml-2 text-muted-foreground">
+                              ({chapter.completedPages}/{chapter.pages.length})
+                            </span>
+                          </div>
+                          <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                         </Button>
                       </CollapsibleTrigger>
                       <CollapsibleContent>
@@ -108,10 +115,13 @@ export function AppSidebarContent({
                             <Button
                               key={page.id}
                               variant="ghost"
-                              className="w-full justify-start text-sm"
+                              className="w-full justify-between text-sm"
                               onClick={() => onPageSelect?.(page.number)}
                             >
-                              Página {page.number}
+                              <span>Página {page.number}</span>
+                              <span className="text-muted-foreground">
+                                ({page.completed ? '1' : '0'}/1)
+                              </span>
                             </Button>
                           ))}
                         </div>
