@@ -318,7 +318,16 @@ const Index = () => {
             >
               <Menu className="h-6 w-6" />
             </Button>
-            {currentView === 'books' && <AppSidebar />}
+            {currentView === 'books' && (
+              <AppSidebar 
+                currentBook={currentBibleBook}
+                onPageSelect={handlePageSelect}
+                noteCounts={getNoteCounts()}
+                tags={sidebarTags}
+                chapterLevels={chapterLevels}
+                onViewChange={setCurrentView}
+              />
+            )}
           </SidebarProvider>
           <h2 className="text-lg font-semibold">Gênesis</h2>
         </div>
