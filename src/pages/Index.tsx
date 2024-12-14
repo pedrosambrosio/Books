@@ -308,8 +308,17 @@ const Index = () => {
     }
 
     return (
-      <div className="flex flex-col h-screen pb-16">
-        <MobileMenu currentView={currentView} onViewChange={setCurrentView} />
+      <div className="flex flex-col h-screen">
+        <div className="flex items-center gap-4 p-4 border-b">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setCurrentView('books')}
+          >
+            <Menu className="h-6 w-6" />
+          </Button>
+          <h2 className="text-lg font-semibold">Gênesis</h2>
+        </div>
         
         <div className="flex-1 overflow-hidden">
           {currentView === 'books' ? (
@@ -326,6 +335,37 @@ const Index = () => {
                     onMarkAsCompleted={handleMarkAsCompleted}
                     onCreateNoteFromSelection={handleCreateNoteFromSelection}
                   />
+
+                  {currentView === 'books' && (
+                    <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2">
+                      <div className="bg-zinc-100 rounded-full shadow-lg px-2 py-1">
+                        <div className="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setCurrentTab('personal')}
+                            className={cn(
+                              "rounded-full",
+                              currentTab === 'personal' && "bg-white"
+                            )}
+                          >
+                            Minhas Notas
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setCurrentTab('chat')}
+                            className={cn(
+                              "rounded-full",
+                              currentTab === 'chat' && "bg-white"
+                            )}
+                          >
+                            Chat
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </ScrollArea>
@@ -334,33 +374,6 @@ const Index = () => {
           ) : (
             <LibraryPanel books={[currentBibleBook]} />
           )}
-        </div>
-
-        <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4">
-          <div className="max-w-md mx-auto flex justify-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentTab('personal')}
-              className={cn(
-                "flex-1 bg-background",
-                currentTab === 'personal' && "bg-white dark:bg-zinc-800"
-              )}
-            >
-              Minhas Notas
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentTab('chat')}
-              className={cn(
-                "flex-1 bg-background",
-                currentTab === 'chat' && "bg-white dark:bg-zinc-800"
-              )}
-            >
-              Chat
-            </Button>
-          </div>
         </div>
       </div>
     );
