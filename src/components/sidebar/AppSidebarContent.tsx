@@ -7,6 +7,7 @@ import { SearchInput } from "@/components/search/SearchInput";
 import { useState } from "react";
 import { Book as BookType } from "@/types/Book";
 import { QuizResult } from "@/types/Quiz";
+import { LevelIcon } from "@/components/quiz/LevelIcon";
 import {
   Collapsible,
   CollapsibleContent,
