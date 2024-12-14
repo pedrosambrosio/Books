@@ -75,7 +75,7 @@ export const ContentViewer = ({
   };
 
   return (
-    <div className="glass-card h-full rounded-lg p-4 md:p-6">
+    <div className="glass-card h-full rounded-lg p-4 md:p-6 mb-16">
       <div className="flex items-center justify-between mb-4 md:mb-6">
         <h2 className="text-xl md:text-2xl font-semibold">Gênesis</h2>
         <div className="flex items-center gap-2">

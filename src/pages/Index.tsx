@@ -310,20 +310,23 @@ const Index = () => {
     return (
       <div className="flex flex-col h-screen">
         <div className="flex items-center gap-4 p-4 border-b">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setCurrentView('books')}
-          >
-            <Menu className="h-6 w-6" />
-          </Button>
+          <SidebarProvider>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setCurrentView('books')}
+            >
+              <Menu className="h-6 w-6" />
+            </Button>
+            {currentView === 'books' && <AppSidebar />}
+          </SidebarProvider>
           <h2 className="text-lg font-semibold">Gênesis</h2>
         </div>
         
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden relative">
           {currentView === 'books' ? (
             <ScrollArea className="h-full">
-              <div className="p-4 md:p-6 flex justify-center">
+              <div className="p-4 md:p-6 flex justify-center mb-20">
                 <div className="w-full max-w-2xl">
                   <ContentViewer
                     content={getCurrentPageContent()}
@@ -335,37 +338,6 @@ const Index = () => {
                     onMarkAsCompleted={handleMarkAsCompleted}
                     onCreateNoteFromSelection={handleCreateNoteFromSelection}
                   />
-
-                  {currentView === 'books' && (
-                    <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2">
-                      <div className="bg-zinc-100 rounded-full shadow-lg px-2 py-1">
-                        <div className="flex gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setCurrentTab('personal')}
-                            className={cn(
-                              "rounded-full",
-                              currentTab === 'personal' && "bg-white"
-                            )}
-                          >
-                            Minhas Notas
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setCurrentTab('chat')}
-                            className={cn(
-                              "rounded-full",
-                              currentTab === 'chat' && "bg-white"
-                            )}
-                          >
-                            Chat
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             </ScrollArea>
@@ -373,6 +345,37 @@ const Index = () => {
             <TagPanel tags={sidebarTags} tasks={tasks} />
           ) : (
             <LibraryPanel books={[currentBibleBook]} />
+          )}
+
+          {currentView === 'books' && (
+            <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2">
+              <div className="bg-zinc-100 rounded-full shadow-lg px-2 py-1">
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCurrentTab('personal')}
+                    className={cn(
+                      "rounded-full hover:bg-transparent",
+                      currentTab === 'personal' && "bg-white"
+                    )}
+                  >
+                    Minhas Notas
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCurrentTab('chat')}
+                    className={cn(
+                      "rounded-full hover:bg-transparent",
+                      currentTab === 'chat' && "bg-white"
+                    )}
+                  >
+                    Chat
+                  </Button>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </div>
