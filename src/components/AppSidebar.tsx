@@ -19,6 +19,8 @@ import { ProfileMenu } from "@/components/profile/ProfileMenu";
 import { Switch } from "@/components/ui/switch";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AppSidebarContent } from "./sidebar/AppSidebarContent";
+import { Book as BookType } from "@/types/Book";
+import { QuizResult } from "@/types/Quiz";
 
 interface AppSidebarProps {
   currentBook: BookType;
