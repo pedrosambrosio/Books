@@ -102,8 +102,20 @@
 
   /* Mobile sidebar tabs */
   @media (max-width: 768px) {
-    [data-tab="sidebar"] {
-      @apply w-full border-b border-border;
+    .mobile-navigation {
+      @apply fixed bottom-0 left-0 right-0 bg-background border-t border-border z-50;
+    }
+
+    .mobile-content {
+      @apply pb-16 h-[calc(100vh-4rem)];
+    }
+
+    .mobile-book-panel {
+      @apply flex flex-col h-full;
+    }
+
+    .mobile-book-header {
+      @apply flex items-center justify-between p-4 border-b border-border;
     }
   }
 

@@ -292,6 +292,38 @@ const Index = () => {
       count
     }));
 
+  const renderMobileBookPanel = () => {
+    if (!isMobile || currentView !== 'books') return null;
+
+    return (
+      <div className="mobile-book-panel">
+        <div className="mobile-book-header">
+          <Button
+            variant="ghost"
+            className="text-lg font-semibold"
+            onClick={() => setCurrentView('library')}
+          >
+            {currentBibleBook.title}
+          </Button>
+        </div>
+        <ScrollArea className="flex-1">
+          <div className="p-4">
+            <ContentViewer
+              content={getCurrentPageContent()}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onNextPage={handleNextPage}
+              onPreviousPage={handlePreviousPage}
+              isCompleted={isBookCompleted}
+              onMarkAsCompleted={handleMarkAsCompleted}
+              onCreateNoteFromSelection={handleCreateNoteFromSelection}
+            />
+          </div>
+        </ScrollArea>
+      </div>
+    );
+  };
+
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full bg-gradient-to-b from-background to-muted/20">
@@ -304,7 +336,17 @@ const Index = () => {
           onViewChange={setCurrentView}
         />
         
-        {currentView === 'books' ? (
+        {isMobile ? (
+          <div className="mobile-content w-full">
+            {currentView === 'books' ? (
+              renderMobileBookPanel()
+            ) : currentView === 'tags' ? (
+              <TagPanel tags={sidebarTags} tasks={tasks} />
+            ) : (
+              <LibraryPanel books={[currentBibleBook]} />
+            )}
+          </div>
+        ) : (
           <ResizablePanelGroup 
             direction={isMobile ? "vertical" : "horizontal"} 
             className="h-screen flex-1"
@@ -399,14 +441,6 @@ const Index = () => {
               </ScrollArea>
             </ResizablePanel>
           </ResizablePanelGroup>
-        ) : currentView === 'tags' ? (
-          <div className="flex-1">
-            <TagPanel tags={sidebarTags} tasks={tasks} />
-          </div>
-        ) : (
-          <div className="flex-1">
-            <LibraryPanel books={[currentBibleBook]} />
-          </div>
         )}
 
         <QuizDialog
