@@ -107,7 +107,7 @@
     }
 
     .mobile-content {
-      @apply pb-16 h-[calc(100vh-4rem)];
+      @apply pb-12 h-[calc(100vh-3rem)];
     }
 
     .mobile-book-panel {
@@ -115,11 +115,11 @@
     }
 
     .mobile-book-header {
-      @apply flex items-center justify-center gap-4 p-4;
+      @apply flex items-center justify-center gap-2 p-2;
     }
 
     .mobile-header-button {
-      @apply px-4 py-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-sm font-medium transition-colors hover:bg-zinc-200 dark:hover:bg-zinc-700;
+      @apply px-4 py-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-sm font-medium transition-colors hover:bg-zinc-200 dark:hover:bg-zinc-700 flex items-center gap-2;
     }
   }
 

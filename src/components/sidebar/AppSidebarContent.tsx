@@ -7,7 +7,6 @@ import { SearchInput } from "@/components/search/SearchInput";
 import { useState } from "react";
 import { Book as BookType } from "@/types/Book";
 import { QuizResult } from "@/types/Quiz";
-import { LevelIcon } from "@/components/quiz/LevelIcon";
 import {
   Collapsible,
   CollapsibleContent,
@@ -79,19 +78,15 @@ export function AppSidebarContent({
           className="mobile-header-button"
           onClick={() => onViewChange?.('books')}
         >
-          <span className="flex items-center gap-2">
-            <Book className="h-4 w-4" />
-            {currentBook.title}
-          </span>
+          <Book className="h-4 w-4" />
+          Minhas Notas
         </button>
         <button 
           className="mobile-header-button"
           onClick={handleChatClick}
         >
-          <span className="flex items-center gap-2">
-            <MessageSquare className="h-4 w-4" />
-            Chat
-          </span>
+          <MessageSquare className="h-4 w-4" />
+          Chat
         </button>
       </div>
 
