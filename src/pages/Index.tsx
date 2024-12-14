@@ -21,6 +21,7 @@ import { TagPanel } from "@/components/TagPanel";
 import { LibraryPanel } from "@/components/LibraryPanel";
 import { MobileNavigation } from "@/components/mobile/MobileNavigation";
 import { MobileChatView } from "@/components/mobile/MobileChatView";
+import { MobileMenu } from "@/components/mobile/MobileMenu";
 
 // Define the view type
 type ViewType = 'books' | 'tags' | 'library';
@@ -296,8 +297,19 @@ const Index = () => {
     }));
 
   const renderMobileContent = () => {
+    if (currentTab === 'chat') {
+      return (
+        <MobileChatView 
+          currentView={currentView}
+          onViewChange={setCurrentView}
+        />
+      );
+    }
+
     return (
       <div className="flex flex-col h-screen pb-16">
+        <MobileMenu currentView={currentView} onViewChange={setCurrentView} />
+        
         <div className="flex-1 overflow-hidden">
           {currentView === 'books' ? (
             <ScrollArea className="h-full">
@@ -322,14 +334,33 @@ const Index = () => {
             <LibraryPanel books={[currentBibleBook]} />
           )}
         </div>
-        <AppSidebar 
-          currentBook={currentBibleBook} 
-          onPageSelect={handlePageSelect}
-          noteCounts={getNoteCounts()}
-          tags={sidebarTags}
-          chapterLevels={chapterLevels}
-          onViewChange={setCurrentView}
-        />
+
+        <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4">
+          <div className="max-w-md mx-auto flex justify-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentTab('personal')}
+              className={cn(
+                "flex-1 bg-background",
+                currentTab === 'personal' && "bg-white dark:bg-zinc-800"
+              )}
+            >
+              Minhas Notas
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentTab('chat')}
+              className={cn(
+                "flex-1 bg-background",
+                currentTab === 'chat' && "bg-white dark:bg-zinc-800"
+              )}
+            >
+              Chat
+            </Button>
+          </div>
+        </div>
       </div>
     );
   };
