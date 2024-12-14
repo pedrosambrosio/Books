@@ -15,7 +15,7 @@ interface CreateNoteDialogProps {
 export function CreateNoteDialog({ isOpen, onClose, initialReference }: CreateNoteDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-[600px] w-[95vw]">
+      <DialogContent className="max-w-[600px] w-[95vw] rounded-xl">
         <DialogHeader>
           <DialogTitle>Criar Anotação</DialogTitle>
         </DialogHeader>

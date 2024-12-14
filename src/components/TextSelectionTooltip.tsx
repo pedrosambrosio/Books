@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { CreateNoteDialog } from "./CreateNoteDialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface TextSelectionTooltipProps {
   onCreateNote: () => void;
@@ -26,6 +27,7 @@ export const TextSelectionTooltip = ({
   const [tagName, setTagName] = useState("");
   const [isCreateNoteOpen, setIsCreateNoteOpen] = useState(false);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const handleAddTag = () => {
     if (!tagName.trim()) {
@@ -54,7 +56,11 @@ export const TextSelectionTooltip = ({
   };
 
   const handleCreateNote = () => {
-    setIsCreateNoteOpen(true);
+    if (isMobile) {
+      setIsCreateNoteOpen(true);
+    } else {
+      onCreateNote();
+    }
   };
 
   if (!position) return null;
@@ -143,11 +149,13 @@ export const TextSelectionTooltip = ({
         )}
       </div>
 
-      <CreateNoteDialog
-        isOpen={isCreateNoteOpen}
-        onClose={() => setIsCreateNoteOpen(false)}
-        initialReference={selectedText}
-      />
+      {isMobile && (
+        <CreateNoteDialog
+          isOpen={isCreateNoteOpen}
+          onClose={() => setIsCreateNoteOpen(false)}
+          initialReference={selectedText}
+        />
+      )}
     </>
   );
 };
