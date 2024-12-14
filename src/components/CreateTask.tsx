@@ -6,13 +6,6 @@ import { Bookmark, Tag, Plus, X, ChevronDown, ChevronUp } from "lucide-react";
 import { Task } from "./TaskCard";
 import { RichTextEditor } from "./RichTextEditor";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 interface CreateTaskProps {
   onCreateTask: (task: Omit<Task, "id" | "completed" | "inProgress">) => void;
@@ -83,11 +76,6 @@ export const CreateTask = ({
     setTitle(newTitle);
     if (!isExpanded && newTitle) {
       setIsExpanded(true);
-    } else if (isExpanded && !newTitle) {
-      setIsExpanded(false);
-      setDescription("");
-      setReference("");
-      setTags([]);
     }
   };
 
