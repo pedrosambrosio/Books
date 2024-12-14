@@ -294,35 +294,52 @@ const Index = () => {
       count
     }));
 
-  const renderMobileBookPanel = () => {
-    if (!isMobile) return null;
-
-    return (
-      <div className="mobile-book-panel">
-        <MobileHeader 
-          currentTab={currentView}
-          onViewChange={setCurrentView}
-        />
-        <ScrollArea className="flex-1">
-          {currentView === 'chat' ? (
-            <ChatPanel />
-          ) : (
-            <div className="p-2">
-              <ContentViewer
-                content={getCurrentPageContent()}
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onNextPage={handleNextPage}
-                onPreviousPage={handlePreviousPage}
-                isCompleted={isBookCompleted}
-                onMarkAsCompleted={handleMarkAsCompleted}
-                onCreateNoteFromSelection={handleCreateNoteFromSelection}
-              />
-            </div>
-          )}
-        </ScrollArea>
-      </div>
-    );
+  const renderContent = () => {
+    switch (currentView) {
+      case 'books':
+        return (
+          <div className="mobile-book-panel">
+            <MobileHeader 
+              currentTab={currentTab}
+              onTabChange={setCurrentTab}
+              onViewChange={setCurrentView}
+            />
+            <ScrollArea className="flex-1">
+              {currentTab === 'chat' ? (
+                <ChatPanel />
+              ) : (
+                <div className="p-2">
+                  <ContentViewer
+                    content={getCurrentPageContent()}
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onNextPage={handleNextPage}
+                    onPreviousPage={handlePreviousPage}
+                    isCompleted={isBookCompleted}
+                    onMarkAsCompleted={handleMarkAsCompleted}
+                    onCreateNoteFromSelection={handleCreateNoteFromSelection}
+                  />
+                </div>
+              )}
+            </ScrollArea>
+          </div>
+        );
+      case 'library':
+        return <LibraryPanel books={[currentBibleBook]} />;
+      case 'tags':
+        return (
+          <TagPanel
+            tags={Object.entries(tagCounts)
+              .filter(([_, count]) => count > 0)
+              .map(([name, count]) => ({ name, count }))}
+            tasks={tasks}
+          />
+        );
+      case 'chat':
+        return <ChatPanel />;
+      default:
+        return null;
+    }
   };
 
   return (
@@ -335,11 +352,12 @@ const Index = () => {
           tags={sidebarTags}
           chapterLevels={chapterLevels}
           onViewChange={setCurrentView}
+          currentView={currentView}
         />
         
         {isMobile ? (
           <div className="mobile-content w-full">
-            {renderMobileBookPanel()}
+            {renderContent()}
           </div>
         ) : (
           <ResizablePanelGroup 

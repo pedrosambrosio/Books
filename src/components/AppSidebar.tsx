@@ -33,6 +33,7 @@ interface AppSidebarProps {
   tags?: { name: string; count: number }[];
   chapterLevels?: { [chapterId: string]: QuizResult };
   onViewChange?: (view: 'books' | 'tags' | 'library' | 'chat') => void;
+  currentView: 'books' | 'tags' | 'library' | 'chat';
 }
 
 export function AppSidebar({ 
@@ -41,10 +42,10 @@ export function AppSidebar({
   noteCounts, 
   tags = [],
   chapterLevels = {},
-  onViewChange
+  onViewChange,
+  currentView
 }: AppSidebarProps) {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [currentTab, setCurrentTab] = useState<'books' | 'tags' | 'library'>('books');
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -60,8 +61,7 @@ export function AppSidebar({
   if (isMobile) {
     return (
       <div className="mobile-navigation">
-        <Tabs value={currentTab} onValueChange={(value) => {
-          setCurrentTab(value as 'books' | 'tags' | 'library');
+        <Tabs value={currentView} onValueChange={(value) => {
           onViewChange?.(value as 'books' | 'tags' | 'library');
         }} className="w-full">
           <TabsList className="grid w-full grid-cols-3">

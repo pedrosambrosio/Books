@@ -3,20 +3,22 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface MobileHeaderProps {
   currentTab: string;
-  onViewChange?: (view: 'books' | 'tags' | 'library' | 'chat') => void;
+  onTabChange: (tab: string) => void;
+  onViewChange: (view: 'books' | 'tags' | 'library' | 'chat') => void;
 }
 
-export function MobileHeader({ currentTab, onViewChange }: MobileHeaderProps) {
-  const handleChatClick = () => {
-    onViewChange?.('chat');
+export function MobileHeader({ currentTab, onTabChange, onViewChange }: MobileHeaderProps) {
+  const handleBooksClick = () => {
+    onTabChange('books');
   };
 
-  const handleBooksClick = () => {
-    onViewChange?.('books');
+  const handleChatClick = () => {
+    onTabChange('chat');
+    onViewChange('chat');
   };
 
   return (
-    <div className="mobile-book-header">
+    <div className="px-4 py-2">
       <Tabs value={currentTab} className="w-full max-w-[280px] mx-auto">
         <TabsList className="grid w-full grid-cols-2 h-9 bg-muted p-1 relative">
           <TabsTrigger 
