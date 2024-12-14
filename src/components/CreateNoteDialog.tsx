@@ -5,6 +5,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { CreateTask } from "./CreateTask";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface CreateNoteDialogProps {
   isOpen: boolean;
@@ -13,6 +14,10 @@ interface CreateNoteDialogProps {
 }
 
 export function CreateNoteDialog({ isOpen, onClose, initialReference }: CreateNoteDialogProps) {
+  const isMobile = useIsMobile();
+
+  if (!isMobile) return null;
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-[600px] w-[95vw] rounded-xl">
