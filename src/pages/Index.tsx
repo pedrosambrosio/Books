@@ -308,10 +308,10 @@ const Index = () => {
     }
 
     return (
-      <div className="flex flex-col h-screen">
+      <div className="flex flex-col h-screen pb-16">
         <MobileMenu currentView={currentView} onViewChange={setCurrentView} />
         
-        <div className="flex-1 overflow-hidden mt-16"> {/* Added mt-16 to create space below the menu */}
+        <div className="flex-1 overflow-hidden">
           {currentView === 'books' ? (
             <ScrollArea className="h-full">
               <div className="p-4 md:p-6 flex justify-center">
@@ -336,35 +336,32 @@ const Index = () => {
           )}
         </div>
 
-        {/* Show bottom navigation only in books view */}
-        {currentView === 'books' && (
-          <div className="fixed bottom-0 left-0 right-0 bg-background p-4">
-            <div className="max-w-md mx-auto flex justify-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentTab('personal')}
-                className={cn(
-                  "flex-1 bg-background",
-                  currentTab === 'personal' && "bg-white dark:bg-zinc-800"
-                )}
-              >
-                Minhas Notas
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentTab('chat')}
-                className={cn(
-                  "flex-1 bg-background",
-                  currentTab === 'chat' && "bg-white dark:bg-zinc-800"
-                )}
-              >
-                Chat
-              </Button>
-            </div>
+        <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4">
+          <div className="max-w-md mx-auto flex justify-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentTab('personal')}
+              className={cn(
+                "flex-1 bg-background",
+                currentTab === 'personal' && "bg-white dark:bg-zinc-800"
+              )}
+            >
+              Minhas Notas
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentTab('chat')}
+              className={cn(
+                "flex-1 bg-background",
+                currentTab === 'chat' && "bg-white dark:bg-zinc-800"
+              )}
+            >
+              Chat
+            </Button>
           </div>
-        )}
+        </div>
       </div>
     );
   };

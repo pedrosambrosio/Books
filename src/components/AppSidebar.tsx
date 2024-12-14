@@ -29,7 +29,7 @@ import { Switch } from "@/components/ui/switch";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface AppSidebarProps {
-  currentBook?: BookType;
+  currentBook: BookType;
   onPageSelect?: (pageNumber: number) => void;
   noteCounts?: {
     bookNotes: number;
@@ -39,7 +39,6 @@ interface AppSidebarProps {
   tags?: { name: string; count: number }[];
   chapterLevels?: { [chapterId: string]: QuizResult };
   onViewChange?: (view: 'books' | 'tags' | 'library') => void;
-  currentView?: 'books' | 'tags' | 'library';
 }
 
 export function AppSidebar({ 
@@ -48,13 +47,13 @@ export function AppSidebar({
   noteCounts, 
   tags = [],
   chapterLevels = {},
-  onViewChange,
-  currentView = 'books'
+  onViewChange
 }: AppSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
   const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [currentView, setCurrentView] = useState<'books' | 'tags' | 'library'>('books');
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -67,14 +66,19 @@ export function AppSidebar({
     });
   };
 
+  const handleTabChange = (value: string) => {
+    setCurrentView(value as 'books' | 'tags' | 'library');
+    onViewChange?.(value as 'books' | 'tags' | 'library');
+  };
+
   const filteredBooks = [currentBook].filter(book => 
-    book?.title.toLowerCase().includes(searchQuery.toLowerCase())
+    book.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (isMobile) {
     return (
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border">
-        <Tabs value={currentView} onValueChange={onViewChange} className="w-full">
+        <Tabs value={currentView} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="books" className="flex items-center gap-2">
               <Book className="h-4 w-4" />
@@ -119,31 +123,31 @@ export function AppSidebar({
               <SidebarMenu>
                 {filteredBooks.map((book) => (
                   <Collapsible
-                    key={book?.id}
-                    open={expandedBook === book?.id}
-                    onOpenChange={() => setExpandedBook(expandedBook === book?.id ? null : book?.id)}
+                    key={book.id}
+                    open={expandedBook === book.id}
+                    onOpenChange={() => setExpandedBook(expandedBook === book.id ? null : book.id)}
                   >
                     <CollapsibleTrigger asChild>
                       <SidebarMenuButton className="w-full px-4 py-2 hover:bg-accent rounded-lg transition-colors">
-                        {expandedBook === book?.id ? (
+                        {expandedBook === book.id ? (
                           <ChevronDown className="h-4 w-4 mr-2" />
                         ) : (
                           <Book className="h-4 w-4 mr-2" />
                         )}
-                        <span className={expandedBook === book?.id ? "text-[#09090B]" : "text-[#71717A]"}>{book?.title}</span>
+                        <span className={expandedBook === book.id ? "text-[#09090B]" : "text-[#71717A]"}>{book.title}</span>
                         <div className="ml-auto flex items-center gap-2">
                           <span className="text-xs bg-muted px-2 py-0.5 rounded-full">
                             notas {noteCounts?.bookNotes || 0}
                           </span>
                           <span className="text-xs bg-muted px-2 py-0.5 rounded-full">
-                            {book?.completedChapters}/{book?.chapters.length}
+                            {book.completedChapters}/{book.chapters.length}
                           </span>
                         </div>
                       </SidebarMenuButton>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <div className="ml-8 space-y-1">
-                        {book?.chapters.map((chapter) => (
+                        {book.chapters.map((chapter) => (
                           <Collapsible
                             key={chapter.id}
                             open={expandedChapter === chapter.id}
