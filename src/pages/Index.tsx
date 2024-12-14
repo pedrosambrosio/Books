@@ -20,8 +20,8 @@ import { ContentViewer } from "@/components/ContentViewer";
 import { TagPanel } from "@/components/TagPanel";
 import { LibraryPanel } from "@/components/LibraryPanel";
 
-// Define the view type
-type ViewType = 'books' | 'tags' | 'library';
+// Update the ViewType definition to include 'chat'
+type ViewType = 'books' | 'tags' | 'library' | 'chat';
 type TabType = 'personal' | 'chat';
 
 const BIBLE_BOOK: BookType = {
@@ -456,3 +456,4 @@ const Index = () => {
 };
 
 export default Index;
+
