@@ -2,7 +2,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { ProfileMenu } from "@/components/profile/ProfileMenu";
 import { Switch } from "@/components/ui/switch";
-import { Book, ChevronDown, Sun, Moon } from "lucide-react";
+import { Book, ChevronDown, Sun, Moon, MessageSquare } from "lucide-react";
 import { SearchInput } from "@/components/search/SearchInput";
 import { useState } from "react";
 import { Book as BookType } from "@/types/Book";
@@ -13,6 +13,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { useToast } from "@/components/ui/use-toast";
 
 interface AppSidebarContentProps {
   currentBook: BookType;
@@ -42,6 +43,7 @@ export function AppSidebarContent({
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
   const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const filteredBooks = [currentBook].filter(book => 
     book.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -54,6 +56,14 @@ export function AppSidebarContent({
     }
   };
 
+  const handleChatClick = () => {
+    onViewChange?.('chat');
+    toast({
+      title: "Chat em breve",
+      description: "O chat estará disponível em breve.",
+    });
+  };
+
   return (
     <ScrollArea className="h-[calc(100vh-2rem)]">
       <div className="p-4">
@@ -63,7 +73,29 @@ export function AppSidebarContent({
       <div className="flex items-center justify-between px-4 py-1">
         <SearchInput onSearch={setSearchQuery} />
       </div>
-      <div>
+
+      <div className="mobile-book-header md:hidden">
+        <button 
+          className="mobile-header-button"
+          onClick={() => onViewChange?.('books')}
+        >
+          <span className="flex items-center gap-2">
+            <Book className="h-4 w-4" />
+            {currentBook.title}
+          </span>
+        </button>
+        <button 
+          className="mobile-header-button"
+          onClick={handleChatClick}
+        >
+          <span className="flex items-center gap-2">
+            <MessageSquare className="h-4 w-4" />
+            Chat
+          </span>
+        </button>
+      </div>
+
+      <div className="hidden md:block">
         {filteredBooks.map((book) => (
           <Collapsible
             key={book.id}

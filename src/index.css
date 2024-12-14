@@ -115,7 +115,11 @@
     }
 
     .mobile-book-header {
-      @apply flex items-center justify-between p-4 border-b border-border;
+      @apply flex items-center justify-center gap-4 p-4;
+    }
+
+    .mobile-header-button {
+      @apply px-4 py-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-sm font-medium transition-colors hover:bg-zinc-200 dark:hover:bg-zinc-700;
     }
   }
 
