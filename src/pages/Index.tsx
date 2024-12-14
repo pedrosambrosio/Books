@@ -23,9 +23,10 @@ import { MobileNavigation } from "@/components/mobile/MobileNavigation";
 import { MobileChatView } from "@/components/mobile/MobileChatView";
 import { MobileMenu } from "@/components/mobile/MobileMenu";
 
-// Define the view type
+// Define view and tab types
 type ViewType = 'books' | 'tags' | 'library';
 type TabType = 'personal' | 'chat';
+type MobileViewType = 'bible' | 'chat';
 
 const BIBLE_BOOK: BookType = {
   id: "bible",
@@ -76,7 +77,7 @@ const Index = () => {
   const [selectedTextReference, setSelectedTextReference] = useState("");
   const [currentView, setCurrentView] = useState<ViewType>('books');
   const [currentTab, setCurrentTab] = useState<TabType>('personal');
-  const [mobileView, setMobileView] = useState<'bible' | 'chat'>('bible');
+  const [mobileView, setMobileView] = useState<MobileViewType>('bible');
 
   const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress" | "isPaused">) => {
     const task: Task = {
