@@ -9,6 +9,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Edit, Tag, MessageSquare, X, Check } from "lucide-react";
+import { CreateNoteDialog } from "./CreateNoteDialog";
 
 interface VerseDisplayProps {
   verse: number;
@@ -23,6 +24,7 @@ export const VerseDisplay = ({ verse, text, onCreateNote, onTagAdded }: VerseDis
   const [tagName, setTagName] = useState("");
   const [hasTag, setHasTag] = useState(false);
   const { toast } = useToast();
+  const [isCreateNoteOpen, setIsCreateNoteOpen] = useState(false);
 
   // Load saved tag state from localStorage on mount
   useEffect(() => {
@@ -91,7 +93,7 @@ export const VerseDisplay = ({ verse, text, onCreateNote, onTagAdded }: VerseDis
 
   const handleCreateNote = () => {
     onCreateNote(`Gênesis 1:${verse} - ${text}`);
-    setIsTooltipOpen(false);
+    setIsCreateNoteOpen(false);
   };
 
   return (
@@ -166,7 +168,7 @@ export const VerseDisplay = ({ verse, text, onCreateNote, onTagAdded }: VerseDis
                       variant="ghost"
                       size="sm"
                       className="p-2 hover:bg-gray-100"
-                      onClick={handleCreateNote}
+                      onClick={() => setIsCreateNoteOpen(true)}
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -201,6 +203,12 @@ export const VerseDisplay = ({ verse, text, onCreateNote, onTagAdded }: VerseDis
         </Tooltip>
       </TooltipProvider>
       <span id={`verse-${verse}`} className="text-sm">{text}</span>
+
+      <CreateNoteDialog
+        isOpen={isCreateNoteOpen}
+        onClose={() => setIsCreateNoteOpen(false)}
+        initialReference={`Gênesis 1:${verse} - ${text}`}
+      />
     </div>
   );
 };
