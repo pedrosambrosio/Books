@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import {
   Tooltip,
@@ -7,11 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { X } from "lucide-react";
-import { CreateNoteDialog } from "./CreateNoteDialog";
-import { VerseTooltipActions } from "./verse/VerseTooltipActions";
-import { VerseTagInput } from "./verse/VerseTagInput";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { Edit, Tag, MessageSquare, X, Check } from "lucide-react";
 
 interface VerseDisplayProps {
   verse: number;
@@ -26,9 +23,8 @@ export const VerseDisplay = ({ verse, text, onCreateNote, onTagAdded }: VerseDis
   const [tagName, setTagName] = useState("");
   const [hasTag, setHasTag] = useState(false);
   const { toast } = useToast();
-  const [isCreateNoteOpen, setIsCreateNoteOpen] = useState(false);
-  const isMobile = useIsMobile();
 
+  // Load saved tag state from localStorage on mount
   useEffect(() => {
     const savedTags = localStorage.getItem(`verse-${verse}-tags`);
     if (savedTags) {
@@ -51,6 +47,7 @@ export const VerseDisplay = ({ verse, text, onCreateNote, onTagAdded }: VerseDis
       return;
     }
 
+    // Save tag to localStorage
     localStorage.setItem(`verse-${verse}-tags`, tagName);
 
     const verseElement = document.getElementById(`verse-${verse}`);
@@ -93,12 +90,8 @@ export const VerseDisplay = ({ verse, text, onCreateNote, onTagAdded }: VerseDis
   };
 
   const handleCreateNote = () => {
-    if (isMobile) {
-      setIsCreateNoteOpen(true);
-    } else {
-      onCreateNote(`Gênesis 1:${verse} - ${text}`);
-      setIsTooltipOpen(false);
-    }
+    onCreateNote(`Gênesis 1:${verse} - ${text}`);
+    setIsTooltipOpen(false);
   };
 
   return (
@@ -131,11 +124,31 @@ export const VerseDisplay = ({ verse, text, onCreateNote, onTagAdded }: VerseDis
             }}
           >
             {isAddingTag ? (
-              <VerseTagInput
-                tagName={tagName}
-                onTagNameChange={setTagName}
-                onAddTag={handleAddTag}
-              />
+              <div className="relative">
+                <Input
+                  value={tagName}
+                  onChange={(e) => setTagName(e.target.value)}
+                  placeholder="Nome da tag..."
+                  className="h-8 text-sm pr-10"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleAddTag();
+                    } else if (e.key === 'Escape') {
+                      setIsAddingTag(false);
+                      setTagName("");
+                    }
+                  }}
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleAddTag}
+                  className="absolute right-0 top-0 h-full px-2"
+                >
+                  <Check className="h-4 w-4" />
+                </Button>
+              </div>
             ) : (
               <div className="flex items-center gap-2">
                 {hasTag ? (
@@ -148,10 +161,39 @@ export const VerseDisplay = ({ verse, text, onCreateNote, onTagAdded }: VerseDis
                     <X className="h-4 w-4" />
                   </Button>
                 ) : (
-                  <VerseTooltipActions
-                    onCreateNote={handleCreateNote}
-                    onAddTag={() => setIsAddingTag(true)}
-                  />
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="p-2 hover:bg-gray-100"
+                      onClick={handleCreateNote}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="p-2 hover:bg-gray-100"
+                      onClick={() => setIsAddingTag(true)}
+                    >
+                      <Tag className="h-4 w-4" />
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="p-2 hover:bg-gray-100"
+                      onClick={() => {
+                        toast({
+                          title: "Em breve",
+                          description: "Esta funcionalidade estará disponível em breve!",
+                        });
+                      }}
+                    >
+                      <MessageSquare className="h-4 w-4" />
+                    </Button>
+                  </>
                 )}
               </div>
             )}
@@ -159,12 +201,6 @@ export const VerseDisplay = ({ verse, text, onCreateNote, onTagAdded }: VerseDis
         </Tooltip>
       </TooltipProvider>
       <span id={`verse-${verse}`} className="text-sm">{text}</span>
-
-      <CreateNoteDialog
-        isOpen={isCreateNoteOpen}
-        onClose={() => setIsCreateNoteOpen(false)}
-        initialReference={`Gênesis 1:${verse} - ${text}`}
-      />
     </div>
   );
 };

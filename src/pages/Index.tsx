@@ -19,10 +19,9 @@ import { QuizResult } from "@/types/Quiz";
 import { ContentViewer } from "@/components/ContentViewer";
 import { TagPanel } from "@/components/TagPanel";
 import { LibraryPanel } from "@/components/LibraryPanel";
-import { MobileHeader } from "@/components/mobile/MobileHeader";
-import { ChatPanel } from "@/components/chat/ChatPanel";
 
-type ViewType = 'books' | 'tags' | 'library' | 'chat';
+// Define the view type
+type ViewType = 'books' | 'tags' | 'library';
 type TabType = 'personal' | 'chat';
 
 const BIBLE_BOOK: BookType = {
@@ -38,11 +37,9 @@ const BIBLE_BOOK: BookType = {
         id: `genesis-${i+1}`,
         number: i + 1,
         title: `Página ${i + 1}`,
-        completed: false,
-        notes: 0
+        completed: false
       })),
       completedPages: 0,
-      notes: 0
     },
     {
       id: "exodus",
@@ -52,11 +49,9 @@ const BIBLE_BOOK: BookType = {
         id: `exodus-${i+1}`,
         number: i + 1,
         title: `Página ${i + 1}`,
-        completed: false,
-        notes: 0
+        completed: false
       })),
       completedPages: 0,
-      notes: 0
     }
   ],
   completedChapters: 0,
@@ -297,58 +292,6 @@ const Index = () => {
       count
     }));
 
-  const handleTabChange = (tab: TabType) => {
-    setCurrentTab(tab);
-  };
-
-  const renderContent = () => {
-    switch (currentView) {
-      case 'books':
-        return (
-          <div className="mobile-book-panel">
-            <MobileHeader 
-              currentTab={currentTab}
-              onTabChange={handleTabChange}
-              onViewChange={setCurrentView}
-            />
-            <ScrollArea className="flex-1">
-              {currentTab === 'chat' ? (
-                <ChatPanel />
-              ) : (
-                <div className="p-2">
-                  <ContentViewer
-                    content={getCurrentPageContent()}
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onNextPage={handleNextPage}
-                    onPreviousPage={handlePreviousPage}
-                    isCompleted={isBookCompleted}
-                    onMarkAsCompleted={handleMarkAsCompleted}
-                    onCreateNoteFromSelection={handleCreateNoteFromSelection}
-                  />
-                </div>
-              )}
-            </ScrollArea>
-          </div>
-        );
-      case 'library':
-        return <LibraryPanel books={[currentBibleBook]} />;
-      case 'tags':
-        return (
-          <TagPanel
-            tags={Object.entries(tagCounts)
-              .filter(([_, count]) => count > 0)
-              .map(([name, count]) => ({ name, count }))}
-            tasks={tasks}
-          />
-        );
-      case 'chat':
-        return <ChatPanel />;
-      default:
-        return null;
-    }
-  };
-
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full bg-gradient-to-b from-background to-muted/20">
@@ -359,14 +302,9 @@ const Index = () => {
           tags={sidebarTags}
           chapterLevels={chapterLevels}
           onViewChange={setCurrentView}
-          currentView={currentView}
         />
         
-        {isMobile ? (
-          <div className="mobile-content w-full">
-            {renderContent()}
-          </div>
-        ) : (
+        {currentView === 'books' ? (
           <ResizablePanelGroup 
             direction={isMobile ? "vertical" : "horizontal"} 
             className="h-screen flex-1"
@@ -461,6 +399,14 @@ const Index = () => {
               </ScrollArea>
             </ResizablePanel>
           </ResizablePanelGroup>
+        ) : currentView === 'tags' ? (
+          <div className="flex-1">
+            <TagPanel tags={sidebarTags} tasks={tasks} />
+          </div>
+        ) : (
+          <div className="flex-1">
+            <LibraryPanel books={[currentBibleBook]} />
+          </div>
         )}
 
         <QuizDialog
