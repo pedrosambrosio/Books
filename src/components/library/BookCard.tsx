@@ -12,7 +12,9 @@ interface BookCardProps {
 
 export function BookCard({ book, onClick }: BookCardProps) {
   const progress = (book.completedChapters / book.chapters.length) * 100;
-  const totalNotes = book.chapters.reduce((acc, chapter) => acc + (chapter.notes || 0), 0);
+  const totalNotes = book.chapters.reduce((acc, chapter) => 
+    acc + (Array.isArray(chapter.notes) ? chapter.notes.length : 0), 
+  0);
 
   return (
     <Card 

@@ -56,11 +56,13 @@ export function BookDetailsDialog({
   };
 
   const progress = (book.completedChapters / book.chapters.length) * 100;
-  const totalNotes = book.chapters.reduce((acc, chapter) => acc + (chapter.notes || 0), 0);
+  const totalNotes = book.chapters.reduce((acc, chapter) => 
+    acc + (Array.isArray(chapter.notes) ? chapter.notes.length : 0), 
+  0);
 
   // Filter notes by selected tag
   const filteredNotes = book.chapters.flatMap(chapter => 
-    (chapter.notes || []).filter(note => 
+    (Array.isArray(chapter.notes) ? chapter.notes : []).filter(note => 
       !selectedTag || note.tags?.includes(selectedTag)
     )
   );
