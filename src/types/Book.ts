@@ -5,13 +5,18 @@ export interface Page {
   completed: boolean;
 }
 
+export interface Note {
+  content: string;
+  tags?: string[];
+}
+
 export interface Chapter {
   id: string;
   number: number;
   title?: string;
   pages: Page[];
   completedPages: number;
-  notes?: number;
+  notes?: Note[];
   quizScore?: number;
 }
 

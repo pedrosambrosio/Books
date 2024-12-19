@@ -19,11 +19,20 @@ export function BookCard({ book, onClick }: BookCardProps) {
       className="hover:bg-accent transition-colors cursor-pointer group relative overflow-hidden" 
       onClick={onClick}
     >
-      {book.coverImage && (
+      {book.coverImage ? (
         <div className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity">
           <Image
             src={book.coverImage}
             alt={book.title}
+            fallback="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b"
+            className="w-full h-full object-cover"
+          />
+        </div>
+      ) : (
+        <div className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity">
+          <Image
+            src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b"
+            alt="Default cover"
             className="w-full h-full object-cover"
           />
         </div>
