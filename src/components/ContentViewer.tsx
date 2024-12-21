@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { TextSelectionTooltip } from "./TextSelectionTooltip";
@@ -30,6 +30,7 @@ export const ContentViewer = ({
 }: ContentViewerProps) => {
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
   const [selectedText, setSelectedText] = useState("");
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleSelectionChange = () => {
@@ -47,18 +48,38 @@ export const ContentViewer = ({
         return;
       }
 
+      // Check if the selection is within the content container
       const range = selection.getRangeAt(0);
+      const container = contentRef.current;
+      if (!container?.contains(range.commonAncestorContainer)) {
+        setTooltipPosition(null);
+        setSelectedText("");
+        return;
+      }
+
       const rect = range.getBoundingClientRect();
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const containerRect = container.getBoundingClientRect();
 
+      // Calculate position relative to the viewport
       const tooltipX = rect.left + (rect.width / 2);
-      const tooltipY = rect.top + scrollTop;
+      const tooltipY = rect.top - 10; // Position slightly above the selection
 
-      setTooltipPosition({
-        x: tooltipX,
-        y: tooltipY,
-      });
-      setSelectedText(text);
+      // Only show tooltip if selection is within container bounds
+      if (
+        tooltipX >= containerRect.left &&
+        tooltipX <= containerRect.right &&
+        tooltipY >= containerRect.top &&
+        tooltipY <= containerRect.bottom
+      ) {
+        setTooltipPosition({
+          x: tooltipX,
+          y: tooltipY,
+        });
+        setSelectedText(text);
+      } else {
+        setTooltipPosition(null);
+        setSelectedText("");
+      }
     };
 
     document.addEventListener("selectionchange", handleSelectionChange);
@@ -75,7 +96,7 @@ export const ContentViewer = ({
   };
 
   return (
-    <div className="glass-card h-full rounded-lg p-4 md:p-6">
+    <div ref={contentRef} className="glass-card h-full rounded-lg p-4 md:p-6">
       <div className="flex items-center justify-between mb-4 md:mb-6">
         <h2 className="text-xl md:text-2xl font-semibold">Gênesis</h2>
         <div className="flex items-center gap-2">
