@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Edit, Tag, MessageSquare, X, Check } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -22,6 +22,14 @@ export const TextSelectionTooltip = ({
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [tagName, setTagName] = useState("");
   const { toast } = useToast();
+
+  // Reset states when tooltip is closed (position becomes null)
+  useEffect(() => {
+    if (!position) {
+      setIsAddingTag(false);
+      setTagName("");
+    }
+  }, [position]);
 
   const handleAddTag = () => {
     if (!tagName.trim()) {
@@ -119,7 +127,11 @@ export const TextSelectionTooltip = ({
                 variant="ghost"
                 size="sm"
                 className="p-2 hover:bg-gray-100"
-                onClick={() => setIsAddingTag(true)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsAddingTag(true);
+                }}
               >
                 <Tag className="h-4 w-4" />
               </Button>
