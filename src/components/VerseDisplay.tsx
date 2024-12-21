@@ -24,6 +24,14 @@ export const VerseDisplay = ({ verse, text, onCreateNote, onTagAdded }: VerseDis
   const [hasTag, setHasTag] = useState(false);
   const { toast } = useToast();
 
+  // Reset states when tooltip is closed
+  useEffect(() => {
+    if (!isTooltipOpen) {
+      setIsAddingTag(false);
+      setTagName("");
+    }
+  }, [isTooltipOpen]);
+
   // Load saved tag state from localStorage on mount
   useEffect(() => {
     const savedTags = localStorage.getItem(`verse-${verse}-tags`);
@@ -72,6 +80,7 @@ export const VerseDisplay = ({ verse, text, onCreateNote, onTagAdded }: VerseDis
     setTagName("");
     setIsAddingTag(false);
     setHasTag(true);
+    setIsTooltipOpen(false);
   };
 
   const handleRemoveTag = () => {
@@ -83,6 +92,7 @@ export const VerseDisplay = ({ verse, text, onCreateNote, onTagAdded }: VerseDis
     }
 
     setHasTag(false);
+    setIsTooltipOpen(false);
     toast({
       title: "Tag removida",
       description: "A tag foi removida do versículo.",
@@ -97,7 +107,7 @@ export const VerseDisplay = ({ verse, text, onCreateNote, onTagAdded }: VerseDis
   return (
     <div className="flex gap-2 mb-2">
       <TooltipProvider>
-        <Tooltip>
+        <Tooltip open={isTooltipOpen}>
           <TooltipTrigger asChild>
             <Button
               variant="ghost"
@@ -124,7 +134,7 @@ export const VerseDisplay = ({ verse, text, onCreateNote, onTagAdded }: VerseDis
             }}
           >
             {isAddingTag ? (
-              <div className="relative">
+              <div className="relative" onClick={(e) => e.stopPropagation()}>
                 <Input
                   value={tagName}
                   onChange={(e) => setTagName(e.target.value)}
@@ -137,13 +147,17 @@ export const VerseDisplay = ({ verse, text, onCreateNote, onTagAdded }: VerseDis
                     } else if (e.key === 'Escape') {
                       setIsAddingTag(false);
                       setTagName("");
+                      setIsTooltipOpen(false);
                     }
                   }}
                 />
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={handleAddTag}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAddTag();
+                  }}
                   className="absolute right-0 top-0 h-full px-2"
                 >
                   <Check className="h-4 w-4" />
@@ -156,7 +170,10 @@ export const VerseDisplay = ({ verse, text, onCreateNote, onTagAdded }: VerseDis
                     variant="ghost"
                     size="sm"
                     className="p-2 hover:bg-gray-100"
-                    onClick={handleRemoveTag}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveTag();
+                    }}
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -166,7 +183,10 @@ export const VerseDisplay = ({ verse, text, onCreateNote, onTagAdded }: VerseDis
                       variant="ghost"
                       size="sm"
                       className="p-2 hover:bg-gray-100"
-                      onClick={handleCreateNote}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCreateNote();
+                      }}
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -175,7 +195,10 @@ export const VerseDisplay = ({ verse, text, onCreateNote, onTagAdded }: VerseDis
                       variant="ghost"
                       size="sm"
                       className="p-2 hover:bg-gray-100"
-                      onClick={() => setIsAddingTag(true)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsAddingTag(true);
+                      }}
                     >
                       <Tag className="h-4 w-4" />
                     </Button>
@@ -184,7 +207,8 @@ export const VerseDisplay = ({ verse, text, onCreateNote, onTagAdded }: VerseDis
                       variant="ghost"
                       size="sm"
                       className="p-2 hover:bg-gray-100"
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         toast({
                           title: "Em breve",
                           description: "Esta funcionalidade estará disponível em breve!",

@@ -31,7 +31,8 @@ export const TextSelectionTooltip = ({
     }
   }, [position]);
 
-  const handleAddTag = () => {
+  const handleAddTag = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     if (!tagName.trim()) {
       setIsAddingTag(false);
       return;
@@ -59,6 +60,12 @@ export const TextSelectionTooltip = ({
 
   if (!position) return null;
 
+  const handleTagClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsAddingTag(true);
+  };
+
   return (
     <div
       className="fixed z-50 bg-white rounded-lg shadow-lg border border-gray-200 py-2 px-3 animate-scale-in flex gap-2 items-center transition-transform duration-15"
@@ -68,12 +75,10 @@ export const TextSelectionTooltip = ({
         transform: 'translate(-50%, -100%)',
         pointerEvents: 'auto',
       }}
-      onClick={(e) => {
-        e.stopPropagation();
-      }}
+      onClick={(e) => e.stopPropagation()}
     >
       {isAddingTag ? (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
           <div className="relative">
             <Input
               value={tagName}
@@ -94,10 +99,7 @@ export const TextSelectionTooltip = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleAddTag();
-              }}
+              onClick={handleAddTag}
               className="absolute right-0 top-0 h-full px-2"
             >
               <Check className="h-4 w-4" />
@@ -137,11 +139,7 @@ export const TextSelectionTooltip = ({
                 variant="ghost"
                 size="sm"
                 className="p-2 hover:bg-gray-100"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setIsAddingTag(true);
-                }}
+                onClick={handleTagClick}
               >
                 <Tag className="h-4 w-4" />
               </Button>
