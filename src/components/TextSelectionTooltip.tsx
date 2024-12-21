@@ -68,6 +68,9 @@ export const TextSelectionTooltip = ({
         transform: 'translate(-50%, -100%)',
         pointerEvents: 'auto',
       }}
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
     >
       {isAddingTag ? (
         <div className="flex items-center gap-2">
@@ -86,11 +89,15 @@ export const TextSelectionTooltip = ({
                   setTagName("");
                 }
               }}
+              onClick={(e) => e.stopPropagation()}
             />
             <Button
               variant="ghost"
               size="sm"
-              onClick={handleAddTag}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddTag();
+              }}
               className="absolute right-0 top-0 h-full px-2"
             >
               <Check className="h-4 w-4" />
@@ -104,7 +111,10 @@ export const TextSelectionTooltip = ({
               variant="ghost"
               size="sm"
               className="p-2 hover:bg-gray-100"
-              onClick={onRemoveTag}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onRemoveTag) onRemoveTag();
+              }}
             >
               <X className="h-4 w-4" />
             </Button>
@@ -140,7 +150,10 @@ export const TextSelectionTooltip = ({
                 variant="ghost"
                 size="sm"
                 className="p-2 hover:bg-gray-100"
-                onClick={handleAskChat}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAskChat();
+                }}
               >
                 <MessageSquare className="h-4 w-4" />
               </Button>
