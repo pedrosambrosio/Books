@@ -142,7 +142,7 @@ export function BookDetailsDialog({
                   <BookOpen className="h-5 w-5" />
                   Total de Anotações
                 </div>
-                <p className="text-2xl font-bold">{totalNotes}</p>
+                <p className="text-2xl font-bold">{totalNotes.toString()}</p>
               </div>
             </div>
 
@@ -210,7 +210,9 @@ export function BookDetailsDialog({
                       className="h-2" 
                     />
                     <div className="flex justify-between text-sm text-muted-foreground">
-                      <span>{chapter.notes || 0} anotações</span>
+                      <span>
+                        {Array.isArray(chapter.notes) ? chapter.notes.length : 0} anotações
+                      </span>
                       <span>
                         {chapter.completedPages} de {chapter.pages.length} páginas
                       </span>
