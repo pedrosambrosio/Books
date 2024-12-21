@@ -32,7 +32,11 @@ export const TextSelectionTooltip = ({
   }, [position]);
 
   const handleAddTag = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+
     if (!tagName.trim()) {
       setIsAddingTag(false);
       return;
@@ -66,6 +70,11 @@ export const TextSelectionTooltip = ({
     setIsAddingTag(true);
   };
 
+  const handleInputClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
   return (
     <div
       className="fixed z-50 bg-white rounded-lg shadow-lg border border-gray-200 py-2 px-3 animate-scale-in flex gap-2 items-center transition-transform duration-15"
@@ -78,7 +87,7 @@ export const TextSelectionTooltip = ({
       onClick={(e) => e.stopPropagation()}
     >
       {isAddingTag ? (
-        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-2" onClick={handleInputClick}>
           <div className="relative">
             <Input
               value={tagName}
@@ -94,7 +103,7 @@ export const TextSelectionTooltip = ({
                   setTagName("");
                 }
               }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={handleInputClick}
             />
             <Button
               variant="ghost"
