@@ -23,7 +23,6 @@ export interface Chapter {
 export interface Book {
   id: string;
   title: string;
-  description?: string;
   type?: string;
   chapters: Chapter[];
   completedChapters: number;

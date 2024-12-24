@@ -39,7 +39,6 @@ interface AppSidebarProps {
   tags?: { name: string; count: number }[];
   chapterLevels?: { [chapterId: string]: QuizResult };
   onViewChange?: (view: 'books' | 'tags' | 'library') => void;
-  children?: React.ReactNode;
 }
 
 export function AppSidebar({ 
@@ -48,8 +47,7 @@ export function AppSidebar({
   noteCounts, 
   tags = [],
   chapterLevels = {},
-  onViewChange,
-  children
+  onViewChange
 }: AppSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
@@ -249,7 +247,6 @@ export function AppSidebar({
               </div>
             </div>
           </div>
-          {children}
         </ScrollArea>
       </SidebarContent>
     </Sidebar>
