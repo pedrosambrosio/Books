@@ -11,6 +11,17 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { FolderTree } from "@/components/folders/FolderTree";
 import { Folder, Material } from "@/types/Folder";
 import { Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { ContentViewer } from "@/components/ContentViewer";
+import { TagPanel } from "@/components/TagPanel";
+import { LibraryPanel } from "@/components/LibraryPanel";
+import { MobileMenu } from "@/components/mobile/MobileMenu";
+import { MobileChatView } from "@/components/mobile/MobileChatView";
+import { BIBLE_BOOK } from "@/data/mockData";
+import { GENESIS_CONTENT } from "@/data/bibleContent";
+import { ViewType, TabType, MobileViewType } from "@/types/ViewTypes";
+import { QuizResult } from "@/types/Quiz";
 
 // Mock data for demonstration
 const MOCK_FOLDERS: Folder[] = [
