@@ -383,7 +383,14 @@ const Index = () => {
           renderMobileContent()
         ) : (
           <>
-            <AppSidebar>
+            <AppSidebar
+              currentBook={currentBibleBook}
+              onPageSelect={handlePageSelect}
+              noteCounts={getNoteCounts()}
+              tags={sidebarTags}
+              chapterLevels={chapterLevels}
+              onViewChange={setCurrentView}
+            >
               <FolderTree
                 folders={MOCK_FOLDERS}
                 materials={MOCK_MATERIALS}

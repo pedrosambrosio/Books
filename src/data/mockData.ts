@@ -10,9 +10,9 @@ export const BIBLE_BOOK: Book = {
       number: 1,
       title: "Creation",
       pages: [
-        { id: "1", number: 1, completed: false },
-        { id: "2", number: 2, completed: false },
-        { id: "3", number: 3, completed: false }
+        { id: "1", number: 1, title: "Page 1", completed: false },
+        { id: "2", number: 2, title: "Page 2", completed: false },
+        { id: "3", number: 3, title: "Page 3", completed: false }
       ],
       completedPages: 0
     }
