@@ -8,58 +8,46 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Star, ArrowLeft, ArrowRight, Check, Sparkles, Book, MessageSquare } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Book as BookType } from "@/types/Book";
-import { GENESIS_CONTENT } from "@/data/bibleContent";
-import { cn } from "@/lib/utils";
-import { QuizDialog } from "@/components/quiz/QuizDialog";
-import { CHAPTER_QUIZZES } from "@/data/quizQuestions";
-import { QuizResult } from "@/types/Quiz";
-import { ContentViewer } from "@/components/ContentViewer";
-import { TagPanel } from "@/components/TagPanel";
-import { LibraryPanel } from "@/components/LibraryPanel";
-import { MobileNavigation } from "@/components/mobile/MobileNavigation";
-import { MobileChatView } from "@/components/mobile/MobileChatView";
-import { MobileMenu } from "@/components/mobile/MobileMenu";
+import { FolderTree } from "@/components/folders/FolderTree";
+import { Folder, Material } from "@/types/Folder";
+import { Sparkles } from "lucide-react";
 
-// Define view and tab types
-type ViewType = 'books' | 'tags' | 'library';
-type TabType = 'personal' | 'chat';
-type MobileViewType = 'bible' | 'chat';
+// Mock data for demonstration
+const MOCK_FOLDERS: Folder[] = [
+  {
+    id: "1",
+    name: "Onboarding",
+    description: "Materiais de onboarding",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    id: "2",
+    name: "Treinamentos Técnicos",
+    description: "Materiais técnicos",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  }
+];
 
-const BIBLE_BOOK: BookType = {
-  id: "bible",
-  title: "Bíblia",
-  type: "bible",
-  chapters: [
-    {
-      id: "genesis",
-      number: 1,
-      title: "Genesis",
-      pages: Array.from({ length: 3 }, (_, i) => ({
-        id: `genesis-${i+1}`,
-        number: i + 1,
-        title: `Página ${i + 1}`,
-        completed: false
-      })),
-      completedPages: 0,
-    },
-    {
-      id: "exodus",
-      number: 2,
-      title: "Exodus",
-      pages: Array.from({ length: 2 }, (_, i) => ({
-        id: `exodus-${i+1}`,
-        number: i + 1,
-        title: `Página ${i + 1}`,
-        completed: false
-      })),
-      completedPages: 0,
-    }
-  ],
-  completedChapters: 0,
-};
+const MOCK_MATERIALS: Material[] = [
+  {
+    id: "1",
+    title: "Guia de Boas-vindas",
+    type: "pdf",
+    folderId: "1",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    id: "2",
+    title: "Políticas da Empresa",
+    type: "doc",
+    folderId: "1",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  }
+];
 
 const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -78,6 +66,8 @@ const Index = () => {
   const [currentView, setCurrentView] = useState<ViewType>('books');
   const [currentTab, setCurrentTab] = useState<TabType>('personal');
   const [mobileView, setMobileView] = useState<MobileViewType>('bible');
+  const [selectedFolder, setSelectedFolder] = useState<string>();
+  const [selectedMaterial, setSelectedMaterial] = useState<Material>();
 
   const handleCreateTask = (newTask: Omit<Task, "id" | "completed" | "inProgress" | "isPaused">) => {
     const task: Task = {
@@ -289,6 +279,15 @@ const Index = () => {
     document.querySelector('.create-task-form')?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const handleFolderSelect = (folderId: string) => {
+    setSelectedFolder(folderId);
+  };
+
+  const handleMaterialSelect = (material: Material) => {
+    setSelectedMaterial(material);
+    // Aqui você pode carregar o conteúdo do material
+  };
+
   // Transform tagCounts into the format expected by AppSidebar
   const sidebarTags = Object.entries(tagCounts)
     .filter(([_, count]) => count > 0)
@@ -373,95 +372,96 @@ const Index = () => {
           renderMobileContent()
         ) : (
           <>
-            <AppSidebar 
-              currentBook={currentBibleBook} 
-              onPageSelect={handlePageSelect}
-              noteCounts={getNoteCounts()}
-              tags={sidebarTags}
-              chapterLevels={chapterLevels}
-              onViewChange={setCurrentView}
-            />
+            <AppSidebar>
+              <FolderTree
+                folders={MOCK_FOLDERS}
+                materials={MOCK_MATERIALS}
+                onFolderSelect={handleFolderSelect}
+                onMaterialSelect={handleMaterialSelect}
+                selectedFolderId={selectedFolder}
+              />
+            </AppSidebar>
             
-            {currentView === 'books' ? (
-              <ResizablePanelGroup 
-                direction={isMobile ? "vertical" : "horizontal"} 
-                className="h-screen flex-1"
-              >
-                <ResizablePanel defaultSize={50} minSize={30} className="h-full">
-                  <ScrollArea className="h-full">
-                    <div className="p-4 md:p-6 flex justify-center">
-                      <div className="w-full max-w-2xl">
-                        <div className="text-center animate-fade-in mb-4">
-                          <h1 className="text-2xl md:text-3xl font-bold mb-2">Anote ou Pesquise..</h1>
-                          <p className="text-muted-foreground">
-                            Organize seu estudo e aprendizado
-                          </p>
-                        </div>
-
-                        <Tabs 
-                          defaultValue="personal" 
-                          className="w-full"
-                          value={currentTab}
-                          onValueChange={(value) => setCurrentTab(value as TabType)}
-                        >
-                          <div className="relative mb-2">
-                            <TabsList className="grid w-full grid-cols-2 h-auto">
-                              <TabsTrigger value="personal">
-                                Minhas Notas
-                              </TabsTrigger>
-                              <TabsTrigger value="chat" className="flex items-center gap-2">
-                                Chat <Sparkles className="h-4 w-4" />
-                              </TabsTrigger>
-                            </TabsList>
-                          </div>
-                          <TabsContent value="personal" className="tab-content-enter">
-                            <div className="space-y-4">
-                              <div className="create-task-form">
-                                <CreateTask 
-                                  onCreateTask={handleCreateTask} 
-                                  existingTags={allTags}
-                                  onTagCreate={handleTagCreate}
-                                  initialReference={isCreatingNoteFromSelection ? selectedTextReference : ""}
-                                  onAfterSubmit={() => {
-                                    setIsCreatingNoteFromSelection(false);
-                                    setSelectedTextReference("");
-                                  }}
-                                />
-                              </div>
-                              
-                              <div className="space-y-4">
-                                {tasks
-                                  .filter(task => task.pageNumber === currentPage)
-                                  .map((task) => (
-                                    <div key={task.id} className="animate-fade-in">
-                                      <TaskCard
-                                        task={task}
-                                        onUpdate={handleUpdateTask}
-                                        onComplete={handleCompleteTask}
-                                        onDelete={handleDeleteTask}
-                                      />
-                                    </div>
-                                  ))}
-                              </div>
-                            </div>
-                          </TabsContent>
-                          <TabsContent value="chat" className="tab-content-enter">
-                            <div className="p-6 text-center text-muted-foreground">
-                              Chat em breve...
-                            </div>
-                          </TabsContent>
-                        </Tabs>
+            <ResizablePanelGroup 
+              direction="horizontal" 
+              className="h-screen flex-1"
+            >
+              <ResizablePanel defaultSize={50} minSize={30} className="h-full">
+                <ScrollArea className="h-full">
+                  <div className="p-4 md:p-6 flex justify-center">
+                    <div className="w-full max-w-2xl">
+                      <div className="text-center animate-fade-in mb-4">
+                        <h1 className="text-2xl md:text-3xl font-bold mb-2">
+                          {selectedMaterial ? selectedMaterial.title : "Selecione um material"}
+                        </h1>
+                        <p className="text-muted-foreground">
+                          Faça anotações e organize seu aprendizado
+                        </p>
                       </div>
+
+                      <Tabs 
+                        defaultValue="personal" 
+                        className="w-full"
+                        value={currentTab}
+                        onValueChange={(value) => setCurrentTab(value as TabType)}
+                      >
+                        <TabsList className="grid w-full grid-cols-2 h-auto">
+                          <TabsTrigger value="personal">
+                            Minhas Notas
+                          </TabsTrigger>
+                          <TabsTrigger value="chat" className="flex items-center gap-2">
+                            Chat <Sparkles className="h-4 w-4" />
+                          </TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="personal" className="tab-content-enter">
+                          <div className="space-y-4">
+                            <div className="create-task-form">
+                              <CreateTask 
+                                onCreateTask={handleCreateTask} 
+                                existingTags={allTags}
+                                onTagCreate={handleTagCreate}
+                                initialReference={isCreatingNoteFromSelection ? selectedTextReference : ""}
+                                onAfterSubmit={() => {
+                                  setIsCreatingNoteFromSelection(false);
+                                  setSelectedTextReference("");
+                                }}
+                              />
+                            </div>
+                            
+                            <div className="space-y-4">
+                              {tasks
+                                .filter(task => task.pageNumber === currentPage)
+                                .map((task) => (
+                                  <div key={task.id} className="animate-fade-in">
+                                    <TaskCard
+                                      task={task}
+                                      onUpdate={handleUpdateTask}
+                                      onComplete={handleCompleteTask}
+                                      onDelete={handleDeleteTask}
+                                    />
+                                  </div>
+                                ))}
+                            </div>
+                          </div>
+                        </TabsContent>
+                        <TabsContent value="chat" className="tab-content-enter">
+                          <div className="p-6 text-center text-muted-foreground">
+                            Chat em breve...
+                          </div>
+                        </TabsContent>
+                      </Tabs>
                     </div>
-                  </ScrollArea>
-                </ResizablePanel>
-                
-                <ResizableHandle withHandle />
-                
-                <ResizablePanel defaultSize={50} minSize={30} className="h-full">
-                  <ScrollArea className="h-full">
-                    <div className="p-4 md:p-6 flex justify-center">
-                      <div className="w-full max-w-2xl">
+                  </div>
+                </ScrollArea>
+              </ResizablePanel>
+              
+              <ResizableHandle withHandle />
+              
+              <ResizablePanel defaultSize={50} minSize={30} className="h-full">
+                <ScrollArea className="h-full">
+                  <div className="p-4 md:p-6 flex justify-center">
+                    <div className="w-full max-w-2xl">
+                      {selectedMaterial ? (
                         <ContentViewer
                           content={getCurrentPageContent()}
                           currentPage={currentPage}
@@ -472,28 +472,16 @@ const Index = () => {
                           onMarkAsCompleted={handleMarkAsCompleted}
                           onCreateNoteFromSelection={handleCreateNoteFromSelection}
                         />
-                      </div>
+                      ) : (
+                        <div className="text-center text-muted-foreground">
+                          Selecione um material para começar
+                        </div>
+                      )}
                     </div>
-                  </ScrollArea>
-                </ResizablePanel>
-              </ResizablePanelGroup>
-            ) : currentView === 'tags' ? (
-              <div className="flex-1">
-                <TagPanel tags={sidebarTags} tasks={tasks} />
-              </div>
-            ) : (
-              <div className="flex-1">
-                <LibraryPanel books={[currentBibleBook]} />
-              </div>
-            )}
-
-            <QuizDialog
-              isOpen={isQuizOpen}
-              onClose={() => setIsQuizOpen(false)}
-              questions={CHAPTER_QUIZZES[0].questions}
-              chapterId="genesis"
-              onComplete={handleQuizComplete}
-            />
+                  </div>
+                </ScrollArea>
+              </ResizablePanel>
+            </ResizablePanelGroup>
           </>
         )}
       </div>
